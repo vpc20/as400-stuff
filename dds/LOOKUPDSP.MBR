@@ -1,0 +1,49 @@
+     A*%%TS  SD  20180326  100100  VPCRZKH     REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      MSGLOC(24)
+     A                                      INDARA
+     A                                      ERRSFL
+     A          R WDWSFL1                   SFL
+     A*%%TS  SD  20180323  070351  VPCRZKH     REL-V7R3M0  5770-WDS
+     A            OPT            1Y 0B  6  2VALUES(0 1)
+     A                                      EDTCDE(4)
+     A                                      CHKMSGID(CPD6A7C QCPFMSG)
+     A            LOOKUPKEY     10A  O  6  6
+     A            LOOKUPDESC    30A  O  6 23
+     A          R WDWCTL1                   SFLCTL(WDWSFL1)
+     A*%%TS  SD  20180326  095627  VPCRZKH     REL-V7R3M0  5770-WDS
+     A                                      CA03
+     A                                      PAGEUP
+     A                                      PAGEDOWN
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A N81                                  SFLCLR
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      WINDOW(WDWREC1)
+     A            HDRDESC       40A  O  1  7DSPATR(HI)
+     A                                  3  1'Type 1 to select'
+     A                                      COLOR(BLU)
+     A                                  3 31'Position to'
+     A            POSKEY        10A  I  3 43
+     A                                  5  1'Opt'
+     A                                      DSPATR(HI)
+     A            LOOKUPGRDS    15A  O  5  6DSPATR(HI)
+     A                                  5 23'Description'
+     A                                      DSPATR(HI)
+     A          R WDWREC1
+     A*%%TS  SD  20180326  100100  VPCRZKH     REL-V7R3M0  5770-WDS
+     A                                      WINDOW(3 12 18 52)
+     A                                      WDWBORDER((*DSPATR RI) (*CHAR '    -
+     A                                          '))
+     A  70                             16 46'More...'
+     A                                      COLOR(WHT)
+     A N70                             16 46'Bottom'
+     A                                      COLOR(WHT)
+     A                                 17  1'F3=Exit'
+     A                                      COLOR(BLU)
+     A          R DUMMY
+     A                                      ASSUME
+     A                                  1  3' '

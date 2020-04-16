@@ -1,0 +1,12 @@
+
+       9900-READ-MSGPF.
+
+           MOVE WS-MSGCODE TO MSGCODE OF MSG-REC.
+
+           READ MSGPF
+              INVALID KEY
+                 MOVE "Error message not found" TO WS-MSGDESC
+              NOT INVALID KEY
+                 MOVE MSGDESC OF MSG-REC        TO WS-MSGDESC
+           END-READ.
+

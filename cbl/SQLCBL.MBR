@@ -1,0 +1,83 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SQLCBL.
+       AUTHOR. VPC.
+
+      *===============================================================*
+      * SQL Statment                                                  *
+      *                                                               *
+      *---------------------------------------------------------------*
+      * Amendment History                                             *
+      *                                                               *
+      * Date      Pgmr  Description                                   *
+      * --------  ---   --------------------------------------------- *
+      *                                                               *
+      *===============================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT SRCPF            ASSIGN TO DATABASE-SRCPF
+                  ORGANIZATION     IS SEQUENTIAL
+                  ACCESS           IS SEQUENTIAL.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  SRCPF
+           LABEL RECORDS ARE STANDARD.
+       01  SRCPF-REC.
+           COPY DDS-ALL-FORMATS OF SRCPF.
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+       01  WS-WORK-AREAS.
+           05 WS-TEMP-STR             PIC X(80) VALUE SPACES.
+           05 I                       PIC 9(2)  VALUE ZEROES.
+           05 WS-STRPOS               PIC 9(4)  VALUE ZEROES.
+
+       LINKAGE SECTION.
+       01 SQL-STMT                   PIC X(5000).
+
+      *===============================================================*
+
+       PROCEDURE DIVISION USING SQL-STMT.
+
+       0000-MAIN.
+
+           OPEN OUTPUT SRCPF.
+
+           MOVE 1 TO WS-STRPOS.
+
+           MOVE SQL-STMT (WS-STRPOS:80) TO WS-TEMP-STR.
+           PERFORM 1000-BUILD-SQL-STMT
+              UNTIL WS-TEMP-STR = SPACES.
+
+           CLOSE SRCPF.
+           GOBACK.
+
+      *===============================================================*
+
+       1000-BUILD-SQL-STMT.
+
+           PERFORM VARYING I FROM 80 BY -1
+              UNTIL WS-TEMP-STR (I:1) = " "
+              CONTINUE
+           END-PERFORM.
+
+           MOVE SPACES TO SRCPF-REC.
+           MOVE WS-TEMP-STR (1:I) TO SRCSTMT OF SRCPF-REC.
+           WRITE SRCPF-REC.
+           COMPUTE WS-STRPOS = WS-STRPOS + I.
+           MOVE SQL-STMT (WS-STRPOS:80) TO WS-TEMP-STR.
+

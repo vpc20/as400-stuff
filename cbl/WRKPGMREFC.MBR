@@ -1,0 +1,298 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. WRKPGMREFC.
+       AUTHOR. VPC.
+
+      *===============================================================*
+      * Work with Parameter Header                                    *
+      *                                                               *
+      *---------------------------------------------------------------*
+      * Amendment History                                             *
+      *                                                               *
+      * Date      Pgmr  Description                                   *
+      * --------  ---   --------------------------------------------- *
+      *                                                               *
+      *===============================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT QADSPPGM         ASSIGN TO DATABASE-QADSPPGM
+                  ORGANIZATION     IS SEQUENTIAL.
+      *           ORGANIZATION     IS INDEXED
+      *           ACCESS           IS DYNAMIC
+      *           RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+
+           SELECT WRKPGMREFD       ASSIGN TO WORKSTATION-WRKPGMREFD-SI
+                  ORGANIZATION     IS TRANSACTION
+                  ACCESS MODE      IS DYNAMIC
+                  RELATIVE KEY     IS WS-SFL-RECNUM
+                  CONTROL-AREA     IS WS-CONTROL-AREA.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  QADSPPGM
+           LABEL RECORDS ARE STANDARD.
+       01  QADSPPGM-REC.
+           COPY DDS-ALL-FORMATS OF QADSPPGM.
+
+       FD  WRKPGMREFD
+           LABEL RECORDS ARE STANDARD.
+       01  WRKPGMREFDREC   PIC X(1920).
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+      *--- Display file records
+       01  WS-SFLREC1-I.
+           COPY DDS-SFLREC1-I OF WRKPGMREFD
+                REPLACING SFLREC1 BY SFLREC1-I.
+       01  WS-SFLREC1-O.
+           COPY DDS-SFLREC1-O OF WRKPGMREFD
+                REPLACING SFLREC1 BY SFLREC1-O.
+
+       01  WS-SFLCTL1-I.
+           COPY DDS-SFLCTL1-I OF WRKPGMREFD.
+       01  WS-SFLCTL1-O.
+           COPY DDS-SFLCTL1-O OF WRKPGMREFD.
+
+      *01  WS-FKEY1-O.
+      *    COPY DDS-FKEY1-O   OF WRKPGMREFD.
+
+      *--- Display file indicators
+       01  INDIC-AREA.
+           COPY DDS-ALL-FORMATS-INDIC OF WRKPGMREFD.
+
+      *--- Display file control area
+       01  WS-CONTROL-AREA.
+           05 FKEY-PRESSED             PIC X(2).
+              88 F0-ENTER              VALUE "00".
+              88 F3-EXIT               VALUE "03".
+
+       01  PROGRAM-SWITCHES.
+           05 END-PROGRAM-SW           PIC 9.
+              88 START-PROGRAM         VALUE 0.
+              88 END-PROGRAM           VALUE 1.
+           05 QADSPPGM-EOF-SW           PIC 9.
+              88 NOT-EOF-QADSPPGM       VALUE 0.
+              88 EOF-QADSPPGM           VALUE 1.
+           05 SFLREC-FOUND-SW          PIC 9.
+              88 SFLREC-NOT-FOUND      VALUE 0.
+              88 SFLREC-FOUND          VALUE 1.
+
+      *01  WS-QCMDEXC-PARM.
+      *    05 WS-CMD.
+      *       10 WS-CMD1               PIC X(14)
+      *          VALUE "DSPPGMREF PGM(".
+      *       10 WS-CMD-PGMNAM         PIC X(10) VALUE SPACES.
+      *       10 WS-CMD2               PIC X(36)
+      *          VALUE ") OUTPUT(*OUTFILE) OUTFILE(QADSPPGM)".
+      *    05 WS-CMD-LEN               PIC 9(10)V9(5) COMP-3 VALUE 60.
+
+       01  WS-WORK-AREAS.
+           05 WS-OPT                   PIC 9  VALUE ZEROES.
+              88 DSPPGM-OPT            VALUE 5.
+              88 WRKOBJREF-OPT         VALUE 6.
+              88 WRKOBJ-OPT            VALUE 7.
+           05 WS-SFL-RECNUM            PIC 9(4)  VALUE ZEROES.
+           05 WS-SFLSIZ                PIC 9(4)  VALUE ZEROES.
+           05 WS-SFLRCDNBR             PIC 9(4)  VALUE ZEROES.
+           05 WS-CTR                   PIC 9(4)  VALUE ZEROES.
+           05 WS-WHPNAM-PREV           PIC X(10) VALUE SPACES.
+           05 WS-OBJTEXT               PIC X(50) VALUE SPACES.
+
+      *===============================================================*
+
+       LINKAGE SECTION.
+
+       01  PGM-PARM.
+           05 PGMNAME                  PIC X(10).
+           05 LIBNAME                  PIC X(10).
+
+      *===============================================================*
+
+       PROCEDURE DIVISION USING PGM-PARM.
+
+       0000-MAIN.
+
+           PERFORM 1000-INITIAL.
+           PERFORM 2000-PROCESS UNTIL END-PROGRAM.
+           PERFORM 9000-CLEAN-UP.
+           GOBACK.
+
+      *===============================================================*
+
+       1000-INITIAL.
+
+           OPEN INPUT QADSPPGM
+                I-O   WRKPGMREFD.
+
+           INITIALIZE SFLREC1-I
+                      SFLREC1-O
+                      SFLCTL1-I
+                      SFLCTL1-O.
+      *               FKEY1-O.
+
+           SET START-PROGRAM TO TRUE.
+           PERFORM 2900-LOAD-SUBFILE.
+      *--- Clear subfile
+      *    MOVE B"0" TO IN81.
+      *    WRITE WRKPGMREFDREC
+      *       FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+      *    MOVE B"1" TO IN81.
+
+      *===============================================================*
+
+       2000-PROCESS.
+
+           WRITE WRKPGMREFDREC
+              FORMAT "FKEY1"    INDICATORS INDIC-AREA.
+           MOVE CORR SFLCTL1-I  TO SFLCTL1-O.
+           WRITE WRKPGMREFDREC  FROM SFLCTL1-O
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+           READ  WRKPGMREFD INTO SFLCTL1-I
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+
+           EVALUATE TRUE
+
+              WHEN F0-ENTER
+                 IF WHPNAM OF SFLCTL1-I NOT = WS-WHPNAM-PREV
+                    CLOSE QADSPPGM
+                    CALL "PGMREFCL1" USING WHPNAM OF SFLCTL1-I
+                    OPEN INPUT QADSPPGM
+      *             MOVE WHPNAM OF SFLCTL1-I TO WS-CMD-PGMNAM
+      *             CALL "QCMDEXC" USING WS-CMD WS-CMD-LEN
+      *             MOVE 1 TO WS-SFLRCDNBR
+                    MOVE WHPNAM OF SFLCTL1-I
+                      TO WHPNAM OF QADSPPGM-REC
+                    PERFORM 2900-LOAD-SUBFILE
+                    MOVE WHPNAM OF SFLCTL1-I TO WS-WHPNAM-PREV
+                 ELSE
+                    SET SFLREC-FOUND  TO TRUE
+                    MOVE ZEROES TO WS-SFL-RECNUM
+                    PERFORM 3000-PROCESS-SUBFILE
+                       UNTIL SFLREC-NOT-FOUND
+      *             PERFORM 2860-READ-FIRST-SFLREC
+      *             PERFORM 2900-LOAD-SUBFILE
+                 END-IF
+
+              WHEN F3-EXIT
+                 SET END-PROGRAM TO TRUE
+
+           END-EVALUATE.
+
+      *===============================================================*
+      *
+      *2860-READ-FIRST-SFLREC.
+      *
+      *    MOVE 1 TO WS-SFL-RECNUM.
+      *    READ SUBFILE WRKPGMREFD INTO SFLREC1-O
+      *       FORMAT "SFLREC1"  INDICATORS INDIC-AREA.
+      *    MOVE PARMCODE OF SFLREC1-O
+      *      TO PARMCODE OF QADSPPGM-REC.
+      *
+      *===============================================================*
+
+       2900-LOAD-SUBFILE.
+
+      *    MOVE WS-SFLRCDNBR TO SFLRCDNBR OF SFLCTL1-I.
+
+      *--- Clear subfile
+           MOVE B"0" TO IN81.
+           WRITE WRKPGMREFDREC
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+           MOVE B"1" TO IN81.
+
+      *--- Load subfile
+           MOVE ZEROES TO WS-SFL-RECNUM.
+           MOVE B"0" TO IN80.
+           SET NOT-EOF-QADSPPGM TO TRUE.
+
+      *    START QADSPPGM
+      *       KEY >= EXTERNALLY-DESCRIBED-KEY
+      *       INVALID KEY
+      *          SET EOF-QADSPPGM TO TRUE
+      *    END-START.
+
+           PERFORM UNTIL EOF-QADSPPGM
+              READ QADSPPGM NEXT RECORD
+                 AT END
+                    SET EOF-QADSPPGM TO TRUE
+              END-READ
+              IF NOT-EOF-QADSPPGM
+              AND WHFNAM OF QWHDRPPR      NOT = SPACES
+              AND WHFNAM OF QWHDRPPR(1:1) NOT = "&"
+              AND WHLNAM OF QWHDRPPR NOT = "QTEMP"
+                  INITIALIZE SFLREC1-O
+                  ADD 1 TO WS-SFL-RECNUM
+                  MOVE CORR QWHDRPPR TO SFLREC1-O
+                  MOVE SPACES TO WS-OBJTEXT
+                  IF WHLNAM OF QWHDRPPR = SPACES
+                     MOVE "*LIBL" TO WHLNAM OF QWHDRPPR
+                  END-IF
+                  CALL "GETOBJTEXT" USING WHLNAM OF QWHDRPPR
+                                          WHFNAM OF QWHDRPPR
+                                          WHOTYP OF QWHDRPPR
+                                          WS-OBJTEXT
+                  MOVE WS-OBJTEXT TO OBJTEXT OF SFLREC1-O
+                  WRITE SUBFILE WRKPGMREFDREC FROM SFLREC1-O
+                     FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+                     INVALID KEY CONTINUE
+                  END-WRITE
+              END-IF
+           END-PERFORM.
+
+      *--- Turn on SFLDSP indicator if subfile record is created
+           IF WS-SFL-RECNUM > 0
+              MOVE B"1" TO IN80
+           END-IF.
+
+      *===============================================================*
+
+       3000-PROCESS-SUBFILE.
+
+           ADD 1 TO WS-SFL-RECNUM.
+           READ SUBFILE WRKPGMREFD INTO SFLREC1-O
+              FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+              INVALID KEY
+                 SET SFLREC-NOT-FOUND TO TRUE
+           END-READ.
+
+           IF SFLREC-FOUND
+              IF OPT OF SFLREC1-O NOT = SPACES
+                 MOVE OPT OF SFLREC1-O TO WS-OPT
+                 EVALUATE TRUE
+                    WHEN DSPPGM-OPT
+                       CONTINUE
+                    WHEN WRKOBJREF-OPT
+                       CONTINUE
+                    WHEN WRKOBJ-OPT
+                       CONTINUE
+                 END-EVALUATE
+      *          MOVE WS-SFL-RECNUM TO WS-SFLRCDNBR
+              END-IF
+
+              MOVE SPACES TO OPT OF SFLREC1-O
+              REWRITE SUBFILE WRKPGMREFDREC FROM SFLREC1-O
+                 FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+                 INVALID KEY CONTINUE
+              END-REWRITE
+           END-IF.
+
+      *===============================================================*
+
+       9000-CLEAN-UP.
+
+           CLOSE QADSPPGM
+                 WRKPGMREFD.
+

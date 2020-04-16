@@ -1,0 +1,355 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. LOOKUPCBL.
+       AUTHOR. VPC.
+
+      *===============================================================*
+      * Lookup program                                                *
+      *                                                               *
+      *---------------------------------------------------------------*
+      * Amendment History                                             *
+      *                                                               *
+      * Date      Pgmr  Description                                   *
+      * --------  ---   --------------------------------------------- *
+      *                                                               *
+      *===============================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT LOOKUPPF         ASSIGN TO DATABASE-LOOKUPPF
+                  ORGANIZATION     IS INDEXED
+                  ACCESS           IS DYNAMIC
+                  RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+
+           SELECT LOOKUPGRPF       ASSIGN TO DATABASE-LOOKUPGRPF
+                  ORGANIZATION     IS INDEXED
+                  ACCESS           IS DYNAMIC
+                  RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+
+           COPY MSGFC.
+
+           SELECT LOOKUPDSP        ASSIGN TO WORKSTATION-LOOKUPDSP-SI
+                  ORGANIZATION     IS TRANSACTION
+                  ACCESS MODE      IS DYNAMIC
+                  RELATIVE KEY     IS WS-SFL-RECNUM
+                  CONTROL-AREA     IS WS-CONTROL-AREA.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  LOOKUPPF
+           LABEL RECORDS ARE STANDARD.
+       01  LOOKUP-REC.
+           COPY DDS-ALL-FORMATS OF LOOKUPPF.
+
+       FD  LOOKUPGRPF
+           LABEL RECORDS ARE STANDARD.
+       01  LOOKUPGR-REC.
+           COPY DDS-ALL-FORMATS OF LOOKUPGRPF.
+
+           COPY MSGFD.
+
+       FD  LOOKUPDSP
+           LABEL RECORDS ARE STANDARD.
+       01  LOOKUPDSPREC   PIC X(1920).
+
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+      *--- Display file records
+       01  WS-WDWSFL1-I.
+           COPY DDS-WDWSFL1-I OF LOOKUPDSP
+                REPLACING WDWSFL1 BY WDWSFL1-I.
+       01  WS-WDWSFL1-O.
+           COPY DDS-WDWSFL1-O OF LOOKUPDSP
+                REPLACING WDWSFL1 BY WDWSFL1-O.
+
+       01  WS-WDWCTL1-I.
+           COPY DDS-WDWCTL1-I OF LOOKUPDSP.
+       01  WS-WDWCTL1-O.
+           COPY DDS-WDWCTL1-O OF LOOKUPDSP.
+
+      *--- Display file indicators
+       01  INDIC-AREA.
+           COPY DDS-ALL-FORMATS-INDIC OF LOOKUPDSP.
+
+      *--- Display file control area
+       01  WS-CONTROL-AREA.
+           05 FKEY-PRESSED             PIC X(2).
+              88 F0-ENTER              VALUE "00".
+              88 F3-EXIT               VALUE "03".
+              88 F90-PAGEDOWN          VALUE "90".
+              88 F91-PAGEUP            VALUE "91".
+
+       01  PROGRAM-SWITCHES.
+           05 END-PROGRAM-SW           PIC 9.
+              88 START-PROGRAM         VALUE 0.
+              88 END-PROGRAM           VALUE 1.
+           05 LOOKUPPF-EOF-SW         PIC 9.
+              88 NOT-EOF-LOOKUPPF     VALUE 0.
+              88 EOF-LOOKUPPF         VALUE 1.
+           05 SFLREC-FOUND-SW          PIC 9.
+              88 SFLREC-NOT-FOUND      VALUE 0.
+              88 SFLREC-FOUND          VALUE 1.
+
+       01  WS-WORK-AREAS.
+           05 WS-SFL-RECNUM            PIC 9(4)  VALUE ZEROES.
+           05 WS-SFLSIZ                PIC 9(4)  VALUE ZEROES.
+           05 WS-CTR                   PIC 9(4)  VALUE ZEROES.
+           05 WS-SV-LOOKUPKEY          PIC X(10) VALUE SPACES.
+
+           COPY MSGVAR.
+
+      *===============================================================*
+
+       LINKAGE SECTION.
+       01  PARM-LOOKUP.
+           05 PARM-LOOKUPGRP               PIC X(10).
+           05 PARM-LOOKUPKEY               PIC X(10).
+           05 PARM-LOOKUPDESC              PIC X(30).
+
+      *===============================================================*
+
+       PROCEDURE DIVISION USING PARM-LOOKUP.
+
+       0000-MAIN.
+
+           PERFORM 1000-INITIAL.
+           PERFORM 2000-PROCESS UNTIL END-PROGRAM.
+           PERFORM 9000-CLEAN-UP.
+           GOBACK.
+
+      *===============================================================*
+
+       1000-INITIAL.
+
+           OPEN INPUT LOOKUPPF
+                      LOOKUPGRPF
+                      MSGPF
+                I-O   LOOKUPDSP.
+
+           INITIALIZE WDWSFL1-I
+                      WDWSFL1-O
+                      WDWCTL1-I
+                      WDWCTL1-O.
+
+           MOVE PARM-LOOKUPGRP TO LOOKUPGRP OF LOOKUPGR-REC.
+           READ LOOKUPGRPF
+              INVALID KEY
+                 CONTINUE
+              NOT INVALID KEY
+                 MOVE LOOKUPGRDS OF LOOKUPGR-REC
+                   TO HDRDESC     OF WDWCTL1-O
+                      LOOKUPGRDS  OF WDWCTL1-O
+           END-READ.
+
+           MOVE 10 TO WS-SFLSIZ.
+
+           SET START-PROGRAM TO TRUE.
+           MOVE PARM-LOOKUPGRP TO LOOKUPGRP OF LOOKUP-REC.
+           PERFORM 2900-LOAD-SUBFILE.
+
+      *===============================================================*
+
+       2000-PROCESS.
+
+           WRITE LOOKUPDSPREC
+              FORMAT "WDWREC1"  INDICATORS INDIC-AREA.
+           WRITE LOOKUPDSPREC  FROM WDWCTL1-O
+              FORMAT "WDWCTL1"  INDICATORS INDIC-AREA.
+           READ  LOOKUPDSP INTO WDWCTL1-I
+              FORMAT "WDWCTL1"  INDICATORS INDIC-AREA.
+
+           EVALUATE TRUE
+              WHEN F0-ENTER
+                 IF POSKEY OF WDWCTL1-I NOT = SPACES
+                    MOVE PARM-LOOKUPGRP TO LOOKUPGRP OF LOOKUP-REC
+                    MOVE POSKEY  OF WDWCTL1-I TO LOOKUPKEY OF LOOKUP-REC
+                    PERFORM 2900-LOAD-SUBFILE
+                 ELSE
+                    SET SFLREC-FOUND  TO TRUE
+                    MOVE ZEROES TO WS-SFL-RECNUM
+                    PERFORM 3000-PROCESS-SUBFILE
+                       UNTIL SFLREC-NOT-FOUND
+                 END-IF
+
+              WHEN F3-EXIT
+                 SET END-PROGRAM TO TRUE
+
+              WHEN F90-PAGEDOWN
+                 PERFORM 2800-PAGEDOWN
+
+              WHEN F91-PAGEUP
+                 IF WS-SFL-RECNUM > 0
+                    PERFORM 2850-PAGEUP
+                 END-IF
+
+           END-EVALUATE.
+
+      *===============================================================*
+
+       2800-PAGEDOWN.
+
+           IF IN70 = B"1"
+              PERFORM 2900-LOAD-SUBFILE
+           END-IF.
+
+      *===============================================================*
+
+       2850-PAGEUP.
+
+           MOVE ZEROES TO WS-CTR.
+           SET NOT-EOF-LOOKUPPF TO TRUE.
+
+           PERFORM 2860-READ-FIRST-SFLREC.
+           START LOOKUPPF
+              KEY >= EXTERNALLY-DESCRIBED-KEY
+              INVALID KEY
+                 SET EOF-LOOKUPPF TO TRUE
+           END-START.
+
+           PERFORM UNTIL EOF-LOOKUPPF OR WS-CTR = WS-SFLSIZ
+              READ LOOKUPPF PRIOR RECORD
+                 AT END
+                    SET EOF-LOOKUPPF TO TRUE
+                    INITIALIZE LOOKUPREC
+                 NOT AT END
+                    IF LOOKUPGRP OF LOOKUP-REC NOT = PARM-LOOKUPGRP
+                       SET EOF-LOOKUPPF TO TRUE
+                    ELSE
+                       MOVE LOOKUPKEY OF LOOKUP-REC TO WS-SV-LOOKUPKEY
+                    END-IF
+              END-READ
+              IF NOT-EOF-LOOKUPPF
+                 ADD 1 TO WS-CTR
+              END-IF
+           END-PERFORM.
+
+           MOVE PARM-LOOKUPGRP  TO LOOKUPGRP OF LOOKUP-REC.
+           MOVE WS-SV-LOOKUPKEY TO LOOKUPKEY OF LOOKUP-REC.
+           PERFORM 2900-LOAD-SUBFILE.
+
+      *===============================================================*
+
+       2860-READ-FIRST-SFLREC.
+
+           MOVE 1 TO WS-SFL-RECNUM.
+           READ SUBFILE LOOKUPDSP INTO WDWSFL1-O
+              FORMAT "WDWSFL1"  INDICATORS INDIC-AREA.
+           MOVE PARM-LOOKUPGRP         TO LOOKUPGRP OF LOOKUP-REC.
+           MOVE LOOKUPKEY OF WDWSFL1-O TO LOOKUPKEY OF LOOKUP-REC.
+
+      *===============================================================*
+
+       2900-LOAD-SUBFILE.
+
+           MOVE B"1" TO IN70.
+
+      *--- Clear subfile
+           WRITE LOOKUPDSPREC
+              FORMAT "WDWREC1"  INDICATORS INDIC-AREA.
+           MOVE B"0" TO IN81.
+           WRITE LOOKUPDSPREC
+              FORMAT "WDWCTL1"  INDICATORS INDIC-AREA.
+           MOVE B"1" TO IN81.
+
+      *--- Load subfile
+           MOVE ZEROES TO WS-SFL-RECNUM.
+           MOVE B"0" TO IN80.
+           SET NOT-EOF-LOOKUPPF TO TRUE.
+
+           START LOOKUPPF
+              KEY >= EXTERNALLY-DESCRIBED-KEY
+              INVALID KEY
+                 READ LOOKUPPF LAST  RECORD
+                    AT END
+                       SET EOF-LOOKUPPF TO TRUE
+                    NOT AT END
+                       READ LOOKUPPF PRIOR RECORD
+                          AT END
+                             MOVE SPACES TO LOOKUPKEY OF LOOKUP-REC
+                             START LOOKUPPF
+                                KEY >= EXTERNALLY-DESCRIBED-KEY
+                       END-READ
+                 END-READ
+           END-START.
+
+           PERFORM UNTIL EOF-LOOKUPPF OR WS-SFL-RECNUM = WS-SFLSIZ
+              READ LOOKUPPF NEXT RECORD
+                 AT END
+                    SET EOF-LOOKUPPF TO TRUE
+              END-READ
+              IF NOT-EOF-LOOKUPPF
+                 IF LOOKUPGRP OF LOOKUP-REC = PARM-LOOKUPGRP
+                    INITIALIZE WDWSFL1-O
+                    ADD 1 TO WS-SFL-RECNUM
+                    MOVE CORR LOOKUPREC TO WDWSFL1-O
+                    WRITE SUBFILE LOOKUPDSPREC FROM WDWSFL1-O
+                       FORMAT "WDWSFL1"  INDICATORS INDIC-AREA
+                 ELSE
+                    SET EOF-LOOKUPPF TO TRUE
+                 END-IF
+              END-IF
+           END-PERFORM.
+
+      *--- Check if there are more records
+      *--- IN70 is on  - display 'More...'
+      *--- IN70 is off - display 'Bottom'
+           IF NOT-EOF-LOOKUPPF
+              READ LOOKUPPF NEXT RECORD
+                 AT END
+                    MOVE B"0" TO IN70
+                 NOT AT END
+                    MOVE B"1" TO IN70
+              END-READ
+           ELSE
+              MOVE B"0" TO IN70
+           END-IF.
+
+      *--- Turn on SFLDSP indicator if subfile record is created
+           IF WS-SFL-RECNUM > 0
+              MOVE B"1" TO IN80
+           END-IF.
+
+      *===============================================================*
+
+       3000-PROCESS-SUBFILE.
+
+           ADD 1 TO WS-SFL-RECNUM.
+           READ SUBFILE LOOKUPDSP INTO WDWSFL1-O
+              FORMAT "WDWSFL1"  INDICATORS INDIC-AREA
+              INVALID KEY
+                 SET SFLREC-NOT-FOUND TO TRUE
+           END-READ.
+
+           IF SFLREC-FOUND
+              IF OPT OF WDWSFL1-O NOT = ZEROES
+                 MOVE LOOKUPKEY  OF WDWSFL1-O TO PARM-LOOKUPKEY
+                 MOVE LOOKUPDESC OF WDWSFL1-O TO PARM-LOOKUPDESC
+                 SET SFLREC-NOT-FOUND TO TRUE
+                 SET END-PROGRAM      TO TRUE
+              END-IF
+           END-IF.
+
+      *===============================================================*
+
+       9000-CLEAN-UP.
+
+           CLOSE LOOKUPPF
+                 LOOKUPGRPF
+                 MSGPF
+                 LOOKUPDSP.
+
+           COPY MSGRTN.
+

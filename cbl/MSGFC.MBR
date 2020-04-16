@@ -1,0 +1,6 @@
+
+           SELECT MSGPF            ASSIGN TO DATABASE-MSGPF
+                  ORGANIZATION     IS INDEXED
+                  ACCESS           IS DYNAMIC
+                  RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+

@@ -1,0 +1,6 @@
+
+       FD  MSGPF
+           LABEL RECORDS ARE STANDARD.
+       01  MSG-REC.
+           COPY DDS-ALL-FORMATS OF MSGPF.
+

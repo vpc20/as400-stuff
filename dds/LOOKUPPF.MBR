@@ -1,0 +1,7 @@
+                                            UNIQUE
+                R LOOKUPREC
+                  LOOKUPGRP     10A
+                  LOOKUPKEY     10A
+                  LOOKUPDESC    30A
+                K LOOKUPGRP
+                K LOOKUPKEY

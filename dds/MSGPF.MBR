@@ -1,0 +1,5 @@
+                                            UNIQUE
+                R MSGREC
+                  MSGCODE        5A
+                  MSGDESC       60A
+                K MSGCODE

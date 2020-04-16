@@ -1,0 +1,5 @@
+                                            UNIQUE
+                R LOOKUPGREC
+                  LOOKUPGRP     10A
+                  LOOKUPGRDS    30A
+                K LOOKUPGRP
