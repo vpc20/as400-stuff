@@ -1,0 +1,13 @@
+     A* PHYSICAL FILE DDS FOR PERSONNEL FILE
+     A
+     A                                      UNIQUE
+     A          R PERSREC
+     A            EMPLNO         6S
+     A            NAME          30
+     A            ADDRESS1      35
+     A            ADDRESS2      20
+     A            BIRTHDATE      6
+     A            MARSTAT        1
+     A            SPOUSENAME    30
+     A            NUMCHILD       2S
+     A          K EMPLNO

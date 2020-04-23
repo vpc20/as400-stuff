@@ -1,0 +1,101 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.     FRMTFILE.
+
+      *-----------------------------------------------------------------
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-ISERIES.
+       OBJECT-COMPUTER. IBM-ISERIES.
+
+      *-----------------------------------------------------------------
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT PERSFILE ASSIGN TO DATABASE-PERSFILE
+              ORGANIZATION IS INDEXED
+              ACCESS MODE  IS SEQUENTIAL
+              RECORD IS EXTERNALLY-DESCRIBED-KEY.
+
+           SELECT PERSREPT ASSIGN TO FORMATFILE-PERSREPT-SI
+               ORGANIZATION IS SEQUENTIAL.
+
+      *-----------------------------------------------------------------
+       DATA DIVISION.
+       FILE SECTION.
+
+       FD  PERSREPT.
+       01  PERSREPT-REC                  PIC X(200).
+
+       FD  PERSFILE.
+       01  PERSFILE-REC.
+           COPY DDS-ALL-FORMATS-O OF PERSFILE.
+
+      *-----------------------------------------------------------------
+       WORKING-STORAGE SECTION.
+       77  HEAD-ORDER                    PIC X(15)
+                                          VALUE "EMPLOYEE NUMBER".
+       01  HEADING-REC.
+           COPY DDS-HEADING-O OF PERSREPT.
+
+       01  DETAIL-REC.
+           COPY DDS-DETAIL-O OF PERSREPT.
+
+       01  PERSREPT-INDICS.
+           COPY DDS-ALL-FORMATS-O-INDIC OF PERSREPT.
+
+       77  EOF-FLAG                      PIC 9  VALUE 0.
+           88  NOT-END-OF-FILE           VALUE 0.
+           88  END-OF-FILE               VALUE 1.
+       77  MARRIED                       PIC X(1)
+                                         VALUE "M".
+
+      *-----------------------------------------------------------------
+       PROCEDURE DIVISION.
+       0000-MAIN.
+           PERFORM 1000-INITIAL.
+           PERFORM 2000-PROCESS UNTIL END-OF-FILE.
+           PERFORM 9900-FINAL.
+
+      *-----------------------------------------------------------------
+       1000-INITIAL.
+           OPEN INPUT  PERSFILE
+                OUTPUT PERSREPT.
+           INITIALIZE HEADING-O DETAIL-O.
+           PERFORM 9000-PRINT-HDR.
+
+           READ PERSFILE
+              AT END
+                 SET END-OF-FILE TO TRUE
+           END-READ.
+
+      *-----------------------------------------------------------------
+       2000-PROCESS.
+           MOVE CORR PERSREC TO DETAIL-O.
+           IF MARSTAT IN PERSFILE-REC = MARRIED
+               MOVE B"1" TO IN01 IN DETAIL-O-INDIC
+           ELSE
+               MOVE B"0" TO IN01 IN DETAIL-O-INDIC
+           END-IF
+
+           WRITE PERSREPT-REC FROM DETAIL-REC FORMAT IS "DETAIL"
+               INDICATORS ARE DETAIL-O-INDIC
+               AT EOP
+                  PERFORM 9000-PRINT-HDR
+           END-WRITE.
+
+           READ PERSFILE
+              AT END
+                 SET END-OF-FILE TO TRUE
+           END-READ.
+
+      *-----------------------------------------------------------------
+       9000-PRINT-HDR.
+           MOVE HEAD-ORDER TO ORDERTYPE.
+           WRITE PERSREPT-REC FROM HEADING-REC FORMAT IS "HEADING".
+
+
+      *-----------------------------------------------------------------
+       9900-FINAL.
+           CLOSE PERSFILE
+                 PERSREPT.
+           STOP RUN.
