@@ -1,0 +1,6 @@
+                                            UNIQUE
+                R CONFREC
+                  CONFKEY       10A
+                  CONFVAL       30A
+                K CONFKEY
+                K CONFVAL
