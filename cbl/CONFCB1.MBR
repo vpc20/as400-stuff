@@ -129,6 +129,7 @@
            05 WS-SFLRCDNBR             PIC 9(4)  VALUE ZEROES.
            05 WS-CTR                   PIC 9(4)  VALUE ZEROES.
            05 WS-LAST-MAINT-MODE       PIC X     VALUE SPACES.
+      *    05 WS-LAST-CONFREC          LIKE CONF-REC.
 
            COPY MSGVAR.
 
@@ -426,6 +427,9 @@
                     WHEN UPDATE-OPTION
                        CONTINUE
                     WHEN DELETE-OPTION
+      *                READ CONFPF LAST RECORD
+      *                MOVE CONFREC TO WS-LAST-CONFREC
+
                        MOVE '00006' TO WS-MSGCODE
                        PERFORM 9900-READ-MSGPF
                        MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
@@ -435,6 +439,8 @@
                        SET ENTER-DTL1 TO TRUE
                        MOVE B'1' TO IN51 IN52
                        PERFORM 3100-CONF-DTL UNTIL EXIT-DTL1
+
+      *                IF  CONFREC = WS-LAST-SFLRECNUM
                     WHEN INQUIRE-OPTION
                        MOVE CORR SFLREC1-O TO CONFREC
                        READ CONFPF
@@ -443,7 +449,11 @@
                        MOVE B'1' TO IN51 IN52
                        PERFORM 3100-CONF-DTL UNTIL EXIT-DTL1
                  END-EVALUATE
-                 MOVE WS-SFLRECNUM TO WS-SFLRCDNBR
+                 IF WS-MSGCODE = '00005'
+                    MOVE 1 TO WS-SFLRCDNBR
+                 ELSE
+                    MOVE WS-SFLRECNUM TO WS-SFLRCDNBR
+                 END-IF
               END-IF
 
               MOVE ZEROES TO OPT OF SFLREC1-O
@@ -461,7 +471,8 @@
            READ  CONFDS1 INTO DTL1-I
               FORMAT "DTL1" INDICATORS INDIC-AREA.
            MOVE B'0' TO IN01 IN02.
-           MOVE SPACES TO MSGDESC OF DTL1-O.
+           MOVE SPACES TO MSGDESC OF DTL1-O
+                          WS-MSGCODE.
 
            EVALUATE TRUE
               WHEN F0-ENTER
