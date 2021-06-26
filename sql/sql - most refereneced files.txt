@@ -1,0 +1,28 @@
+
+DSPPGMREF PGM(VPCRZKH1/*ALL)        
+          OUTPUT(*OUTFILE)          
+          OBJTYPE(*ALL)             
+          OUTFILE(QTEMP/TMPPGMREF)  
+CPYF FROMFILE(QTEMP/TMPPGMREF)      
+     TOFILE(QTEMP/PGMREFPF)         
+     MBROPT(*REPLACE)               
+     CRTFILE(*YES)                  
+     INCREL((*IF WHFNAM *NL 'A'))   
+     ERRLVL(*NOMAX)                 
+
+DSPDBR FILE(VPCRZKH1/*ALL) OUTPUT(*OUTFILE) OUTFILE(QTEMP/DBRPF)
+
+// update the lf names to pf names
+update qtemp/pgmref p                                            
+set p.whfnam = coalesce((select whrfi from dbrpf                
+                         where p.whfnam = whrefi), p.whfnam)    
+93 rows updated in PGMREF in QTEMP.                              
+
+with t1 as (SELECT whfnam, count(*) ctr                          
+            FROM qtemp/pgmref                                    
+            WHERE WHOBJT = 'F'                                   
+            GROUP BY whfnam                                      
+            ORDER BY whfnam)                                     
+select * from t1                                                 
+order by ctr desc, whfnam                                        
+                                   

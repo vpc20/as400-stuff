@@ -278,15 +278,20 @@
                     AT END
                        SET EOF-PGMREFPF TO TRUE
                     NOT AT END
-                       IF WHFNAM OF PGMREFPF-REC = WHFNAM OF SFLCTL1-I
-                          READ PGMREFPF PRIOR RECORD
-                             AT END
-                               MOVE SPACES TO WHFNAM OF PGMREFPF-REC
-                               START PGMREFPF
-                                  KEY >= EXTERNALLY-DESCRIBED-KEY
-                          END-READ
-                       ELSE
-                          SET EOF-PGMREFPF TO TRUE
+                       IF WHFNAM OF SFLCTL1-I NOT = SPACES
+                          IF WHFNAM OF PGMREFPF-REC =
+                             WHFNAM OF SFLCTL1-I
+                             READ PGMREFPF PRIOR RECORD
+                          ELSE
+                             READ PGMREFPF PRIOR RECORD
+                             READ PGMREFPF PRIOR RECORD
+                                AT END
+                                  MOVE SPACES TO WHFNAM OF PGMREFPF-REC
+                                  MOVE SPACES TO WHPNAM OF PGMREFPF-REC
+                                  START PGMREFPF
+                                     KEY >= EXTERNALLY-DESCRIBED-KEY
+                             END-READ
+                          END-IF
                        END-IF
                  END-READ
            END-START.
@@ -317,7 +322,11 @@
                  AT END
                     MOVE B"0" TO IN70
                  NOT AT END
-                    MOVE B"1" TO IN70
+                    IF WHFNAM OF PGMREFPF-REC = WHFNAM OF SFLCTL1-I
+                       MOVE B"1" TO IN70
+                    ELSE
+                       MOVE B"0" TO IN70
+                    END-IF
               END-READ
            ELSE
               MOVE B"0" TO IN70
