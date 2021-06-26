@@ -3,14 +3,19 @@ DSPPGMREF PGM(VPCRZKH1/*ALL)
           OUTPUT(*OUTFILE)          
           OBJTYPE(*ALL)             
           OUTFILE(QTEMP/TMPPGMREF)  
-CPYF FROMFILE(QTEMP/TMPPGMREF)      
-     TOFILE(QTEMP/PGMREFPF)         
-     MBROPT(*REPLACE)               
-     CRTFILE(*YES)                  
-     INCREL((*IF WHFNAM *NL 'A'))   
-     ERRLVL(*NOMAX)                 
 
-DSPDBR FILE(VPCRZKH1/*ALL) OUTPUT(*OUTFILE) OUTFILE(QTEMP/DBRPF)
+DSPFD FILE(VPCRZKH1/*ALL)  
+      TYPE(*BASATR)        
+      OUTPUT(*OUTFILE)     
+      OUTFILE(QTEMP/TMPFD) 
+
+DSPDBR FILE(VPCRZKH1/*ALL)   
+       OUTPUT(*OUTFILE)      
+       OUTFILE(QTEMP/TMPDBR) 
+
+delete FROM tmppgmref                      
+WHERE WHFNAM < 'A'                         
+13 rows deleted from TMPPGMREF in QTEMP.   
 
 // update the lf names to pf names
 // update qtemp/pgmref p                                            
@@ -19,17 +24,20 @@ DSPDBR FILE(VPCRZKH1/*ALL) OUTPUT(*OUTFILE) OUTFILE(QTEMP/DBRPF)
 // 93 rows updated in PGMREF in QTEMP.                              
 
 // update the lf names to pf names
-update qtemp/pgmrefpf p                                 
-set p.whfnam = (select whrfi from qtemp/dbrpf d         
-                         where p.whfnam = d.whrefi)     
-where p.whfnam in (select whrefi from qtemp/dbrpf)      
-2 rows updated in PGMREFPF in QTEMP.                    
+update tmppgmref p                                    
+set p.whfnam = (select whrfi from tmpdbr d            
+                         where p.whfnam = d.whrefi)   
+where p.whfnam in (select whrefi from tmpdbr)         
+2 rows updated in TMPPGMREF in QTEMP.                 
 
-with t1 as (SELECT whfnam, count(*) ctr                          
-            FROM qtemp/pgmrefpf                                    
-            WHERE WHOBJT = 'F'                                   
-            GROUP BY whfnam                                      
-            ORDER BY whfnam)                                     
-select * from t1                                                 
-order by ctr desc, whfnam                                        
+with t1 as (SELECT p.whfnam, count(*) ctr          
+            FROM tmppgmref p                       
+            join tmpfd f                           
+            on p.whfnam = f.atfile                 
+            WHERE f.atfatr = 'PF'                  
+            and   f.atdtat = 'D'                   
+            GROUP BY whfnam                        
+            ORDER BY whfnam)                       
+select * from t1                                   
+order by ctr desc, whfnam                                                                      
                                    
