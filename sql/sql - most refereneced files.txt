@@ -13,13 +13,20 @@ CPYF FROMFILE(QTEMP/TMPPGMREF)
 DSPDBR FILE(VPCRZKH1/*ALL) OUTPUT(*OUTFILE) OUTFILE(QTEMP/DBRPF)
 
 // update the lf names to pf names
-update qtemp/pgmref p                                            
-set p.whfnam = coalesce((select whrfi from dbrpf                
-                         where p.whfnam = whrefi), p.whfnam)    
-93 rows updated in PGMREF in QTEMP.                              
+// update qtemp/pgmref p                                            
+// set p.whfnam = coalesce((select whrfi from dbrpf                
+//                          where p.whfnam = whrefi), p.whfnam)    
+// 93 rows updated in PGMREF in QTEMP.                              
+
+// update the lf names to pf names
+update qtemp/pgmrefpf p                                 
+set p.whfnam = (select whrfi from qtemp/dbrpf d         
+                         where p.whfnam = d.whrefi)     
+where p.whfnam in (select whrefi from qtemp/dbrpf)      
+2 rows updated in PGMREFPF in QTEMP.                    
 
 with t1 as (SELECT whfnam, count(*) ctr                          
-            FROM qtemp/pgmref                                    
+            FROM qtemp/pgmrefpf                                    
             WHERE WHOBJT = 'F'                                   
             GROUP BY whfnam                                      
             ORDER BY whfnam)                                     
