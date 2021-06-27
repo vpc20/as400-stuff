@@ -13,13 +13,13 @@
      A            LOOKUPDESC    30A  O  6 23
      A          R WDWCTL1                   SFLCTL(WDWSFL1)
      A*%%TS  SD  20180326  095627  VPCRZKH     REL-V7R3M0  5770-WDS
-     A                                      CA03
-     A                                      PAGEUP
-     A                                      PAGEDOWN
+     A                                      CA03(03)
+     A                                      PAGEUP(91)
+     A                                      PAGEDOWN(90)
      A                                      OVERLAY
      A  80                                  SFLDSP
-     A                                      SFLDSPCTL
-     A N81                                  SFLCLR
+     A N81                                  SFLDSPCTL
+     A  81                                  SFLCLR
      A                                      SFLSIZ(0011)
      A                                      SFLPAG(0010)
      A                                      WINDOW(WDWREC1)
