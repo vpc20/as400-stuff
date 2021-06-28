@@ -1,0 +1,18 @@
+     **free
+             dcl-f objdpf keyed ;
+             dcl-f lstobjp printer oflind(*in90);
+
+             write hdr1;
+             read QLIDOBJD;
+
+             dou (%eof);
+                write dtl1;
+                if *in90; // overflow
+                   write hdr1;
+                   *in90 = *off;
+                endif;
+                read QLIDOBJD;
+             enddo;
+
+             // *inlr = *on;
+             return;
