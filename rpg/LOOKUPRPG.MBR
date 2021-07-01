@@ -1,12 +1,15 @@
 **free
        dcl-pi *N;
           lookupgrpParm char(10);
+          lookupkeyParm char(10);
        end-pi;
 
        dcl-f lookuppf keyed;
+       dcl-f lookupgrpf keyed;
        dcl-f lookupdsp workstn indds(dsp) sfile(wdwsfl1:recnum);
 
-       dcl-ds keyLookup likerec(lookuprec:*key);
+       dcl-ds keyLookup   likerec(lookuprec:*key);
+       // dcl-ds keyLookupGr likerec(lookupgrec:*key);
 
        dcl-c maxSflSize 10;
        dcl-s recnum zoned(4:0);
@@ -19,6 +22,12 @@
          pageDown   ind pos(90);
          pageUp     ind pos(91);
        end-ds ;
+
+       chain (lookupgrpParm) lookupgrpf;
+       if %found;
+          hdrdesc   = lookupgrds;
+          lookupgrd = lookupgrds;
+       endif;
 
        keyLookup.lookupgrp = lookupgrpParm;
        keyLookup.lookupkey = *blank;
@@ -45,6 +54,9 @@
 
              when dsp.pageUp;
                 exsr SubfilePageUp;
+
+             other;
+                exsr ProcessSubfile;
           endsl;
        enddo;
 
@@ -97,7 +109,7 @@
              keyLookup.lookupkey = lookupkey;
              chain %kds(keyLookup) lookuprec;
           else;
-             setll *end lookuppf;
+             leavesr;
           endif;
 
           for recnum = 1 to maxSflSize + 1;
@@ -111,4 +123,16 @@
           endfor;
 
           exsr LoadSubfile;
+       endsr;
+
+       //-----------------------------------------------------------------------
+
+       begsr ProcessSubfile;
+          readc wdwsfl1;
+
+          dow not %eof(lookupdsp);
+             lookupkeyParm = lookupkey;
+             return;
+             readc wdwsfl1;
+          enddo;
        endsr;
