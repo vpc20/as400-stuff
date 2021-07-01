@@ -1,18 +1,22 @@
      **free
-             dcl-f objdpf keyed ;
-             dcl-f lstobjp printer oflind(*in90);
+            dcl-f objdpf keyed ;
+            dcl-f lstobjp printer indds(indic) oflind(*in90);
 
-             write hdr1;
-             read QLIDOBJD;
+            dcl-ds indic qualified ;
+               eop   ind pos(90); // page overflow
+            end-ds;
 
-             dou (%eof);
-                write dtl1;
-                if *in90; // overflow
-                   write hdr1;
-                   *in90 = *off;
-                endif;
-                read QLIDOBJD;
-             enddo;
+            write hdr1;
+            read QLIDOBJD;
 
-             // *inlr = *on;
-             return;
+            dou (%eof);
+               write dtl1;
+               if indic.eop; // end of page
+                  write hdr1;
+                  indic.eop = *off;
+               endif;
+               read QLIDOBJD;
+            enddo;
+
+            *inlr = *on;
+
