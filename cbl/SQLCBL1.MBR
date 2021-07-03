@@ -1,0 +1,69 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SQLCBL1.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+            EXEC SQL
+               INCLUDE SQLCA
+            END-EXEC.
+
+        01 CURS-REC.
+           05 TXT1                      PIC X(10).
+        77 HELLO-TXT                    PIC X(20) VALUE 'HELLO WORLD'.
+
+      ******************************************************************
+       PROCEDURE DIVISION.
+
+       A000-MAIN.
+
+           EXEC SQL
+             WHENEVER SQLERROR GOTO 9990-SQL-ERROR
+           END-EXEC.
+
+           EXEC SQL
+             DECLARE CURS CURSOR FOR
+               SELECT SUBSTR(:HELLO-TXT, 1, 5)
+               FROM SYSIBM.SYSDUMMY1
+           END-EXEC.
+
+      *--- error test
+      *    EXEC SQL
+      *      DECLARE CURS CURSOR FOR
+      *        SELECT SUBSTR('HELLO X', 1, 5)
+      *        FROM SYSIBM.SYSDUMMY1
+      *    END-EXEC.
+
+           EXEC SQL
+             OPEN CURS
+           END-EXEC.
+
+           PERFORM A010-FETCH
+              UNTIL SQLCODE IS = 100.
+
+           EXEC SQL
+             CLOSE CURS
+           END-EXEC.
+           STOP RUN.
+
+      ******************************************************************
+       A010-FETCH.
+
+           EXEC SQL
+             FETCH NEXT FROM CURS INTO :CURS-REC
+           END-EXEC.
+           IF SQLCODE IS = 0
+              DISPLAY TXT1
+           END-IF.
+
+      ******************************************************************
+       9990-SQL-ERROR.
+
+           DISPLAY 'SQLCODE ' SQLCODE.
+           DISPLAY 'SQLSTATE ' SQLSTATE.
+           STOP RUN.
+
