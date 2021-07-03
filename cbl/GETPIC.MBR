@@ -1,0 +1,56 @@
+       PROCESS VARCHAR DATETIME.
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. GETPIC.
+       AUTHOR. VPC.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT FILENAME        ASSIGN TO DATABASE-USER_INFO-ALWNULL.
+
+      **   SELECT FILENAME        ASSIGN TO DATABASE-SYSVALINFO-ALWNULL
+      **          ORGANIZATION    IS INDEXED
+      **          ACCESS          IS DYNAMIC
+      **          RECORD KEY      IS EXTERNALLY-DESCRIBED-KEY.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  FILENAME
+           LABEL RECORDS ARE STANDARD.
+       01  RECNAME.
+           COPY DDS-ALL-FORMATS OF USER_INFO.
+      *    COPY DDR-ALL-FORMATS OF USER_INFO.
+      *    COPY DD-ALL-FORMATS  OF USER_INFO.
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+       01  WS-WORK-AREAS.
+           05 X                       PIC X     VALUE SPACES.
+
+      *===============================================================*
+
+       PROCEDURE DIVISION.
+
+       0000-MAIN.
+
+           OPEN INPUT FILENAME.
+           read filename next record
+              at end continue.
+           display recname.
+           CLOSE FILENAME.
+
+           GOBACK.
+
