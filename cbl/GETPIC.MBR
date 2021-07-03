@@ -1,4 +1,4 @@
-       PROCESS VARCHAR DATETIME.
+       PROCESS VARCHAR FLOAT DATETIME.
 
        IDENTIFICATION DIVISION.
        PROGRAM-ID. GETPIC.
@@ -11,10 +11,31 @@
 
       *===============================================================*
 
+      *--- create table using interactive sql session
+      * create table sampledb2f (
+      *             intv         int           not null with default,
+      *             smallintv    smallint      not null with default,
+      *             bigintv      bigint        not null with default,
+      *             floatv       float         not null with default,
+      *             decfloatv    decfloat      not null with default,
+      *             numericv     numeric       not null with default,
+      *             charv        char          not null with default,
+      *             varcharv     varchar(20)   not null with default,
+      *             binaryv      binary        not null with default,
+      *             varbinaryv   varbinary(10) not null with default,
+      *             datev        date          not null with default,
+      *             timev        time          not null with default,
+      *             timestampv   timestamp     not null with default,
+      *             realv        real          not null with default,
+      *             doublev      double        not null with default
+      *         )
+
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
 
-           SELECT FILENAME        ASSIGN TO DATABASE-USER_INFO-ALWNULL.
+           SELECT FILENAME        ASSIGN TO DATABASE-sampledb2f-ALWNULL.
+
+      **   SELECT FILENAME        ASSIGN TO DATABASE-USER_INFO-ALWNULL.
 
       **   SELECT FILENAME        ASSIGN TO DATABASE-SYSVALINFO-ALWNULL
       **          ORGANIZATION    IS INDEXED
@@ -29,7 +50,8 @@
        FD  FILENAME
            LABEL RECORDS ARE STANDARD.
        01  RECNAME.
-           COPY DDS-ALL-FORMATS OF USER_INFO.
+           COPY DDS-ALL-FORMATS OF sampledb2f.
+      *    COPY DDS-ALL-FORMATS OF USER_INFO.
       *    COPY DDR-ALL-FORMATS OF USER_INFO.
       *    COPY DD-ALL-FORMATS  OF USER_INFO.
 
