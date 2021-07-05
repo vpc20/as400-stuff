@@ -1,0 +1,45 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SQLCBL2.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+            EXEC SQL
+               INCLUDE SQLCA
+            END-EXEC.
+
+       01 DEPT-ID              PIC X(3)                VALUE 'C01'.
+       01 TOT-DEP-SALARY       PIC S9(13)V9(2) COMP-3  VALUE 0.
+       01 TOT-BONUS-COUNT      PIC S9(9)       COMP-4  VALUE 0.
+
+      ******************************************************************
+       PROCEDURE DIVISION.
+
+       A000-MAIN.
+
+           EXEC SQL
+              WHENEVER SQLERROR GOTO 9990-SQL-ERROR
+           END-EXEC.
+
+           EXEC SQL
+               CALL RETURN_DEPT_SALARY(:DEPT-ID,
+                                       :TOT-DEP-SALARY,
+                                       :TOT-BONUS-COUNT)
+           END-EXEC.
+
+           DISPLAY TOT-DEP-SALARY.
+           DISPLAY TOT-BONUS-COUNT.
+
+           STOP RUN.
+
+      ******************************************************************
+       9990-SQL-ERROR.
+
+           DISPLAY 'SQLCODE ' SQLCODE.
+           DISPLAY 'SQLSTATE ' SQLSTATE.
+           STOP RUN.
+
