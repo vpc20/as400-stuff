@@ -176,7 +176,6 @@
                     PERFORM 2900-LOAD-SUBFILE
                  ELSE
                     SET SFLREC-FOUND  TO TRUE
-                    MOVE ZEROES TO WS-SFL-RECNUM
                     PERFORM 3000-PROCESS-SUBFILE
                        UNTIL SFLREC-NOT-FOUND
                  END-IF
@@ -316,10 +315,9 @@
 
        3000-PROCESS-SUBFILE.
 
-           ADD 1 TO WS-SFL-RECNUM.
-           READ SUBFILE LOOKUPDSP INTO SFLREC1-I
+           READ SUBFILE LOOKUPDSP NEXT MODIFIED INTO SFLREC1-I
               FORMAT "SFLREC1"  INDICATORS INDIC-AREA
-              INVALID KEY
+              AT END
                  SET SFLREC-NOT-FOUND TO TRUE
            END-READ.
 

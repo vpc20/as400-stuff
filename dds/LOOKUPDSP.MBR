@@ -1,18 +1,20 @@
-     A*%%TS  SD  20180326  100100  VPCRZKH     REL-V7R3M0  5770-WDS
+     A*%%TS  SD  20210705  145431  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      MSGLOC(24)
      A                                      INDARA
      A                                      ERRSFL
      A          R SFLREC1                   SFL
-     A*%%TS  SD  20180323  070351  VPCRZKH     REL-V7R3M0  5770-WDS
-     A            OPT            1Y 0B  6  2VALUES(0 1)
-     A                                      EDTCDE(4)
-     A                                      CHKMSGID(CPD6A7C QCPFMSG)
+     A*%%TS  SD  20210705  145431  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            1A  I  6  2VALUES(' ' '1')
+     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
      A            LOOKUPKEY     10A  O  6  6
      A            LOOKUPDESC    30A  O  6 23
      A          R SFLCTL1                   SFLCTL(SFLREC1)
-     A*%%TS  SD  20180326  095627  VPCRZKH     REL-V7R3M0  5770-WDS
+     A*%%TS  SD  20210705  144628  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      WINDOW(WDWREC1)
      A                                      CA03(03)
      A                                      PAGEUP(91)
      A                                      PAGEDOWN(90)
@@ -20,10 +22,7 @@
      A  80                                  SFLDSP
      A                                      SFLDSPCTL
      A  81                                  SFLCLR
-     A                                      SFLSIZ(0011)
-     A                                      SFLPAG(0010)
-     A                                      WINDOW(WDWREC1)
-     A            HDRDESC       40A  O  1  7DSPATR(HI)
+     A            HDRDESC       40A  O  1  1DSPATR(HI)
      A                                  3  1'Type 1 to select'
      A                                      COLOR(BLU)
      A                                  3 31'Position to'
