@@ -4,21 +4,21 @@
      A                                      MSGLOC(24)
      A                                      INDARA
      A                                      ERRSFL
-     A          R WDWSFL1                   SFL
+     A          R SFLREC1                   SFL
      A*%%TS  SD  20180323  070351  VPCRZKH     REL-V7R3M0  5770-WDS
      A            OPT            1Y 0B  6  2VALUES(0 1)
      A                                      EDTCDE(4)
      A                                      CHKMSGID(CPD6A7C QCPFMSG)
      A            LOOKUPKEY     10A  O  6  6
      A            LOOKUPDESC    30A  O  6 23
-     A          R WDWCTL1                   SFLCTL(WDWSFL1)
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
      A*%%TS  SD  20180326  095627  VPCRZKH     REL-V7R3M0  5770-WDS
      A                                      CA03(03)
      A                                      PAGEUP(91)
      A                                      PAGEDOWN(90)
      A                                      OVERLAY
      A  80                                  SFLDSP
-     A N81                                  SFLDSPCTL
+     A                                      SFLDSPCTL
      A  81                                  SFLCLR
      A                                      SFLSIZ(0011)
      A                                      SFLPAG(0010)
