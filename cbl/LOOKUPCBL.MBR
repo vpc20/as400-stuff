@@ -149,8 +149,9 @@
                  CONTINUE
               NOT INVALID KEY
                  MOVE LOOKUPGRDS OF LOOKUPGR-REC
-                   TO HDRDESC     OF SFLCTL1-O
-                      LOOKUPGRDS  OF SFLCTL1-O
+                   TO HDRDESC    OF SFLCTL1-O
+                 MOVE LOOKUPGRDS OF LOOKUPGR-REC
+                   to LOOKUPGRD  OF SFLCTL1-O
            END-READ.
 
            SET START-PROGRAM TO TRUE.
