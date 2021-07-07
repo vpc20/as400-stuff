@@ -1,0 +1,115 @@
+**free
+       ctl-opt main(Main) dftactgrp(*no);
+
+       dcl-f empl1 keyed qualified;
+       dcl-f empdsp workstn indds(indic) qualified sfile(sflrec1:recnum);
+
+       dcl-ds emprec  likerec(empl1.employee: *all);
+       dcl-ds sflr1   likerec(empdsp.sflrec1: *all);
+       dcl-ds sflc1   likerec(empdsp.sflctl1: *all);
+       dcl-ds fk1     likerec(empdsp.fkey1: *all);
+       dcl-ds kempl1  likerec(empl1.employee:*key);
+
+       dcl-c maxSflSize 14;
+
+       dcl-s recnum zoned(4:0);
+       dcl-s lastLastname like(emprec.lastname);
+
+       dcl-ds indic qualified ;
+         exitKey    ind pos(3);
+         addKey     ind pos(6);
+         sflMore    ind pos(70);
+         sflDsp     ind pos(80);
+         sflClr     ind pos(81);
+         pageDown   ind pos(90);
+         pageUp     ind pos(91);
+       end-ds ;
+
+       //******************************************************************
+       dcl-proc Main;
+          setll *hival empl1.employee;
+          readp empl1.employee emprec ;
+          lastLastname = emprec.lastname;
+
+          sflc1.sflRcdNbr = 1;
+          setll *loval empl1.employee;
+          LoadSubfile();
+
+          // loop until exit key is pressed
+          dow not indic.exitKey;
+             write empdsp.fkey1 fk1;
+             exfmt empdsp.sflctl1 sflc1;
+
+             select;
+                when sflc1.posto <> *blanks;
+                   // setll sflc1.posto empl1.employee;
+                   kempl1.lastname = sflc1.posto;
+                   kempl1.firstnme = *blanks;
+                   kempl1.midinit  = *blanks;
+                   setll %kds(kempl1:1) empl1.employee;
+                   LoadSubfile();
+
+                when indic.pageDown;
+                   if indic.sflMore;
+                      LoadSubfile();
+                   endif;
+
+                when indic.pageUp;
+                   SubfilePageUp();
+             endsl;
+          enddo;
+
+          *inlr = *on;
+       end-proc;
+
+       //******************************************************************
+       dcl-proc LoadSubfile;
+          // clear subfile
+          indic.sflClr = *on;
+          write empdsp.sflctl1 sflc1;
+          indic.sflClr = *off;
+
+          // fill subfile
+          indic.sflDsp = *off;
+          recnum = 0;
+
+          for recnum = 1 to maxSflSize;
+             read empl1.employee emprec ;
+             if not %eof(empl1);
+                sflr1.opt = *zeros;
+                eval-corr sflr1 = emprec;
+                write empdsp.sflrec1 sflr1;
+             else;
+                leave;
+             endif;
+          endfor;
+
+          if recnum > 0;
+             indic.sflDsp = *on;
+          endif;
+
+          // display More or Bottom
+          if emprec.lastname = lastLastname;
+             indic.sflMore = *off;
+          else;
+             indic.sflMore = *on;
+          endif;
+
+        end-proc;
+
+       //******************************************************************
+       dcl-proc SubfilePageup;
+
+          chain 1 empdsp.sflrec1 sflr1;
+          chain sflr1.lastname empl1.employee emprec ;
+
+          for recnum = 1 to maxSflSize + 1;
+             readp empl1.employee emprec ;
+             if %eof(empl1);
+                setll *loval empl1.employee;
+                leave;
+             endif;
+          endfor;
+
+          LoadSubfile();
+       end-proc;

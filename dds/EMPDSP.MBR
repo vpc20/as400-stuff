@@ -1,0 +1,70 @@
+     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A          R SFLREC1                   SFL
+     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            2Y 0B  8  2EDTCDE(4)
+     A                                      VALUES(0 2 4 5)
+     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A            LASTNAME  R        O  8  7REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
+     A                                      OYEE)
+     A            FIRSTNME  R        O  8 24REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
+     A                                      OYEE)
+     A            MIDINIT   R        O  8 38REFFLD(EMPLOYEE/MIDINIT *LIBL/EMPLO-
+     A                                      YEE)
+     A            EMPNO     R        O  8 41REFFLD(EMPLOYEE/EMPNO *LIBL/EMPLOYE-
+     A                                      E)
+     A            WORKDEPT  R        O  8 49REFFLD(EMPLOYEE/WORKDEPT *LIBL/EMPL-
+     A                                      OYEE)
+     A            JOB       R        O  8 55REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
+     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0014)
+     A                                      CF03(03)
+     A                                      CF06(06)
+     A                                      PAGEUP(91)
+     A                                      PAGEDOWN(90)
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  81                                  SFLCLR
+     A            SFLRCDNBR      4S 0H      SFLRCDNBR(CURSOR)
+     A                                  1  2'PGMID     '
+     A                                  1 27'Employee Master Maintenance'
+     A                                      COLOR(WHT)
+     A                                  1 72DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2 72TIME
+     A                                      EDTWRD('0  :  :  ')
+     A                                  4  2'Options'
+     A                                      COLOR(BLU)
+     A                                  4 57'Position to'
+     A            POSTO         10A  I  4 70
+     A                                  5  3'2=Update  4=Delete  5=Inquire'
+     A                                      COLOR(BLU)
+     A                                  7  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  7  7'Last Name'
+     A                                      COLOR(WHT)
+     A                                  7 24'First Name'
+     A                                      COLOR(WHT)
+     A                                  7 38'M'
+     A                                      COLOR(WHT)
+     A                                  7 41'Emp No'
+     A                                      COLOR(WHT)
+     A                                  7 49'Dept'
+     A                                      COLOR(WHT)
+     A                                  7 55'Job Desc'
+     A                                      COLOR(WHT)
+     A          R FKEY1
+     A*%%TS  SD  20210707  021026  VPCRZKH     REL-V7R4M0  5770-WDS
+     A  70                             22 73'More...'
+     A                                      COLOR(WHT)
+     A N70                             22 73'Bottom'
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit   F6=Add'
+     A                                      COLOR(BLU)
+     A            MSGDS         60   O 24  2COLOR(WHT)
