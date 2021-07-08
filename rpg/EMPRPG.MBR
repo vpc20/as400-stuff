@@ -5,9 +5,9 @@
        dcl-f empdsp workstn indds(indic) qualified sfile(sflrec1:recnum);
 
        dcl-ds emprec  likerec(empl1.employee: *all);
-       dcl-ds sflr1   likerec(empdsp.sflrec1: *all);
-       dcl-ds sflc1   likerec(empdsp.sflctl1: *all);
-       dcl-ds fk1     likerec(empdsp.fkey1: *all);
+       dcl-ds sfrec1  likerec(empdsp.sflrec1: *all);
+       dcl-ds sfctl1  likerec(empdsp.sflctl1: *all);
+       dcl-ds fkrec1  likerec(empdsp.fkyrec1: *all);
        dcl-ds kempl1  likerec(empl1.employee:*key);
 
        dcl-c maxSflSize 14;
@@ -30,18 +30,18 @@
 
           indic.exitKey = *off;
 
-          sflc1.sflRcdNbr = 1;
+          sfctl1.sflRcdNbr = 1;
           setll *start empl1;
           LoadSubfile();
 
           // loop until exit key is pressed
           dow not indic.exitKey;
-             write empdsp.fkey1 fk1;
-             exfmt empdsp.sflctl1 sflc1;
+             write empdsp.fkyrec1 fkrec1;
+             exfmt empdsp.sflctl1 sfctl1;
 
              select;
-                when sflc1.posto <> *blanks;
-                   kempl1.lastname = sflc1.posto;
+                when sfctl1.posto <> *blanks;
+                   kempl1.lastname = sfctl1.posto;
                    kempl1.firstnme = *blanks;
                    kempl1.midinit  = *blanks;
                    setll %kds(kempl1) empl1.employee;
@@ -74,7 +74,7 @@
 
           // clear subfile
           indic.sflClr = *on;
-          write empdsp.sflctl1 sflc1;
+          write empdsp.sflctl1 sfctl1;
           indic.sflClr = *off;
 
           // fill subfile
@@ -84,17 +84,17 @@
           read empl1.employee emprec;
           dow not %eof(empl1) and recnum <> maxSflSize;
              recnum += 1;
-             sflr1.opt = *zeros;
-             eval-corr sflr1 = emprec;
-             write empdsp.sflrec1 sflr1;
+             sfrec1.opt = *zeros;
+             eval-corr sfrec1= emprec;
+             write empdsp.sflrec1 sfrec1;
              read empl1.employee emprec;
           enddo;
 
           if recnum > 0;
              indic.sflDsp = *on;
-             sflc1.sflRcdNbr = 1;
+             sfctl1.sflRcdNbr = 1;
           else;
-             sflc1.sflRcdNbr = 0;
+             sfctl1.sflRcdNbr = 0;
              indic.sflMore = *off;
              return;
           endif;
@@ -113,8 +113,8 @@
 
        dcl-proc SubfilePageup;
 
-          chain 1 empdsp.sflrec1 sflr1;
-          chain sflr1.lastname empl1.employee emprec ;
+          chain 1 empdsp.sflrec1 sfrec1;
+          chain sfrec1.lastname empl1.employee emprec ;
 
           for recnum = 1 to maxSflSize + 1;
              readp empl1.employee emprec ;

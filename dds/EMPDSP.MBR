@@ -1,4 +1,4 @@
-     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210708  085728  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
@@ -31,7 +31,7 @@
      A                                      SFLDSPCTL
      A  81                                  SFLCLR
      A            SFLRCDNBR      4S 0H      SFLRCDNBR(CURSOR)
-     A                                  1  2'PGMID     '
+     A                                  1  2'EMPRPG    '
      A                                  1 27'Employee Master Maintenance'
      A                                      COLOR(WHT)
      A                                  1 72DATE
@@ -59,7 +59,81 @@
      A                                      COLOR(WHT)
      A                                  7 55'Job Desc'
      A                                      COLOR(WHT)
-     A          R FKEY1
+     A          R DSPREC1
+     A*%%TS  SD  20210708  085728  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      CF03(03)
+     A                                  1  2'EMPRPG    '
+     A                                  1 27'Employee Master Maintenance'
+     A                                      COLOR(WHT)
+     A                                  1 72DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2 72TIME
+     A                                      EDTWRD('0  :  :  ')
+     A            FLD001        20   O  4  2COLOR(BLU)
+     A                                  6  2'Emp No:'
+     A                                      COLOR(WHT)
+     A            EMPNO     R        B  6 15REFFLD(EMPLOYEE/EMPNO *LIBL/EMPLOYE-
+     A                                      E)
+     A                                  7  2'First Name:'
+     A                                      COLOR(WHT)
+     A            FIRSTNME  R        B  7 15REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
+     A                                      OYEE)
+     A                                  8  2'Last Name:'
+     A                                      COLOR(WHT)
+     A            LASTNAME  R        B  8 15REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
+     A                                      OYEE)
+     A                                  9  2'Middle Init:'
+     A                                      COLOR(WHT)
+     A            MIDINIT   R        B  9 15REFFLD(EMPLOYEE/MIDINIT *LIBL/EMPLO-
+     A                                      YEE)
+     A                                 10  2'Dept:'
+     A                                      COLOR(WHT)
+     A            WORKDEPT  R        B 10 15REFFLD(EMPLOYEE/WORKDEPT *LIBL/EMPL-
+     A                                      OYEE)
+     A                                 11  2'Phone No:'
+     A                                      COLOR(WHT)
+     A            PHONENO   R        B 11 15REFFLD(EMPLOYEE/PHONENO *LIBL/EMPLO-
+     A                                      YEE)
+     A                                 12  2'Hire Date:'
+     A                                      COLOR(WHT)
+     A            HIREDATE  R        B 12 15REFFLD(EMPLOYEE/HIREDATE *LIBL/EMPL-
+     A                                      OYEE)
+     A                                      DATFMT(*ISO)
+     A                                 13  2'Job:'
+     A                                      COLOR(WHT)
+     A            JOB       R        B 13 15REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
+     A                                 14  2'Educ Level:'
+     A                                      COLOR(WHT)
+     A            EDLEVEL   R        B 14 15REFFLD(EMPLOYEE/EDLEVEL *LIBL/EMPLO-
+     A                                      YEE)
+     A                                      EDTCDE(4)
+     A                                 15  2'Sex:'
+     A                                      COLOR(WHT)
+     A            SEX       R        B 15 15REFFLD(EMPLOYEE/SEX *LIBL/EMPLOYEE)
+     A                                 16  2'Birth Date:'
+     A                                      COLOR(WHT)
+     A            BIRTHDATE R        B 16 15REFFLD(EMPLOYEE/BIRTHDATE *LIBL/EMP-
+     A                                      LOYEE)
+     A                                      DATFMT(*ISO)
+     A                                 17  2'Salary:'
+     A                                      COLOR(WHT)
+     A            SALARY    R        B 17 15REFFLD(EMPLOYEE/SALARY *LIBL/EMPLOY-
+     A                                      EE)
+     A                                      EDTCDE(1)
+     A                                 18  2'Bonus:'
+     A                                      COLOR(WHT)
+     A            BONUS     R        B 18 15REFFLD(EMPLOYEE/BONUS *LIBL/EMPLOYE-
+     A                                      E)
+     A                                      EDTCDE(1)
+     A                                 19  2'Commision:'
+     A                                      COLOR(WHT)
+     A            COMM      R        B 19 15REFFLD(EMPLOYEE/COMM *LIBL/EMPLOYEE)
+     A                                      EDTCDE(1)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A            MSGDS         60A  O 24  2COLOR(WHT)
+     A          R FKYREC1
      A*%%TS  SD  20210707  021026  VPCRZKH     REL-V7R4M0  5770-WDS
      A  70                             22 73'More...'
      A                                      COLOR(WHT)
