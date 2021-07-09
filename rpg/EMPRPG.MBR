@@ -1,27 +1,33 @@
 **free
        ctl-opt main(Main) dftactgrp(*no);
 
-       dcl-f empl1 keyed qualified;
+       dcl-f empl1 keyed qualified usage(*input : *output : *update : *delete);
        dcl-f empdsp workstn indds(indic) qualified sfile(sflrec1:recnum);
 
        dcl-ds emprec  likerec(empl1.employee: *all);
        dcl-ds sfrec1  likerec(empdsp.sflrec1: *all);
        dcl-ds sfctl1  likerec(empdsp.sflctl1: *all);
        dcl-ds fkrec1  likerec(empdsp.fkyrec1: *all);
+       dcl-ds dsrec1  likerec(empdsp.dsprec1: *all);
+
        dcl-ds kempl1  likerec(empl1.employee:*key);
 
        dcl-c maxSflSize 14;
 
-       dcl-s recnum zoned(4:0);
+       dcl-s recnum      zoned(4:0);
+       dcl-s maintMode   char(1);
 
        dcl-ds indic qualified ;
-         exitKey    ind pos(3);
-         addKey     ind pos(6);
-         sflMore    ind pos(70);
-         sflDsp     ind pos(80);
-         sflClr     ind pos(81);
-         pageDown   ind pos(90);
-         pageUp     ind pos(91);
+         exitKey            ind pos(3);
+         addKey             ind pos(6);
+         empnoRequired      ind pos(31);
+         protEmpno          ind pos(61);
+         protNonKey         ind pos(62);
+         sflMore            ind pos(70);
+         sflDsp             ind pos(80);
+         sflClr             ind pos(81);
+         pageDown           ind pos(90);
+         pageUp             ind pos(91);
        end-ds ;
 
        //***********************************************************************
@@ -47,9 +53,17 @@
                    setll %kds(kempl1) empl1.employee;
                    if not %found(empl1);
                       setll *end empl1;
-                      readp empl1.employee emprec;
+                      readp(n) empl1.employee emprec;
                    endif;
                    LoadSubfile();
+
+                when indic.addKey;
+                      maintMode = 'A';
+                      clear dsrec1;
+                      dsrec1.maintDesc = 'New Record';
+                      indic.protEmpno = *off;
+                      indic.protNonKey = *off;
+                      EmpDtlScreen();
 
                 when indic.pageDown;
                    if indic.sflMore;
@@ -60,6 +74,9 @@
                    if indic.sflDsp = *on;
                       SubfilePageUp();
                    endif;
+
+                other;
+                   ProcessSubfile();
              endsl;
           enddo;
 
@@ -81,13 +98,13 @@
           indic.sflDsp = *off;
           recnum = 0;
 
-          read empl1.employee emprec;
+          read(n) empl1.employee emprec;
           dow not %eof(empl1) and recnum <> maxSflSize;
              recnum += 1;
              sfrec1.opt = *zeros;
-             eval-corr sfrec1= emprec;
+             eval-corr sfrec1 = emprec;
              write empdsp.sflrec1 sfrec1;
-             read empl1.employee emprec;
+             read(n) empl1.employee emprec;
           enddo;
 
           if recnum > 0;
@@ -104,7 +121,7 @@
              indic.sflMore = *off;
           else;
              indic.sflMore = *on;
-             readp empl1.employee emprec;
+             readp(n) empl1.employee emprec;
           endif;
 
         end-proc;
@@ -117,7 +134,7 @@
           chain sfrec1.lastname empl1.employee emprec ;
 
           for recnum = 1 to maxSflSize + 1;
-             readp empl1.employee emprec ;
+             readp(n) empl1.employee emprec ;
              if %eof(empl1);
                 setll *loval empl1.employee;
                 leave;
@@ -125,5 +142,96 @@
           endfor;
 
           LoadSubfile();
+
+       end-proc;
+
+       //**********************************************************************
+
+       dcl-proc ProcessSubfile;
+          readc empdsp.sflrec1 sfrec1;
+
+          dow not %eof(empdsp);
+             if sfrec1.opt <> *blanks;
+                indic.protEmpno = *off;
+                indic.protNonKey = *off;
+
+                select;
+                   when %trim(sfrec1.opt) = '2';
+                      maintMode = 'U';
+                      dsrec1.maintDesc = 'Update Record';
+                      indic.protEmpno = *on;
+                   when %trim(sfrec1.opt) = '4';
+                      maintMode = 'D';
+                      dsrec1.maintDesc = 'Delete Record';
+                      indic.protEmpno = *on;
+                      indic.protNonKey = *on;
+                   when %trim(sfrec1.opt) = '5';
+                      maintMode = 'I';
+                      dsrec1.maintDesc = 'Inquire Record';
+                endsl;
+
+                kempl1.lastname = sfrec1.lastname;
+                kempl1.firstnme = sfrec1.firstnme;
+                kempl1.midinit  = sfrec1.midinit;
+                chain %kds(kempl1) empl1.employee emprec;
+                eval-corr dsrec1 = emprec;
+                EmpDtlScreen();
+             endif;
+             readc empdsp.sflrec1 sfrec1;
+          enddo;
+
+          LoadSubfile();
+
+       end-proc;
+
+       //**********************************************************************
+
+       dcl-proc EmpDtlScreen;
+
+          dow not indic.exitKey;
+             exfmt empdsp.dsprec1 dsrec1;
+
+             select;
+                when maintMode = 'A';
+                   if ValidEntries();
+                      eval-corr emprec = dsrec1;
+                      write empl1.employee emprec;
+                      kempl1.lastname = emprec.lastname;
+                      kempl1.firstnme = emprec.firstnme;
+                      kempl1.midinit  = emprec.midinit;
+                      setll %kds(kempl1) empl1.employee;
+                      leave;
+                   endif;
+                when maintMode = 'U';
+                   if ValidEntries();
+                      eval-corr emprec = dsrec1;
+                      update empl1.employee emprec;
+                      leave;
+                   endif;
+                when maintMode = 'D';
+                   delete empl1.employee;
+                      leave;
+             endsl;
+           enddo;
+
+           indic.exitKey = *off;
+
+       end-proc;
+
+       //**********************************************************************
+
+       dcl-proc ValidEntries;
+
+          dcl-pi *n ind;
+          end-pi;
+
+          indic.empnoRequired = *off;
+
+          if dsrec1.empno = *blanks;
+             indic.empnoRequired = *on;
+             return *off;
+          endif;
+
+          return *on;
 
        end-proc;

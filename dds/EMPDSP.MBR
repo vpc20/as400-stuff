@@ -1,12 +1,13 @@
-     A*%%TS  SD  20210708  085728  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  022544  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
+     A                                      ERRSFL
      A          R SFLREC1                   SFL
-     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
-     A            OPT            2Y 0B  8  2EDTCDE(4)
-     A                                      VALUES(0 2 4 5)
-     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A*%%TS  SD  20210708  222845  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            2A  I  8  2CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A                                      VALUES('  ' ' 2' '2 ' ' 4' '4 ' ' 5-
+     A                                      ' '5 ')
      A            LASTNAME  R        O  8  7REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
      A                                      OYEE)
      A            FIRSTNME  R        O  8 24REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
@@ -60,7 +61,7 @@
      A                                  7 55'Job Desc'
      A                                      COLOR(WHT)
      A          R DSPREC1
-     A*%%TS  SD  20210708  085728  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  022544  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
      A                                  1  2'EMPRPG    '
      A                                  1 27'Employee Master Maintenance'
@@ -70,75 +71,93 @@
      A                                  2  2USER
      A                                  2 72TIME
      A                                      EDTWRD('0  :  :  ')
-     A            FLD001        20   O  4  2COLOR(BLU)
+     A            MAINTDESC     20A  O  4  2COLOR(BLU)
      A                                  6  2'Emp No:'
      A                                      COLOR(WHT)
      A            EMPNO     R        B  6 15REFFLD(EMPLOYEE/EMPNO *LIBL/EMPLOYE-
      A                                      E)
+     A  31                                  ERRMSG('Employee number should not -
+     A                                      be blanks.')
+     A  61                                  DSPATR(PR)
      A                                  7  2'First Name:'
      A                                      COLOR(WHT)
      A            FIRSTNME  R        B  7 15REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
      A                                      OYEE)
+     A  32                                  ERRMSG('First name should not be bl-
+     A                                      anks.')
+     A  62                                  DSPATR(PR)
      A                                  8  2'Last Name:'
      A                                      COLOR(WHT)
      A            LASTNAME  R        B  8 15REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
      A                                      OYEE)
+     A  33                                  ERRMSG('Last name should not be bla-
+     A                                      nks.')
+     A  62                                  DSPATR(PR)
      A                                  9  2'Middle Init:'
      A                                      COLOR(WHT)
      A            MIDINIT   R        B  9 15REFFLD(EMPLOYEE/MIDINIT *LIBL/EMPLO-
      A                                      YEE)
+     A  62                                  DSPATR(PR)
      A                                 10  2'Dept:'
      A                                      COLOR(WHT)
      A            WORKDEPT  R        B 10 15REFFLD(EMPLOYEE/WORKDEPT *LIBL/EMPL-
      A                                      OYEE)
+     A  62                                  DSPATR(PR)
      A                                 11  2'Phone No:'
      A                                      COLOR(WHT)
      A            PHONENO   R        B 11 15REFFLD(EMPLOYEE/PHONENO *LIBL/EMPLO-
      A                                      YEE)
+     A  62                                  DSPATR(PR)
      A                                 12  2'Hire Date:'
      A                                      COLOR(WHT)
      A            HIREDATE  R        B 12 15REFFLD(EMPLOYEE/HIREDATE *LIBL/EMPL-
      A                                      OYEE)
-     A                                      DATFMT(*ISO)
+     A                                      DATFMT(*USA)
+     A  62                                  DSPATR(PR)
      A                                 13  2'Job:'
      A                                      COLOR(WHT)
      A            JOB       R        B 13 15REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
+     A  62                                  DSPATR(PR)
      A                                 14  2'Educ Level:'
      A                                      COLOR(WHT)
      A            EDLEVEL   R        B 14 15REFFLD(EMPLOYEE/EDLEVEL *LIBL/EMPLO-
      A                                      YEE)
      A                                      EDTCDE(4)
+     A  62                                  DSPATR(PR)
      A                                 15  2'Sex:'
      A                                      COLOR(WHT)
      A            SEX       R        B 15 15REFFLD(EMPLOYEE/SEX *LIBL/EMPLOYEE)
+     A  62                                  DSPATR(PR)
      A                                 16  2'Birth Date:'
      A                                      COLOR(WHT)
      A            BIRTHDATE R        B 16 15REFFLD(EMPLOYEE/BIRTHDATE *LIBL/EMP-
      A                                      LOYEE)
-     A                                      DATFMT(*ISO)
+     A                                      DATFMT(*USA)
+     A  62                                  DSPATR(PR)
      A                                 17  2'Salary:'
      A                                      COLOR(WHT)
      A            SALARY    R        B 17 15REFFLD(EMPLOYEE/SALARY *LIBL/EMPLOY-
      A                                      EE)
      A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
      A                                 18  2'Bonus:'
      A                                      COLOR(WHT)
      A            BONUS     R        B 18 15REFFLD(EMPLOYEE/BONUS *LIBL/EMPLOYE-
      A                                      E)
      A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
      A                                 19  2'Commision:'
      A                                      COLOR(WHT)
      A            COMM      R        B 19 15REFFLD(EMPLOYEE/COMM *LIBL/EMPLOYEE)
      A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
      A                                 23  2'F3=Exit'
      A                                      COLOR(BLU)
-     A            MSGDS         60A  O 24  2COLOR(WHT)
      A          R FKYREC1
-     A*%%TS  SD  20210707  021026  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210708  222518  VPCRZKH     REL-V7R4M0  5770-WDS
      A  70                             22 73'More...'
      A                                      COLOR(WHT)
      A N70                             22 73'Bottom'
      A                                      COLOR(WHT)
      A                                 23  2'F3=Exit   F6=Add'
      A                                      COLOR(BLU)
-     A            MSGDS         60   O 24  2COLOR(WHT)
