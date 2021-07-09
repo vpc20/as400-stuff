@@ -1,4 +1,4 @@
-     A*%%TS  SD  20210709  043919  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  102844  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
@@ -20,9 +20,7 @@
      A                                      OYEE)
      A            JOB       R        O  8 55REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
      A          R SFLCTL1                   SFLCTL(SFLREC1)
-     A*%%TS  SD  20210707  022126  VPCRZKH     REL-V7R4M0  5770-WDS
-     A                                      SFLSIZ(0015)
-     A                                      SFLPAG(0014)
+     A*%%TS  SD  20210709  102844  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
      A                                      CF06(06)
      A                                      PAGEUP(91)
@@ -31,6 +29,14 @@
      A  80                                  SFLDSP
      A                                      SFLDSPCTL
      A  81                                  SFLCLR
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0014)
+     A  92                                  SFLMSG('New employee record has bee-
+     A                                      n created.')
+     A  93                                  SFLMSG('Employee record has been up-
+     A                                      dated.')
+     A  94                                  SFLMSG('Employee record has been de-
+     A                                      leted.')
      A            SFLRCDNBR      4S 0H      SFLRCDNBR(CURSOR)
      A                                  1  2'EMPRPG    '
      A                                  1 27'Employee Master Maintenance'

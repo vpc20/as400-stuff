@@ -16,12 +16,15 @@
 
        dcl-s recnum      zoned(4:0);
        dcl-s maintMode   char(1);
+       dcl-s validEntry  ind;
 
        dcl-ds indic qualified ;
          exitKey            ind pos(3);
          addKey             ind pos(6);
          deleteKey          ind pos(23);
          empnoRequired      ind pos(31);
+         firstnmeRequired   ind pos(32);
+         lastnameRequired   ind pos(33);
          protEmpno          ind pos(61);
          protNonKey         ind pos(62);
          sflMore            ind pos(70);
@@ -29,6 +32,9 @@
          sflClr             ind pos(81);
          pageDown           ind pos(90);
          pageUp             ind pos(91);
+         addMsg             ind pos(92);
+         updMsg             ind pos(93);
+         delMsg             ind pos(94);
          dspF23             ind pos(95);
        end-ds ;
 
@@ -46,6 +52,9 @@
           dow not indic.exitKey;
              write empdsp.fkyrec1 fkrec1;
              exfmt empdsp.sflctl1 sfctl1;
+             indic.addMsg = *off;
+             indic.updMsg = *off;
+             indic.delMsg = *off;
 
              select;
                 when sfctl1.posto <> *blanks;
@@ -111,7 +120,6 @@
 
           if recnum > 0;
              indic.sflDsp = *on;
-             sfctl1.sflRcdNbr = 1;
           else;
              sfctl1.sflRcdNbr = 0;
              indic.sflMore = *off;
@@ -133,7 +141,8 @@
        dcl-proc SubfilePageup;
 
           chain 1 empdsp.sflrec1 sfrec1;
-          chain sfrec1.lastname empl1.employee emprec;
+          eval-corr kempl1 = sfrec1;
+          chain(n) %kds(kempl1) empl1.employee emprec;
 
           for recnum = 1 to maxSflSize + 1;
              readp(n) empl1.employee emprec ;
@@ -162,8 +171,8 @@
                 select;
                    when %trim(sfrec1.opt) = '2';
                       maintMode = 'U';
-                      dsrec1.maintDesc = 'Update Record';
                       indic.protEmpno = *on;
+                      dsrec1.maintDesc = 'Update Record';
                    when %trim(sfrec1.opt) = '4';
                       maintMode = 'D';
                       dsrec1.maintDesc = 'Delete Record';
@@ -175,13 +184,11 @@
                       indic.protEmpno = *on;
                       indic.protNonKey = *on;
                       dsrec1.maintDesc = 'Inquire Record';
-                      sfctl1.sflRcdNbr = recnum;
                       update empdsp.sflrec1 sfrec1;
                 endsl;
 
-                kempl1.lastname = sfrec1.lastname;
-                kempl1.firstnme = sfrec1.firstnme;
-                kempl1.midinit  = sfrec1.midinit;
+                sfctl1.sflRcdNbr = recnum;
+                eval-corr kempl1 = sfrec1;
                 chain %kds(kempl1) empl1.employee emprec;
                 eval-corr dsrec1 = emprec;
                 EmpDtlScreen();
@@ -191,56 +198,17 @@
           enddo;
 
           if maintMode = 'U' or maintMode = 'D';
+             chain 1 empdsp.sflrec1 sfrec1;
+             eval-corr kempl1  = sfrec1;
+             setll %kds(kempl1) empl1.employee;
+             readp(n) empl1.employee emprec;
+             if %eof(empl1);
+                setll *start empl1;
+             endif;
              LoadSubfile();
           endif;
 
        end-proc;
-
-      //  //**********************************************************************
-
-      //  dcl-proc ProcessSubfile;
-      //     readc empdsp.sflrec1 sfrec1;
-
-      //     dow not %eof(empdsp);
-      //        if sfrec1.opt <> *blanks;
-      //           indic.protEmpno = *off;
-      //           indic.protNonKey = *off;
-      //           indic.dspF23 = *off;
-
-      //           select;
-      //              when %trim(sfrec1.opt) = '2';
-      //                 maintMode = 'U';
-      //                 dsrec1.maintDesc = 'Update Record';
-      //                 indic.protEmpno = *on;
-      //              when %trim(sfrec1.opt) = '4';
-      //                 maintMode = 'D';
-      //                 dsrec1.maintDesc = 'Delete Record';
-      //                 indic.protEmpno = *on;
-      //                 indic.protNonKey = *on;
-      //                 indic.dspF23 = *on;
-      //              when %trim(sfrec1.opt) = '5';
-      //                 maintMode = 'I';
-      //                 indic.protEmpno = *on;
-      //                 indic.protNonKey = *on;
-      //                 dsrec1.maintDesc = 'Inquire Record';
-      //                 update empdsp.sflrec1 sfrec1;
-      //           endsl;
-
-      //           kempl1.lastname = sfrec1.lastname;
-      //           kempl1.firstnme = sfrec1.firstnme;
-      //           kempl1.midinit  = sfrec1.midinit;
-      //           chain %kds(kempl1) empl1.employee emprec;
-      //           eval-corr dsrec1 = emprec;
-      //           EmpDtlScreen();
-      //        endif;
-      //        readc empdsp.sflrec1 sfrec1;
-      //     enddo;
-
-      //     if maintMode = 'U' or maintMode = 'D';
-      //        LoadSubfile();
-      //     endif;
-
-      //  end-proc;
 
        //**********************************************************************
 
@@ -254,11 +222,10 @@
                    if ValidEntries();
                       eval-corr emprec = dsrec1;
                       write empl1.employee emprec;
-                      kempl1.lastname = emprec.lastname;
-                      kempl1.firstnme = emprec.firstnme;
-                      kempl1.midinit  = emprec.midinit;
+                      eval-corr kempl1 = emprec;
                       setll %kds(kempl1) empl1.employee;
                       sfctl1.sflRcdNbr = 1;
+                      indic.addMsg = *on;
                       LoadSubfile();
                       leave;
                    endif;
@@ -266,15 +233,15 @@
                    if ValidEntries();
                       eval-corr emprec = dsrec1;
                       update empl1.employee emprec;
+                      indic.updMsg = *on;
                       leave;
                    endif;
                 when maintMode = 'D';
                    if indic.deleteKey;
                       delete empl1.employee;
-                      kempl1.lastname = emprec.lastname;
-                      kempl1.firstnme = emprec.firstnme;
-                      kempl1.midinit  = emprec.midinit;
+                      eval-corr kempl1 = emprec;
                       setll %kds(kempl1) empl1.employee;
+                      indic.delMsg = *on;
                       leave;
                    endif;
              endsl;
@@ -288,16 +255,28 @@
 
        dcl-proc ValidEntries;
 
-          dcl-pi *n ind;
-          end-pi;
+          dcl-pi *n ind end-pi;
 
+          validEntry = *on;
           indic.empnoRequired = *off;
+          indic.firstnmeRequired = *off;
+          indic.lastnameRequired = *off;
 
           if dsrec1.empno = *blanks;
              indic.empnoRequired = *on;
-             return *off;
+             validEntry = *off;
           endif;
 
-          return *on;
+          if dsrec1.firstnme = *blanks;
+             indic.firstnmeRequired = *on;
+             validEntry = *off;
+          endif;
+
+          if dsrec1.lastname = *blanks;
+             indic.lastnameRequired = *on;
+             validEntry = *off;
+          endif;
+
+          return validEntry;
 
        end-proc;
