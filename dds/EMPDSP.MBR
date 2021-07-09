@@ -1,4 +1,4 @@
-     A*%%TS  SD  20210709  022544  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  043919  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
@@ -61,8 +61,9 @@
      A                                  7 55'Job Desc'
      A                                      COLOR(WHT)
      A          R DSPREC1
-     A*%%TS  SD  20210709  022544  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  043919  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
+     A  95                                  CF23(23)
      A                                  1  2'EMPRPG    '
      A                                  1 27'Employee Master Maintenance'
      A                                      COLOR(WHT)
@@ -152,6 +153,8 @@
      A                                      EDTCDE(1)
      A  62                                  DSPATR(PR)
      A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A  95                             23 12'F23=Delete'
      A                                      COLOR(BLU)
      A          R FKYREC1
      A*%%TS  SD  20210708  222518  VPCRZKH     REL-V7R4M0  5770-WDS

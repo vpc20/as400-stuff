@@ -20,6 +20,7 @@
        dcl-ds indic qualified ;
          exitKey            ind pos(3);
          addKey             ind pos(6);
+         deleteKey          ind pos(23);
          empnoRequired      ind pos(31);
          protEmpno          ind pos(61);
          protNonKey         ind pos(62);
@@ -28,6 +29,7 @@
          sflClr             ind pos(81);
          pageDown           ind pos(90);
          pageUp             ind pos(91);
+         dspF23             ind pos(95);
        end-ds ;
 
        //***********************************************************************
@@ -131,7 +133,7 @@
        dcl-proc SubfilePageup;
 
           chain 1 empdsp.sflrec1 sfrec1;
-          chain sfrec1.lastname empl1.employee emprec ;
+          chain sfrec1.lastname empl1.employee emprec;
 
           for recnum = 1 to maxSflSize + 1;
              readp(n) empl1.employee emprec ;
@@ -148,12 +150,14 @@
        //**********************************************************************
 
        dcl-proc ProcessSubfile;
-          readc empdsp.sflrec1 sfrec1;
+          recnum = 1;
+          chain recnum empdsp.sflrec1 sfrec1;
 
-          dow not %eof(empdsp);
+          dow %found(empdsp);
              if sfrec1.opt <> *blanks;
                 indic.protEmpno = *off;
                 indic.protNonKey = *off;
+                indic.dspF23 = *off;
 
                 select;
                    when %trim(sfrec1.opt) = '2';
@@ -165,9 +169,14 @@
                       dsrec1.maintDesc = 'Delete Record';
                       indic.protEmpno = *on;
                       indic.protNonKey = *on;
+                      indic.dspF23 = *on;
                    when %trim(sfrec1.opt) = '5';
                       maintMode = 'I';
+                      indic.protEmpno = *on;
+                      indic.protNonKey = *on;
                       dsrec1.maintDesc = 'Inquire Record';
+                      sfctl1.sflRcdNbr = recnum;
+                      update empdsp.sflrec1 sfrec1;
                 endsl;
 
                 kempl1.lastname = sfrec1.lastname;
@@ -177,12 +186,61 @@
                 eval-corr dsrec1 = emprec;
                 EmpDtlScreen();
              endif;
-             readc empdsp.sflrec1 sfrec1;
+             recnum += 1;
+             chain recnum empdsp.sflrec1 sfrec1;
           enddo;
 
-          LoadSubfile();
+          if maintMode = 'U' or maintMode = 'D';
+             LoadSubfile();
+          endif;
 
        end-proc;
+
+      //  //**********************************************************************
+
+      //  dcl-proc ProcessSubfile;
+      //     readc empdsp.sflrec1 sfrec1;
+
+      //     dow not %eof(empdsp);
+      //        if sfrec1.opt <> *blanks;
+      //           indic.protEmpno = *off;
+      //           indic.protNonKey = *off;
+      //           indic.dspF23 = *off;
+
+      //           select;
+      //              when %trim(sfrec1.opt) = '2';
+      //                 maintMode = 'U';
+      //                 dsrec1.maintDesc = 'Update Record';
+      //                 indic.protEmpno = *on;
+      //              when %trim(sfrec1.opt) = '4';
+      //                 maintMode = 'D';
+      //                 dsrec1.maintDesc = 'Delete Record';
+      //                 indic.protEmpno = *on;
+      //                 indic.protNonKey = *on;
+      //                 indic.dspF23 = *on;
+      //              when %trim(sfrec1.opt) = '5';
+      //                 maintMode = 'I';
+      //                 indic.protEmpno = *on;
+      //                 indic.protNonKey = *on;
+      //                 dsrec1.maintDesc = 'Inquire Record';
+      //                 update empdsp.sflrec1 sfrec1;
+      //           endsl;
+
+      //           kempl1.lastname = sfrec1.lastname;
+      //           kempl1.firstnme = sfrec1.firstnme;
+      //           kempl1.midinit  = sfrec1.midinit;
+      //           chain %kds(kempl1) empl1.employee emprec;
+      //           eval-corr dsrec1 = emprec;
+      //           EmpDtlScreen();
+      //        endif;
+      //        readc empdsp.sflrec1 sfrec1;
+      //     enddo;
+
+      //     if maintMode = 'U' or maintMode = 'D';
+      //        LoadSubfile();
+      //     endif;
+
+      //  end-proc;
 
        //**********************************************************************
 
@@ -200,6 +258,8 @@
                       kempl1.firstnme = emprec.firstnme;
                       kempl1.midinit  = emprec.midinit;
                       setll %kds(kempl1) empl1.employee;
+                      sfctl1.sflRcdNbr = 1;
+                      LoadSubfile();
                       leave;
                    endif;
                 when maintMode = 'U';
@@ -209,8 +269,14 @@
                       leave;
                    endif;
                 when maintMode = 'D';
-                   delete empl1.employee;
+                   if indic.deleteKey;
+                      delete empl1.employee;
+                      kempl1.lastname = emprec.lastname;
+                      kempl1.firstnme = emprec.firstnme;
+                      kempl1.midinit  = emprec.midinit;
+                      setll %kds(kempl1) empl1.employee;
                       leave;
+                   endif;
              endsl;
            enddo;
 
