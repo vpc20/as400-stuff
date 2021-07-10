@@ -1,4 +1,4 @@
-     A*%%TS  SD  20210709  102844  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210710  082159  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
@@ -22,7 +22,9 @@
      A          R SFLCTL1                   SFLCTL(SFLREC1)
      A*%%TS  SD  20210709  102844  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
+     A                                      CF04(04)
      A                                      CF06(06)
+     A                                      CF21(21)
      A                                      PAGEUP(91)
      A                                      PAGEDOWN(90)
      A                                      OVERLAY
@@ -67,9 +69,17 @@
      A                                  7 55'Job Desc'
      A                                      COLOR(WHT)
      A          R DSPREC1
-     A*%%TS  SD  20210709  043919  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210710  082159  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
-     A  95                                  CF23(23)
+     A  95 96                               CF04(04)
+     A N95 96                               CF23(23)
+     A                                      RTNCSRLOC(&CSRREC &CSRFLD)
+     A                                      RTNCSRLOC(*WINDOW &CSRROW &CSRCOL)
+     A                                      CSRLOC(CSRROW     CSRCOL)
+     A            CSRROW         3S 0H
+     A            CSRCOL         3S 0H
+     A            CSRREC        10A  H
+     A            CSRFLD        10A  H
      A                                  1  2'EMPRPG    '
      A                                  1 27'Employee Master Maintenance'
      A                                      COLOR(WHT)
@@ -83,9 +93,11 @@
      A                                      COLOR(WHT)
      A            EMPNO     R        B  6 15REFFLD(EMPLOYEE/EMPNO *LIBL/EMPLOYE-
      A                                      E)
+     A  61                                  DSPATR(PR)
      A  31                                  ERRMSG('Employee number should not -
      A                                      be blanks.')
-     A  61                                  DSPATR(PR)
+     A  35                                  ERRMSG('Duplicate employee number i-
+     A                                      s not allowed.')
      A                                  7  2'First Name:'
      A                                      COLOR(WHT)
      A            FIRSTNME  R        B  7 15REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
@@ -97,9 +109,9 @@
      A                                      COLOR(WHT)
      A            LASTNAME  R        B  8 15REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
      A                                      OYEE)
+     A  62                                  DSPATR(PR)
      A  33                                  ERRMSG('Last name should not be bla-
      A                                      nks.')
-     A  62                                  DSPATR(PR)
      A                                  9  2'Middle Init:'
      A                                      COLOR(WHT)
      A            MIDINIT   R        B  9 15REFFLD(EMPLOYEE/MIDINIT *LIBL/EMPLO-
@@ -110,6 +122,7 @@
      A            WORKDEPT  R        B 10 15REFFLD(EMPLOYEE/WORKDEPT *LIBL/EMPL-
      A                                      OYEE)
      A  62                                  DSPATR(PR)
+     A  34                                  ERRMSG('Invalid dept code.')
      A                                 11  2'Phone No:'
      A                                      COLOR(WHT)
      A            PHONENO   R        B 11 15REFFLD(EMPLOYEE/PHONENO *LIBL/EMPLO-
@@ -117,10 +130,15 @@
      A  62                                  DSPATR(PR)
      A                                 12  2'Hire Date:'
      A                                      COLOR(WHT)
-     A            HIREDATE  R        B 12 15REFFLD(EMPLOYEE/HIREDATE *LIBL/EMPL-
-     A                                      OYEE)
-     A                                      DATFMT(*USA)
+     A**          HIREDATE  R        B 12 15REFFLD(EMPLOYEE/HIREDATE *LIBL/EMPL-
+     A**                                    OYEE)
+     A**                                    DATFMT(*USA)
+     A**62                                  DSPATR(PR)
+     A            HIREDATE       8Y 0B 12 15
      A  62                                  DSPATR(PR)
+     A                                      EDTWRD('0  /  /    ')
+     A                                      EDTMSK('  &  &    ')
+     A  36                                  ERRMSG('Invalid hire date.')
      A                                 13  2'Job:'
      A                                      COLOR(WHT)
      A            JOB       R        B 13 15REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
@@ -158,15 +176,17 @@
      A            COMM      R        B 19 15REFFLD(EMPLOYEE/COMM *LIBL/EMPLOYEE)
      A                                      EDTCDE(1)
      A  62                                  DSPATR(PR)
-     A                                 23  2'F3=Exit'
+     A  95 96                          23  2'F3=Exit   F4=List'
      A                                      COLOR(BLU)
-     A  95                             23 12'F23=Delete'
+     A N95 96                          23  2'F3=Exit   F23=Delete'
+     A                                      COLOR(BLU)
+     A  95N96                          23  2'F3=Exit'
      A                                      COLOR(BLU)
      A          R FKYREC1
-     A*%%TS  SD  20210708  222518  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210709  222902  VPCRZKH     REL-V7R4M0  5770-WDS
      A  70                             22 73'More...'
      A                                      COLOR(WHT)
      A N70                             22 73'Bottom'
      A                                      COLOR(WHT)
-     A                                 23  2'F3=Exit   F6=Add'
+     A                                 23  2'F3=Exit   F6=Add   F21=Print'
      A                                      COLOR(BLU)

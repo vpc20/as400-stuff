@@ -2,9 +2,11 @@
        ctl-opt main(Main) dftactgrp(*no);
 
        dcl-f empl1 keyed qualified usage(*input : *output : *update : *delete);
+       dcl-f employee keyed qualified usage(*input);
        dcl-f empdsp workstn indds(indic) qualified sfile(sflrec1:recnum);
 
        dcl-ds emprec  likerec(empl1.employee: *all);
+       dcl-ds emplrec likerec(employee.employee: *all);
        dcl-ds sfrec1  likerec(empdsp.sflrec1: *all);
        dcl-ds sfctl1  likerec(empdsp.sflctl1: *all);
        dcl-ds fkrec1  likerec(empdsp.fkyrec1: *all);
@@ -20,11 +22,15 @@
 
        dcl-ds indic qualified ;
          exitKey            ind pos(3);
+         listKey            ind pos(4);
          addKey             ind pos(6);
+         printKey           ind pos(21);
          deleteKey          ind pos(23);
          empnoRequired      ind pos(31);
          firstnmeRequired   ind pos(32);
          lastnameRequired   ind pos(33);
+         duplicateEmpno     ind pos(35);
+         invalidHiredate    ind pos(36);
          protEmpno          ind pos(61);
          protNonKey         ind pos(62);
          sflMore            ind pos(70);
@@ -35,7 +41,8 @@
          addMsg             ind pos(92);
          updMsg             ind pos(93);
          delMsg             ind pos(94);
-         dspF23             ind pos(95);
+         dspFkey95          ind pos(95);
+         dspFkey96          ind pos(96);
        end-ds ;
 
        //***********************************************************************
@@ -74,6 +81,8 @@
                       dsrec1.maintDesc = 'New Record';
                       indic.protEmpno = *off;
                       indic.protNonKey = *off;
+                      indic.dspFkey95 = *on;
+                      indic.dspFkey96 = *on;
                       EmpDtlScreen();
 
                 when indic.pageDown;
@@ -166,31 +175,39 @@
              if sfrec1.opt <> *blanks;
                 indic.protEmpno = *off;
                 indic.protNonKey = *off;
-                indic.dspF23 = *off;
 
                 select;
                    when %trim(sfrec1.opt) = '2';
                       maintMode = 'U';
-                      indic.protEmpno = *on;
                       dsrec1.maintDesc = 'Update Record';
+                      indic.protEmpno = *on;
+                      indic.dspFkey95 = *on;
+                      indic.dspFkey96 = *on;
                    when %trim(sfrec1.opt) = '4';
                       maintMode = 'D';
                       dsrec1.maintDesc = 'Delete Record';
                       indic.protEmpno = *on;
                       indic.protNonKey = *on;
-                      indic.dspF23 = *on;
+                      indic.dspFkey95 = *off;
+                      indic.dspFkey96 = *on;
                    when %trim(sfrec1.opt) = '5';
                       maintMode = 'I';
+                      dsrec1.maintDesc = 'Inquire Record';
                       indic.protEmpno = *on;
                       indic.protNonKey = *on;
-                      dsrec1.maintDesc = 'Inquire Record';
-                      update empdsp.sflrec1 sfrec1;
+                      indic.dspFkey95 = *on;
+                      indic.dspFkey96 = *off;
+                      update empdsp.sflrec1 sfrec1;  // clear input field opt
                 endsl;
 
                 sfctl1.sflRcdNbr = recnum;
                 eval-corr kempl1 = sfrec1;
                 chain %kds(kempl1) empl1.employee emprec;
                 eval-corr dsrec1 = emprec;
+                dsrec1.hiredate = *zeros;
+               //  dsrec1.hiredate = %dec(%char(emprec.hiredate:*usa/):8:0);
+               //  dsrec1.hiredate = %dec(%scanrpl('/': '': %CHAR(emprec.hiredate:*usa)):8:0);
+                dsrec1.hiredate = %dec(emprec.hiredate:*usa);
                 EmpDtlScreen();
              endif;
              recnum += 1;
@@ -218,9 +235,13 @@
              exfmt empdsp.dsprec1 dsrec1;
 
              select;
+                when indic.listKey;
+                   dsply dsrec1.csrfld;
+
                 when maintMode = 'A';
                    if ValidEntries();
                       eval-corr emprec = dsrec1;
+                      emprec.hiredate = %date(dsrec1.hiredate:*usa);
                       write empl1.employee emprec;
                       eval-corr kempl1 = emprec;
                       setll %kds(kempl1) empl1.employee;
@@ -261,10 +282,21 @@
           indic.empnoRequired = *off;
           indic.firstnmeRequired = *off;
           indic.lastnameRequired = *off;
+          indic.duplicateEmpno = *off;
+          indic.invalidHiredate = *off;
+
 
           if dsrec1.empno = *blanks;
              indic.empnoRequired = *on;
              validEntry = *off;
+          else;
+             if maintMode = 'A';
+                chain(n) (dsrec1.empno) employee.employee emplrec;
+                if %found(employee);
+                   indic.duplicateEmpno = *on;
+                   validEntry = *off;
+                endif;
+             endif;
           endif;
 
           if dsrec1.firstnme = *blanks;
@@ -274,6 +306,12 @@
 
           if dsrec1.lastname = *blanks;
              indic.lastnameRequired = *on;
+             validEntry = *off;
+          endif;
+
+          test(de) *usa dsrec1.hiredate;
+          if %error;
+             indic.invalidHiredate = *on;
              validEntry = *off;
           endif;
 
