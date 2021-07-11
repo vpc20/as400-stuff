@@ -1,3 +1,4 @@
+--#SET TERMINATOR #
 create procedure vpcrzkh1.return_selected_emp (
                 in dept_number char(3)
             )
@@ -12,4 +13,4 @@ begin
     return;
 end
 
-// run from ACS Run SQL scripts to get interactive results
+-- run from ACS Run SQL scripts to get interactive results

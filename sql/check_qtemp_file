@@ -1,3 +1,4 @@
+--#SET TERMINATOR #
 create procedure vpcrzkh1.check_qtemp_file (
                 in filename char(10)
             )

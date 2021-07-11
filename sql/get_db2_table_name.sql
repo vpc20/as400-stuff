@@ -1,3 +1,4 @@
+--#SET TERMINATOR #
 create procedure vpcrzkh1.get_db2_table_name (
                 in sys_table_name varchar(128)
             )
