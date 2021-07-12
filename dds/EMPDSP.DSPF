@@ -1,4 +1,4 @@
-     A*%%TS  SD  20210710  082159  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210712  073918  VPCRZKH     REL-V7R4M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
@@ -69,7 +69,7 @@
      A                                  7 55'Job Desc'
      A                                      COLOR(WHT)
      A          R DSPREC1
-     A*%%TS  SD  20210710  082159  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%TS  SD  20210712  073918  VPCRZKH     REL-V7R4M0  5770-WDS
      A                                      CF03(03)
      A  95 96                               CF04(04)
      A N95 96                               CF23(23)
@@ -136,9 +136,8 @@
      A**62                                  DSPATR(PR)
      A            HIREDATE       8Y 0B 12 15
      A  62                                  DSPATR(PR)
-     A                                      EDTWRD('0  /  /    ')
-     A                                      EDTMSK('  &  &    ')
      A  36                                  ERRMSG('Invalid hire date.')
+     A                                      EDTWRD('  /  /    ')
      A                                 13  2'Job:'
      A                                      COLOR(WHT)
      A            JOB       R        B 13 15REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
@@ -155,10 +154,14 @@
      A  62                                  DSPATR(PR)
      A                                 16  2'Birth Date:'
      A                                      COLOR(WHT)
-     A            BIRTHDATE R        B 16 15REFFLD(EMPLOYEE/BIRTHDATE *LIBL/EMP-
-     A                                      LOYEE)
-     A                                      DATFMT(*USA)
+     A*           BIRTHDATE R        B 16 15REFFLD(EMPLOYEE/BIRTHDATE *LIBL/EMP-
+     A*                                     LOYEE)
+     A*                                     DATFMT(*USA)
+     A* 62                                  DSPATR(PR)
+     A            BIRTHDATE      8Y 0B 16 15
      A  62                                  DSPATR(PR)
+     A  37                                  ERRMSG('Invalid birth date.')
+     A                                      EDTWRD('  /  /    ')
      A                                 17  2'Salary:'
      A                                      COLOR(WHT)
      A            SALARY    R        B 17 15REFFLD(EMPLOYEE/SALARY *LIBL/EMPLOY-
