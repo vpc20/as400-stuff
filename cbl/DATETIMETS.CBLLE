@@ -1,0 +1,44 @@
+      *> process varchar float datetime.
+
+       identification division.
+       program-id. datetimets.
+       author. vpc.
+
+       environment division.
+       configuration section.
+       source-computer.  ibm-as400.
+       object-computer.  ibm-as400.
+
+      *===============================================================*
+
+       data division.
+
+       working-storage section.
+
+       01  date1n              pic 9(8) value  12312019.
+       01  date1c              pic x(8) value "12312019".
+      *> 01  date1x              format date "%m/%d/@Y".
+
+      *===============================================================*
+
+       procedure division.
+
+       0000-main.
+
+           IF FUNCTION TEST-DATE-TIME (date1n DATE "%m%d%Y") = B"1"
+              DISPLAY "Valid Date"
+           else
+              DISPLAY "Invalid Date"
+           END-IF.
+
+           IF FUNCTION TEST-DATE-TIME (date1c DATE "%m%d%Y") = B"1"
+              DISPLAY "Valid Date"
+           else
+              DISPLAY "Invalid Date"
+           END-IF.
+
+      *>     move "31/31/2021" to date1x.
+      *>     display date1x.
+
+           goback.
+
