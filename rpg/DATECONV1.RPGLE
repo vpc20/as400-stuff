@@ -19,7 +19,6 @@
        dsply ('Date 4-digit year format *hival: ' + %char(date1));
 
        dsply 'Date to numeric(*usa format)';
-       dsply %dec(%scanrpl('/': '': %char(date:*usa)):8:0);
        dsply %dec(date:*usa);
 
        *inlr = *on;
