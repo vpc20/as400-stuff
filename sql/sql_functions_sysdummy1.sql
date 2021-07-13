@@ -42,9 +42,6 @@ select rpad('abcdef', 15, '#')
 select position('c', 'abcdef')
    from sysibm.sysdummy1;
 
-select posstr('abcdef', 'c')
-   from sysibm.sysdummy1;
-
 select space(5)
    from sysibm.sysdummy1;
 
@@ -83,6 +80,19 @@ select length('abcdef')
    from sysibm.sysdummy1;
 
 -- similar to posstr with arguments inverted
+select posstr('abcdef', 'c')
+   from sysibm.sysdummy1;
+
 select locate('c', 'abcdef')
    from sysibm.sysdummy1;
 
+select position('c', 'abcdef')
+   from sysibm.sysdummy1;
+
+-- output is '123'
+select char(0000000123)
+   from sysibm.sysdummy1;
+
+-- output is '0000000123'
+select digits(0000000123)
+   from sysibm.sysdummy1;
