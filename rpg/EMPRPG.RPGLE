@@ -19,6 +19,7 @@
        dcl-s recnum      zoned(4:0);
        dcl-s maintMode   char(1);
        dcl-s validEntry  ind;
+       dcl-s deptnoParm  char(3);
 
        dcl-ds indic qualified ;
          exitKey            ind pos(3);
@@ -37,8 +38,8 @@
          sflMore            ind pos(70);
          sflDsp             ind pos(80);
          sflClr             ind pos(81);
-         poscsrEmpno        ind pos(85);
-         poscsrFirstnme     ind pos(86);
+         // poscsrEmpno        ind pos(85);
+         // poscsrFirstnme     ind pos(86);
          pageDown           ind pos(90);
          pageUp             ind pos(91);
          addMsg             ind pos(92);
@@ -46,7 +47,13 @@
          delMsg             ind pos(94);
          dspFkey95          ind pos(95);
          dspFkey96          ind pos(96);
+         listNotAvail       ind pos(99);
        end-ds ;
+
+
+       dcl-pr deptlookr extpgm;
+          deptno char(3) const;
+       end-pr;
 
        //***********************************************************************
 
@@ -253,12 +260,16 @@
              indic.duplicateEmpno = *off;
              indic.invalidHiredate = *off;
              indic.invalidBirthdate = *off;
-
+             indic.listNotAvail = *off;
 
              select;
 
                 when indic.listKey;
-                   dsply dsrec1.csrfld;
+                   if dsrec1.csrfld = 'WORKDEPT';
+                      deptnoParm = *blanks;
+                      deptlookr(deptnoParm);
+                      dsrec1.workdept = deptnoParm;
+                   endif;
 
                 when maintMode = 'A';
                    if ValidEntries();

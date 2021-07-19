@@ -1,0 +1,52 @@
+     A*%%TS  SD  20210719  014027  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      MSGLOC(24)
+     A                                      INDARA
+     A                                      ERRSFL
+     A          R SFLREC1                   SFL
+     A*%%TS  SD  20210719  014027  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            1A  I  6  2VALUES(' ' '1')
+     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A            DEPTNO    R        O  6  6REFFLD(DEPARTMENT/DEPTNO VPCRZKH1/D-
+     A                                      EPARTMENT)
+     A            DEPTNAME  R        O  6 12REFFLD(DEPARTMENT/DEPTNAME VPCRZKH1-
+     A                                      /DEPARTMENT)
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
+     A*%%TS  SD  20210719  014027  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      WINDOW(WDWREC1)
+     A                                      CA03(03)
+     A                                      PAGEUP(91)
+     A                                      PAGEDOWN(90)
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  81                                  SFLCLR
+     A                                  1 17'Departmet Codes'
+     A                                      COLOR(WHT)
+     A                                  3  1'Type 1 to select'
+     A                                      COLOR(BLU)
+     A                                  3 33'Position to'
+     A            POSKEY         3A  I  3 45
+     A                                  5  1'Opt'
+     A                                      DSPATR(HI)
+     A                                  5  6'Dept'
+     A                                      COLOR(WHT)
+     A                                  5 12'Description'
+     A                                      COLOR(WHT)
+     A          R WDWREC1
+     A*%%TS  SD  20210719  014027  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      WINDOW(3 14 18 47)
+     A                                      WDWBORDER((*DSPATR RI) (*CHAR '    -
+     A                                          '))
+     A  70                             16 41'More...'
+     A                                      COLOR(WHT)
+     A N70                             16 42'Bottom'
+     A                                      COLOR(WHT)
+     A                                 17  1'F3=Exit'
+     A                                      COLOR(BLU)
+     A          R DUMMY
+     A                                      ASSUME
+     A                                  1  2' '
