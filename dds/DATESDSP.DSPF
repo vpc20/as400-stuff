@@ -1,0 +1,42 @@
+     A*%%TS  SD  20210723  224639  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A          R DSPREC1
+     A*%%TS  SD  20210723  224639  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      CA03(03)
+     A                                  1  2'Date, Time and Timestamp Functions'
+     A                                  3  2'%date:'
+     A            CURDATE         L  O  3  9
+     A                                  3 22'%time:'
+     A            CURTIME         T  O  3 29
+     A                                  3 40'%timestamp:'
+     A            CURTS           Z  O  3 52
+     A                                  5  2'Date *ISO:'
+     A            DATEISO         L  B  5 13
+     A                                  6  2'Date *USA:'
+     A            DATEUSA       10A  O  6 13
+     A                                  7  2'Date *EUR:'
+     A            DATEEUR       10A  O  7 13
+     A                                  9  2'Add'
+     A            NDAYS          3Y 0B  9  6EDTCDE(4)
+     A                                  9 10'days  :'
+     A            DATEPLUSD       L  O  9 18
+     A                                 10  2'Add'
+     A            NMONTHS        3Y 0B 10  6EDTCDE(4)
+     A                                 10 10'months:'
+     A            DATEPLUSM       L  O 10 18
+     A                                 11  2'Add'
+     A            NYEARS         3Y 0B 11  6EDTCDE(4)
+     A                                 11 10'years :'
+     A            DATEPLUSY       L  O 11 18
+     A                                 13  2'Start date:'
+     A            STRDATE         L  B 13 14
+     A                                 13 26'End date:'
+     A            ENDDATE         L  B 13 36
+     A                                 14  2'Duration in days  :'
+     A            DURD           5  0O 14 22
+     A                                 15  2'Duration in months:'
+     A            DURM           5  0O 15 22
+     A                                 16  2'Duration in years :'
+     A            DURY           5  0O 16 22
