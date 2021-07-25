@@ -13,11 +13,11 @@
      A                                  3 40'%timestamp:'
      A            CURTS           Z  O  3 52
      A                                  5  2'Date *ISO:'
-     A            DATEISO         L  B  5 13
+     A            DATEISO         L  B  5 13DATFMT(*ISO)
      A                                  6  2'Date *USA:'
-     A            DATEUSA       10A  O  6 13
+     A            DATEUSA         L  O  6 13DATFMT(*USA)
      A                                  7  2'Date *EUR:'
-     A            DATEEUR       10A  O  7 13
+     A            DATEEUR         L  O  7 13DATFMT(*EUR)
      A                                  9  2'Add'
      A            NDAYS          3Y 0B  9  6EDTCDE(4)
      A                                  9 10'days  :'

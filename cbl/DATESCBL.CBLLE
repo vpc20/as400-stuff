@@ -1,0 +1,200 @@
+       PROCESS DATETIME DATE TIME TIMESTAMP.
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. DATECBL.
+       AUTHOR. VPC.
+
+      *===============================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT DATESDSP ASSIGN TO WORKSTATION-DATESDSP-SI
+                  ORGANIZATION IS TRANSACTION
+                  ACCESS MODE  IS SEQUENTIAL
+                  CONTROL-AREA IS WS-CONTROL-AREA.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD  DATESDSP
+           LABEL RECORDS ARE STANDARD.
+       01  DATESDSP-REC  PIC X(1920).
+
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+      *--- Display file records
+       01  WS-DSPREC1-I.
+           COPY DDS-DSPREC1-I OF DATESDSP.
+       01  WS-DSPREC1-O.
+           COPY DDS-DSPREC1-O OF DATESDSP.
+
+      *--- Display file indicators
+       01  INDIC-AREA.
+           COPY DDS-ALL-FORMATS-INDIC OF DATESDSP.
+
+      *--- Display file control area
+       01  WS-CONTROL-AREA.
+           05 FKEY-PRESSED             PIC X(2).
+              88 F0-ENTER              VALUE "00".
+              88 F3-EXIT               VALUE "03".
+
+       01  PROGRAM-SWITCHES.
+           05 END-PROGRAM-SW           PIC 9.
+              88 START-PROGRAM         VALUE 0.
+              88 END-PROGRAM           VALUE 1.
+
+       01  WS-WORK-AREAS.
+           05 CURR-TIMESTAMP.
+              10 CURRDATE.
+                 15 CURRYYYY           PIC 9(4).
+                 15 CURRMM             PIC 9(2).
+                 15 CURRDD             PIC 9(2).
+              10 CURRTIME.
+                 15 CURRHH             PIC 9(2).
+                 15 CURRMIN            PIC 9(2).
+                 15 CURRSS             PIC 9(2).
+                 15 CURRHS             PIC 9(2).
+              10 FILLER                PIC X(5).
+           05 TIMESTAMPX.
+              10 CURRDATEX.
+                 15 CURRYYYY           PIC 9(4).
+                 15 FILLER             PIC X VALUE "-".
+                 15 CURRMM             PIC 9(2).
+                 15 FILLER             PIC X VALUE "-".
+                 15 CURRDD             PIC 9(2).
+              10 FILLER                PIC X VALUE "-".
+              10 CURRTIMEX.
+                 15 CURRHH             PIC 9(2).
+                 15 FILLER             PIC X VALUE ".".
+                 15 CURRMIN            PIC 9(2).
+                 15 FILLER             PIC X VALUE ".".
+                 15 CURRSS             PIC 9(2).
+               10 FILLER               PIC X VALUE ".".
+               10 FILLER               PIC X(2).
+      *>     05 DATE-ISO.
+      *>        10 YYYY                  PIC 9(4).
+      *>        10 FILLER                PIC X VALUE "-".
+      *>        10 MM                    PIC 9(2).
+      *>        10 FILLER                PIC X VALUE "-".
+      *>        10 DD                    PIC 9(2).
+      *>     05 DATE-USA.
+      *>        10 MM                    PIC 9(2).
+      *>        10 FILLER                PIC X VALUE "-".
+      *>        10 DD                    PIC 9(2).
+      *>        10 FILLER                PIC X VALUE "-".
+      *>        10 YYYY                  PIC 9(4).
+      *>     05 DATE-EUR.
+      *>        10 DD                    PIC 9(2).
+      *>        10 FILLER                PIC X VALUE '-'.
+      *>        10 MM                    PIC 9(2).
+      *>        10 FILLER                PIC X VALUE '-'.
+      *>        10 YYYY                  PIC 9(4).
+
+
+      *===============================================================*
+
+       PROCEDURE DIVISION.
+
+       0000-MAIN.
+
+           PERFORM 1000-INITIAL.
+           PERFORM 2000-PROCESS UNTIL END-PROGRAM.
+           PERFORM 9000-CLEAN-UP.
+           GOBACK.
+
+      *===============================================================*
+
+       1000-INITIAL.
+
+           OPEN I-O   DATESDSP.
+
+           INITIALIZE DSPREC1-I
+                      DSPREC1-O.
+
+           SET START-PROGRAM TO TRUE.
+
+           MOVE FUNCTION CURRENT-DATE TO CURR-TIMESTAMP.
+           MOVE CORR CURRDATE TO CURRDATEX.
+           MOVE CORR CURRTIME TO CURRTIMEX.
+
+           MOVE FUNCTION CONVERT-DATE-TIME
+             (CURRDATEx DATE "@Y-%m-%d")
+             TO CURDATE OF DSPREC1-O
+                DATEISO OF DSPREC1-I
+                DATEUSA OF DSPREC1-O
+                DATEEUR OF DSPREC1-O
+                STRDATE OF DSPREC1-I
+                ENDDATE OF DSPREC1-I.
+           MOVE FUNCTION CONVERT-DATE-TIME
+             (CURRTIMEX TIME "%H.%M.%S")
+             TO CURTIME OF DSPREC1-O.
+           MOVE FUNCTION CONVERT-DATE-TIME
+             (TIMESTAMPX TIMESTAMP)
+      *>        "@Y-%m-%d-%H.%M.%S.@Sm")
+             TO CURTS OF DSPREC1-O.
+
+      *    MOVE CURRDATEX  TO CURDATE OF DSPREC1-O.
+      *    MOVE CURRTIMEX  TO CURTIME OF DSPREC1-O.
+      *    MOVE TIMESTAMPX TO CURTS   OF DSPREC1-O.
+
+      *===============================================================*
+
+       2000-PROCESS.
+
+           MOVE CORR DSPREC1-I TO DSPREC1-O.
+           WRITE DATESDSP-REC FROM DSPREC1-O
+              FORMAT "DSPREC1"  INDICATORS INDIC-AREA.
+           READ  DATESDSP INTO DSPREC1-I
+              FORMAT "DSPREC1"  INDICATORS INDIC-AREA.
+
+           EVALUATE TRUE
+              WHEN F0-ENTER
+                 PERFORM 2100-DATES-PROC
+              WHEN F3-EXIT
+                 SET END-PROGRAM TO TRUE
+           END-EVALUATE.
+
+      *===============================================================*
+
+       2100-DATES-PROC.
+
+           MOVE FUNCTION ADD-DURATION
+             (DATEISO OF DSPREC1-I, DAYS, NDAYS OF DSPREC1-I)
+             TO DATEPLUSD OF DSPREC1-O.
+           MOVE FUNCTION ADD-DURATION
+             (DATEISO OF DSPREC1-I, MONTHS, NMONTHS OF DSPREC1-I)
+             TO DATEPLUSM OF DSPREC1-O.
+           MOVE FUNCTION ADD-DURATION
+             (DATEISO OF DSPREC1-I, YEARS, NYEARS OF DSPREC1-I)
+             TO DATEPLUSY OF DSPREC1-O.
+
+           MOVE FUNCTION FIND-DURATION
+             (STRDATE OF DSPREC1-I, ENDDATE OF DSPREC1-I, DAYS)
+             TO DURD OF DSPREC1-O.
+           MOVE FUNCTION FIND-DURATION
+             (STRDATE OF DSPREC1-I, ENDDATE OF DSPREC1-I, MONTHS)
+             TO DURM OF DSPREC1-O.
+           MOVE FUNCTION FIND-DURATION
+             (STRDATE OF DSPREC1-I, ENDDATE OF DSPREC1-I, YEARS)
+             TO DURY OF DSPREC1-O.
+
+      *===============================================================*
+
+       9000-CLEAN-UP.
+
+           CLOSE DATESDSP.
+
