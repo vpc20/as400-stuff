@@ -1,5 +1,6 @@
 ﻿drop procedure create_bonus_table;
 
+--#SET TERMINATOR #
 create procedure create_bonus_table (in    dept_number char(3), 
                                      inout cnt         int)
       language sql

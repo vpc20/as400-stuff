@@ -1,5 +1,6 @@
 ﻿drop procedure return_dept_salary;
 
+--#SET TERMINATOR #
 create procedure return_dept_salary (in dept_number char(3), 
                                      out dept_salary decimal(15, 2),  
                                      out dept_bonus_cnt int)
