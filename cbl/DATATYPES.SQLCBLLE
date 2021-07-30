@@ -1,0 +1,92 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. datatypes.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01  data-types.
+           05 alphanum                PIC x(10).
+           05 zoned1                  pic 9(9)v99.
+           05 packed1                 pic 9(9)v99 packed-decimal.
+           05 packed2                 pic 9(9)v99 computational.
+           05 packed3                 pic 9(9)v99 comp.
+           05 packed4                 pic 9(9)v99 computational-3.
+           05 packed5                 pic 9(9)v99 comp-3.
+           05 binary1                 pic 9(4) binary.
+           05 binary2                 pic 9(4) computational-4.
+           05 binary3                 pic 9(4) comp-4.
+           05 native-binary1          pic 9(4) computational-5.
+           05 native-binary2          pic 9(4) comp-5.
+           05 float4a                 USAGE computational-1.
+           05 float4b                 USAGE COMP-1.
+           05 float8a                 USAGE computational-2.
+           05 float8b                 USAGE COMP-2.
+
+      *> sql types
+           05 smallint                PIC S9(4) COMP-4.
+           05 integer1                PIC S9(9) COMP-4.
+           05 bigint                  PIC S9(18) COMP-4.
+           05 decimal1                PIC S9(9)V9(2) COMP-3.
+           05 numeric1                PIC S9(9)V9(2).
+           05 float1                  USAGE COMP-1.
+           05 float2                  USAGE COMP-2.
+           05 chars                   PIC X(10).
+           05 clob                    SQL TYPE IS CLOB(16384).
+           05 clob-locator            SQL TYPE IS CLOB-LOCATOR.
+           05 clob-file               SQL TYPE IS CLOB-FILE.
+           05 dbclob                  SQL TYPE IS DBCLOB(8192).
+           05 dbclob-locator          SQL TYPE IS DBCLOB-LOCATOR.
+           05 dbclob-file             SQL TYPE IS DBCLOB-FILE.
+           05 blob                    SQL TYPE IS BLOB(16384).
+           05 blob-locator            SQL TYPE IS BLOB-LOCATOR.
+           05 blob-file               SQL TYPE IS BLOB-FILE.
+           05 xml-clob                SQL TYPE IS XML as CLOB(4096).
+           05 xml-dbclob              SQL TYPE IS XML as DBCLOB(8192).
+           05 xml-blob                SQL TYPE IS XML as BLOB(4096).
+           05 xml-locator             SQL TYPE IS XML-LOCATOR.
+           05 binary1                 SQL TYPE IS BINARY(200).
+           05 varbinary1              SQL TYPE IS VARBINARY(250).
+           05 date1                   FORMAT DATE.
+           05 time1                   FORMAT TIME.
+           05 timestamp1              FORMAT TIMESTAMP.
+
+       PROCEDURE DIVISION.
+
+       main-proc.
+           display 'hello'.
+           stop run.
+
+
+      *> INTEGER (INT)
+      *> SMALLINT
+      *> BIGINT
+      *> FLOAT
+      *> DECFLOAT
+      *> NUMERIC
+      *> DECIMAL
+      *> CHAR
+      *> VARCHAR
+      *> LONG VARCHAR
+      *> BINARY
+      *> VARBINARY
+      *> DATE
+      *> TIME
+      *> TIMESTAMP
+      *> GRAPHIC
+      *> VARGRAPHIC
+      *> LONG VARGRAPHIC
+      *> REAL
+      *> DOUBLE PRECISION
+      *> CLOB
+      *> BLOB
+      *> DBCLOB
+      *> ROWID
+
+
+
+
