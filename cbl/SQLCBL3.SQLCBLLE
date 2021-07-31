@@ -1,0 +1,73 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SQLCBL3.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+            EXEC SQL
+               INCLUDE SQLCA
+            END-EXEC.
+
+       01  DEPT-REC.
+           COPY DDS-ALL-FORMATS OF DEPARTMENT.
+
+       01  EMP-REC.
+           COPY DDS-ALL-FORMATS OF EMPLOYEE.
+
+       01  WORK-AREAS.
+           05 RSL1                SQL TYPE IS  RESULT-SET-LOCATOR.
+           05 RSL2                SQL TYPE IS  RESULT-SET-LOCATOR.
+      *>   Indicator variable is required because of null value
+      *>   without the indicator variable, null record is returned
+           02 LOC-IND             PIC S9(4) USAGE COMP-4.
+
+      ******************************************************************
+
+       PROCEDURE DIVISION.
+
+       A000-MAIN.
+
+           EXEC SQL
+              CALL RESULT_SET_DEMO()
+           END-EXEC.
+
+           EXEC SQL
+              ASSOCIATE RESULT SET LOCATORS (:RSL1, :RSL2) WITH
+                 PROCEDURE RESULT_SET_DEMO
+           END-EXEC.
+
+           EXEC SQL
+              ALLOCATE C1 CURSOR FOR RESULT SET :RSL1
+           END-EXEC.
+           EXEC SQL
+              ALLOCATE C2 CURSOR FOR RESULT SET :RSL2
+           END-EXEC.
+
+           EXEC SQL
+               FETCH C1 INTO :DEPTNO    ,
+                             :DEPTNAME  ,
+                             :MGRNO     ,
+                             :ADMRDEPT  ,
+                             :LOCATION:LOC-IND
+           END-EXEC.
+           DISPLAY DEPT-REC.
+
+           EXEC SQL
+               FETCH C2 INTO :EMPLOYEE
+           END-EXEC.
+           DISPLAY EMP-REC.
+
+           EXEC SQL
+               CLOSE C1
+           END-EXEC.
+           EXEC SQL
+               CLOSE C2
+           END-EXEC.
+
+           STOP RUN.
+
+
