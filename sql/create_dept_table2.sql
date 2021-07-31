@@ -2,6 +2,7 @@
 
 create procedure create_dept_table2 (in p_dept char(3), 
                                      in schema_name varchar(128) default 'VPCRZKH1')
+--#SET TERMINATOR #
 begin
    declare dynamic_stmt varchar(1000);
    declare message char(20);

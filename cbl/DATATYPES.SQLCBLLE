@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. datatypes.
+       PROGRAM-ID. DATATYPES.
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -9,57 +9,62 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
 
-       01  data-types.
-           05 alphanum                PIC x(10).
-           05 zoned1                  pic 9(9)v99.
-           05 packed1                 pic 9(9)v99 packed-decimal.
-           05 packed2                 pic 9(9)v99 computational.
-           05 packed3                 pic 9(9)v99 comp.
-           05 packed4                 pic 9(9)v99 computational-3.
-           05 packed5                 pic 9(9)v99 comp-3.
-           05 binary1                 pic 9(4) binary.
-           05 binary2                 pic 9(4) computational-4.
-           05 binary3                 pic 9(4) comp-4.
-           05 native-binary1          pic 9(4) computational-5.
-           05 native-binary2          pic 9(4) comp-5.
-           05 float4a                 USAGE computational-1.
-           05 float4b                 USAGE COMP-1.
-           05 float8a                 USAGE computational-2.
-           05 float8b                 USAGE COMP-2.
+       01  DATA-TYPES.
+           05 ALPHANUM                PIC X(10).
+           05 ZONED1                  PIC 9(9)V99.
+           05 PACKED1                 PIC 9(9)V99 PACKED-DECIMAL.
+           05 PACKED2                 PIC 9(9)V99 COMPUTATIONAL.
+           05 PACKED3                 PIC 9(9)V99 COMP.
+           05 PACKED4                 PIC 9(9)V99 COMPUTATIONAL-3.
+           05 PACKED5                 PIC 9(9)V99 COMP-3.
+           05 BINARY1                 PIC 9(4) BINARY.
+           05 BINARY2                 PIC 9(4) COMPUTATIONAL-4.
+           05 BINARY3                 PIC 9(4) COMP-4.
+           05 NATIVE-BINARY1          PIC 9(4) COMPUTATIONAL-5.
+           05 NATIVE-BINARY2          PIC 9(4) COMP-5.
+           05 FLOAT4A                 USAGE COMPUTATIONAL-1.
+           05 FLOAT4B                 USAGE COMP-1.
+           05 FLOAT8A                 USAGE COMPUTATIONAL-2.
+           05 FLOAT8B                 USAGE COMP-2.
 
-      *> sql types
-           05 smallint                PIC S9(4) COMP-4.
-           05 integer1                PIC S9(9) COMP-4.
-           05 bigint                  PIC S9(18) COMP-4.
-           05 decimal1                PIC S9(9)V9(2) COMP-3.
-           05 numeric1                PIC S9(9)V9(2).
-           05 float1                  USAGE COMP-1.
-           05 float2                  USAGE COMP-2.
-           05 chars                   PIC X(10).
-           05 clob                    SQL TYPE IS CLOB(16384).
-           05 clob-locator            SQL TYPE IS CLOB-LOCATOR.
-           05 clob-file               SQL TYPE IS CLOB-FILE.
-           05 dbclob                  SQL TYPE IS DBCLOB(8192).
-           05 dbclob-locator          SQL TYPE IS DBCLOB-LOCATOR.
-           05 dbclob-file             SQL TYPE IS DBCLOB-FILE.
-           05 blob                    SQL TYPE IS BLOB(16384).
-           05 blob-locator            SQL TYPE IS BLOB-LOCATOR.
-           05 blob-file               SQL TYPE IS BLOB-FILE.
-           05 xml-clob                SQL TYPE IS XML as CLOB(4096).
-           05 xml-dbclob              SQL TYPE IS XML as DBCLOB(8192).
-           05 xml-blob                SQL TYPE IS XML as BLOB(4096).
-           05 xml-locator             SQL TYPE IS XML-LOCATOR.
-           05 binary1                 SQL TYPE IS BINARY(200).
-           05 varbinary1              SQL TYPE IS VARBINARY(250).
-           05 date1                   FORMAT DATE.
-           05 time1                   FORMAT TIME.
-           05 timestamp1              FORMAT TIMESTAMP.
+      *> SQL TYPES
+           05 SMALLINT                PIC S9(4) COMP-4.
+           05 INTEGER1                PIC S9(9) COMP-4.
+           05 BIGINT                  PIC S9(18) COMP-4.
+           05 DECIMAL1                PIC S9(9)V9(2) COMP-3.
+           05 NUMERIC1                PIC S9(9)V9(2).
+           05 FLOAT1                  USAGE COMP-1.
+           05 FLOAT2                  USAGE COMP-2.
+           05 CHARS                   PIC X(10).
+           05 CLOB                    SQL TYPE IS CLOB(16384).
+           05 CLOB-LOCATOR            SQL TYPE IS CLOB-LOCATOR.
+           05 CLOB-FILE               SQL TYPE IS CLOB-FILE.
+           05 DBCLOB                  SQL TYPE IS DBCLOB(8192).
+           05 DBCLOB-LOCATOR          SQL TYPE IS DBCLOB-LOCATOR.
+           05 DBCLOB-FILE             SQL TYPE IS DBCLOB-FILE.
+           05 BLOB                    SQL TYPE IS BLOB(16384).
+           05 BLOB-LOCATOR            SQL TYPE IS BLOB-LOCATOR.
+           05 BLOB-FILE               SQL TYPE IS BLOB-FILE.
+           05 XML-CLOB                SQL TYPE IS XML AS CLOB(4096).
+           05 XML-DBCLOB              SQL TYPE IS XML AS DBCLOB(1024).
+           05 XML-BLOB                SQL TYPE IS XML AS BLOB(1024).
+           05 XML-CLOB-FILE           SQL TYPE IS XML as CLOB-FILE.
+           05 XML-DBCLOB-FILE         SQL TYPE IS XML AS DBCLOB-FILE.
+           05 XML-BLOB-FILE           SQL TYPE IS XML AS BLOB-FILE.
+           05 XML-LOCATOR             SQL TYPE IS XML-LOCATOR.
+           05 BINARY1                 SQL TYPE IS BINARY(200).
+           05 VARBINARY1              SQL TYPE IS VARBINARY(250).
+           05 DATE1                   FORMAT DATE.
+           05 TIME1                   FORMAT TIME.
+           05 TIMESTAMP1              FORMAT TIMESTAMP.
+           05 ROWID1                  SQL TYPE IS ROWID.
+           05 RSL1                    SQL TYPE IS  RESULT_SET_LOCATOR.
 
        PROCEDURE DIVISION.
 
-       main-proc.
-           display 'hello'.
-           stop run.
+       MAIN-PROC.
+           DISPLAY 'HELLO'.
+           STOP RUN.
 
 
       *> INTEGER (INT)

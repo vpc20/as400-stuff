@@ -2,6 +2,7 @@
 
 create procedure create_dept_table (in p_dept char(3))
       language sql
+--#SET TERMINATOR #
 begin
    declare stmt char(1000);
    declare message char(20);

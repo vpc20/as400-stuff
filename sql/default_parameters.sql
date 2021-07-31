@@ -1,4 +1,5 @@
-﻿create procedure update_employee_info (in employee_number char(10), 
+﻿--#SET TERMINATOR #
+create procedure update_employee_info (in employee_number char(10), 
                                        in emp_dept        char(3)  default null,
                                        in phone_number    char(4)  default null, 
                                        in job             char(8)  default null, 
