@@ -15,6 +15,8 @@
              CHGVAR     VAR(&LIBNM)  VALUE(%SST(&FILE 11 10))
 
        /***  get member list  ***/
+             DLTF       FILE(QTEMP/TMPFD)
+             MONMSG     MSGID(CPF0000)
              DSPFD      FILE(&LIBNM/&FILENM) TYPE(*MBRLIST) +
                           OUTPUT(*OUTFILE) OUTFILE(QTEMP/TMPFD)
 
