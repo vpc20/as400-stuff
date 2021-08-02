@@ -9,7 +9,7 @@
              DLTF       FILE(QTEMP/PROCS)
              MONMSG     MSGID(CPF0000)
 
-             CALL       PGM(PROCSRPG) PARM(&SCHEMA)
+             CALL       PGM(WRKPROCRPG) PARM(&SCHEMA)
 
              RETURN
 

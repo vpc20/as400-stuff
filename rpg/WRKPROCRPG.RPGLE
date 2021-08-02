@@ -2,12 +2,12 @@
        ctl-opt main(Main) dftactgrp(*no) alwnull(*usrctl);
 
        dcl-f procs keyed qualified;
-       dcl-f procsdsp workstn usropn indds(indic) qualified sfile(sflrec1:recnum);
+       dcl-f wrkprocdsp workstn usropn indds(indic) qualified sfile(sflrec1:recnum);
 
        dcl-ds procsrec likerec(procs.procs: *all);
-       dcl-ds sfrec1  likerec(procsdsp.sflrec1: *all);
-       dcl-ds sfctl1  likerec(procsdsp.sflctl1: *all);
-       dcl-ds fkrec1  likerec(procsdsp.fkyrec1: *all);
+       dcl-ds sfrec1  likerec(wrkprocdsp.sflrec1: *all);
+       dcl-ds sfctl1  likerec(wrkprocdsp.sflctl1: *all);
+       dcl-ds fkrec1  likerec(wrkprocdsp.fkyrec1: *all);
 
        dcl-ds keyProcs   likerec(procs.procs:*key);
 
@@ -33,7 +33,7 @@
              parmSchema char(10);
           end-pi;
 
-          open procsdsp;
+          open wrkprocdsp;
           indic.exitKey = *off;
           sfctl1.sflRcdNbr = 1;
           sfctl1.specschema = parmSchema;
@@ -45,8 +45,8 @@
           LoadSubfile();
 
           dow not indic.exitKey;
-             write procsdsp.fkyrec1 fkrec1;
-             exfmt procsdsp.sflctl1 sfctl1;
+             write wrkprocdsp.fkyrec1 fkrec1;
+             exfmt wrkprocdsp.sflctl1 sfctl1;
 
              select;
                 when (sfctl1.specSchema <> prevSchema
@@ -70,7 +70,7 @@
              endsl;
           enddo;
 
-          close procsdsp;
+          close wrkprocdsp;
           *inlr = *on;
 
        end-proc;
@@ -81,7 +81,7 @@
 
           // clear subfile
           indic.sflClr = *on;
-          write procsdsp.sflctl1 sfctl1;
+          write wrkprocdsp.sflctl1 sfctl1;
           indic.sflClr = *off;
 
           // fill subfile
@@ -93,7 +93,7 @@
              recnum += 1;
              sfrec1.opt = *blanks;
              eval-corr sfrec1 = procsrec;
-             write procsdsp.sflrec1 sfrec1;
+             write wrkprocdsp.sflrec1 sfrec1;
              reade %kds(keyProcs:1) procs.procs procsrec;
           enddo;
 
@@ -116,7 +116,7 @@
 
        dcl-proc SubfilePageUp;
 
-          chain 1 procsdsp.sflrec1 sfrec1;
+          chain 1 wrkprocdsp.sflrec1 sfrec1;
           if %found;
              keyProcs.specschema = sfctl1.specschema;
              keyProcs.specname = sfrec1.specname;
@@ -143,9 +143,9 @@
 
        dcl-proc ProcessSubfile;
 
-          readc procsdsp.sflrec1 sfrec1;
+          readc wrkprocdsp.sflrec1 sfrec1;
 
-          if not %eof(procsdsp);
+          if not %eof(wrkprocdsp);
              indic.exitKey = *on;
              return;
           endif;
