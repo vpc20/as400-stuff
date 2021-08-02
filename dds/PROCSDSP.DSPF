@@ -1,0 +1,221 @@
+     A*%%TS  SD  20210802  041858  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      INDARA
+     A                                      ERRSFL
+     A          R SFLREC1                   SFL
+     A*%%TS  SD  20210802  041858  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            2A  I  9  2VALUES('  ' ' P' 'P ')
+     A                                      CHKMSGID(CAE9036 QCPFMSG)
+     A            SPECNAME      20A  O  9  7
+     A            BODY           8A  O  9 29
+     A            EXTNAME       24A  O  9 39
+     A            PARM_STYLE     7A  O  9 65
+     A            LANGUAGE       8A  O  9 74
+     A            DATAACCESS     8A  O  9 84
+     A            RESULTS        5Y 0O  9 94EDTCDE(3)
+     A            IN_PARMS       5Y 0O  9101EDTCDE(3)
+     A            OUT_PARMS      5Y 0O  9108EDTCDE(3)
+     A            INOUT_PARM     5Y 0O  9115EDTCDE(3)
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
+     A*%%TS  SD  20210801  233757  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      SFLSIZ(0017)
+     A                                      SFLPAG(0016)
+     A                                      CF03(03)
+     A                                      CF04(04)
+     A                                      CF06(06)
+     A                                      CF21(21)
+     A                                      PAGEUP(91)
+     A                                      PAGEDOWN(90)
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  81                                  SFLCLR
+     A  92                                  SFLMSG('New employee record has bee-
+     A                                      n created.')
+     A  93                                  SFLMSG('Employee record has been up-
+     A                                      dated.')
+     A  94                                  SFLMSG('Employee record has been de-
+     A                                      leted.')
+     A            SFLRCDNBR      4S 0H      SFLRCDNBR(CURSOR)
+     A                                  1  2'PROCSRPG'
+     A                                  1 57'Work with Procedures'
+     A                                      COLOR(WHT)
+     A                                  1125DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2125TIME
+     A                                      EDTWRD('0  :  :  ')
+     A                                  4  2'Schema'
+     A            SPECSCHEMA    10A  B  4  9
+     A                                  4100'Position to'
+     A            POSTO         20A  I  4113
+     A                                  6  2'Options:'
+     A                                      COLOR(BLU)
+     A                                  6 11'P=Parms'
+     A                                      COLOR(BLU)
+     A                                  7 29'Routine'
+     A                                      COLOR(WHT)
+     A                                  7 65'Parm'
+     A                                      COLOR(WHT)
+     A                                  7 74'External'
+     A                                      COLOR(WHT)
+     A                                  7 84'SQL Data'
+     A                                      COLOR(WHT)
+     A                                  7 94'Num'
+     A                                      COLOR(WHT)
+     A                                  7102'In'
+     A                                      COLOR(WHT)
+     A                                  7109'Out'
+     A                                      COLOR(WHT)
+     A                                  7115'InOut'
+     A                                      COLOR(WHT)
+     A                                  8  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  8  7'Procedure Name'
+     A                                      COLOR(WHT)
+     A                                  8 29'Body'
+     A                                      COLOR(WHT)
+     A                                  8 39'External Name'
+     A                                      COLOR(WHT)
+     A                                  8 65'Style'
+     A                                      COLOR(WHT)
+     A                                  8 74'Language'
+     A                                      COLOR(WHT)
+     A                                  8 84'Access'
+     A                                      COLOR(WHT)
+     A                                  8 94'Result'
+     A                                      COLOR(WHT)
+     A                                  8106'Parameters'
+     A                                      COLOR(WHT)
+     A          R DSPREC1
+     A*%%TS  SD  20210712  215506  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      CF03(03)
+     A  95 96                               CF04(04)
+     A N95 96                               CF23(23)
+     A                                      RTNCSRLOC(&CSRREC &CSRFLD)
+     A                                      RTNCSRLOC(*WINDOW &CSRROW &CSRCOL)
+     A                                      CSRLOC(CSRROW     CSRCOL)
+     A            CSRROW         3S 0H
+     A            CSRCOL         3S 0H
+     A            CSRREC        10A  H
+     A            CSRFLD        10A  H
+     A                                  1  2'EMPRPG    '
+     A                                  1 27'Employee Master Maintenance'
+     A                                      COLOR(WHT)
+     A                                  1 72DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2 72TIME
+     A                                      EDTWRD('0  :  :  ')
+     A            MAINTDESC     20A  O  4  2COLOR(BLU)
+     A                                  6  2'Emp No:'
+     A                                      COLOR(WHT)
+     A            EMPNO     R        B  6 15REFFLD(EMPLOYEE/EMPNO *LIBL/EMPLOYE-
+     A                                      E)
+     A  61                                  DSPATR(PR)
+     A  31                                  ERRMSG('Employee number should not -
+     A                                      be blanks.')
+     A  35                                  ERRMSG('Duplicate employee number i-
+     A                                      s not allowed.')
+     A                                  7  2'First Name:'
+     A                                      COLOR(WHT)
+     A            FIRSTNME  R        B  7 15REFFLD(EMPLOYEE/FIRSTNME *LIBL/EMPL-
+     A                                      OYEE)
+     A  32                                  ERRMSG('First name should not be bl-
+     A                                      anks.')
+     A  62                                  DSPATR(PR)
+     A                                  8  2'Last Name:'
+     A                                      COLOR(WHT)
+     A            LASTNAME  R        B  8 15REFFLD(EMPLOYEE/LASTNAME *LIBL/EMPL-
+     A                                      OYEE)
+     A  62                                  DSPATR(PR)
+     A  33                                  ERRMSG('Last name should not be bla-
+     A                                      nks.')
+     A                                  9  2'Middle Init:'
+     A                                      COLOR(WHT)
+     A            MIDINIT   R        B  9 15REFFLD(EMPLOYEE/MIDINIT *LIBL/EMPLO-
+     A                                      YEE)
+     A  62                                  DSPATR(PR)
+     A                                 10  2'Dept:'
+     A                                      COLOR(WHT)
+     A            WORKDEPT  R        B 10 15REFFLD(EMPLOYEE/WORKDEPT *LIBL/EMPL-
+     A                                      OYEE)
+     A  62                                  DSPATR(PR)
+     A  34                                  ERRMSG('Invalid dept code.')
+     A                                 11  2'Phone No:'
+     A                                      COLOR(WHT)
+     A            PHONENO   R        B 11 15REFFLD(EMPLOYEE/PHONENO *LIBL/EMPLO-
+     A                                      YEE)
+     A  62                                  DSPATR(PR)
+     A                                 12  2'Hire Date:'
+     A                                      COLOR(WHT)
+     A**          HIREDATE  R        B 12 15REFFLD(EMPLOYEE/HIREDATE *LIBL/EMPL-
+     A**                                    OYEE)
+     A**                                    DATFMT(*USA)
+     A**62                                  DSPATR(PR)
+     A            HIREDATE       8Y 0B 12 15
+     A  62                                  DSPATR(PR)
+     A  36                                  ERRMSG('Invalid hire date.')
+     A                                      EDTWRD('  /  /    ')
+     A                                 13  2'Job:'
+     A                                      COLOR(WHT)
+     A            JOB       R        B 13 15REFFLD(EMPLOYEE/JOB *LIBL/EMPLOYEE)
+     A  62                                  DSPATR(PR)
+     A                                 14  2'Educ Level:'
+     A                                      COLOR(WHT)
+     A            EDLEVEL   R        B 14 15REFFLD(EMPLOYEE/EDLEVEL *LIBL/EMPLO-
+     A                                      YEE)
+     A                                      EDTCDE(4)
+     A  62                                  DSPATR(PR)
+     A                                 15  2'Sex:'
+     A                                      COLOR(WHT)
+     A            SEX       R        B 15 15REFFLD(EMPLOYEE/SEX *LIBL/EMPLOYEE)
+     A  62                                  DSPATR(PR)
+     A                                 16  2'Birth Date:'
+     A                                      COLOR(WHT)
+     A*           BIRTHDATE R        B 16 15REFFLD(EMPLOYEE/BIRTHDATE *LIBL/EMP-
+     A*                                     LOYEE)
+     A*                                     DATFMT(*USA)
+     A* 62                                  DSPATR(PR)
+     A            BIRTHDATE      8Y 0B 16 15
+     A  62                                  DSPATR(PR)
+     A  37                                  ERRMSG('Invalid birth date.')
+     A                                      EDTWRD('  /  /    ')
+     A                                 17  2'Salary:'
+     A                                      COLOR(WHT)
+     A            SALARY    R        B 17 15REFFLD(EMPLOYEE/SALARY *LIBL/EMPLOY-
+     A                                      EE)
+     A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
+     A                                 18  2'Bonus:'
+     A                                      COLOR(WHT)
+     A            BONUS     R        B 18 15REFFLD(EMPLOYEE/BONUS *LIBL/EMPLOYE-
+     A                                      E)
+     A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
+     A                                 19  2'Commision:'
+     A                                      COLOR(WHT)
+     A            COMM      R        B 19 15REFFLD(EMPLOYEE/COMM *LIBL/EMPLOYEE)
+     A                                      EDTCDE(1)
+     A  62                                  DSPATR(PR)
+     A  95 96                          23  2'F3=Exit   F4=List'
+     A                                      COLOR(BLU)
+     A N95 96                          23  2'F3=Exit   F23=Delete'
+     A                                      COLOR(BLU)
+     A  95N96                          23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A* 99                             24  2'List not available at current curs-
+     A*                                     or position.'
+     A*                                     COLOR(WHT)
+     A            DUMMY1         1   O 22 80
+     A  99                                  ERRMSG('List not available at curre-
+     A                                      nt cursor position.')
+     A          R FKYREC1
+     A*%%TS  SD  20210801  055715  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                 26  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A  70                             25126'More...'
+     A                                      COLOR(WHT)
+     A N70                             25126'Bottom'
+     A                                      COLOR(WHT)
