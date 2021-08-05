@@ -16,6 +16,8 @@ alter table emp_resume
 create unique index xemp_resume
    on emp_resume (empno, resume_format);
 
+delete from emp_resume; 
+
 insert into emp_resume values('000130', 'ascii', null, '', null);
 insert into emp_resume values('000130', 'html' , null, '', null);
 insert into emp_resume values('000140', 'ascii', null, '', null);

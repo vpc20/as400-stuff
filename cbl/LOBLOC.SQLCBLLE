@@ -11,11 +11,11 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
            EXEC SQL INCLUDE SQLCA END-EXEC.
-       
+
        01 EMPNUM                  PIC X(6).
        01 DI-BEGIN-LOC            PIC S9(9) COMP-5.
        01 DI-END-LOC              PIC S9(9) COMP-5.
-       01 RESUME                  SQL TYPE IS CLOB-LOCATOR. 
+       01 RESUME                  SQL TYPE IS CLOB-LOCATOR.
        01 DI-BUFFER               SQL TYPE IS CLOB-LOCATOR.
        01 LOBIND                  PIC S9(4) COMP-5.
        01 BUFFER                  SQL TYPE IS CLOB(1K).
@@ -27,43 +27,45 @@
       * Employee A10030 is not included in the following select, because
       * the lobeval program manipulates the record for A10030 so that it is
       * not compatible with lobloc
-       EXEC SQL DECLARE C1 CURSOR FOR
-          SELECT EMPNO, RESUME FROM EMP_RESUME
-          WHERE RESUME_FORMAT = 'ascii'
-          AND EMPNO <> 'A00130' END-EXEC.
+           EXEC SQL DECLARE C1 CURSOR FOR
+              SELECT EMPNO, RESUME FROM EMP_RESUME
+              WHERE RESUME_FORMAT = "ascii"
+              AND EMPNO <> "A00130" END-EXEC.
 
-       EXEC SQL OPEN C1 END-EXEC.
+           EXEC SQL OPEN C1 END-EXEC.
 
-       MOVE 0 TO BUFFER-LENGTH.
-       EXEC SQL FETCH C1 INTO :EMPNUM, :RESUME :LOBIND END-EXEC.
-       PERFORM FETCH-LOOP
-          UNTIL SQLCODE NOT = 0 OR LOBIND < 0.
+           MOVE 0 TO BUFFER-LENGTH.
+           MOVE 0 TO LOBIND.
+           EXEC SQL FETCH C1 INTO :EMPNUM, :RESUME :LOBIND END-EXEC.
+           PERFORM FETCH-LOOP
+              UNTIL SQLCODE = 100 OR LOBIND < 0.
 
       * display contents of the buffer.
-       DISPLAY BUFFER-DATA(1:BUFFER-LENGTH).
-       EXEC SQL FREE LOCATOR :RESUME, :DI-BUFFER END-EXEC.
-       EXEC SQL CLOSE C1 END-EXEC.
-       STOP RUN.
+           DISPLAY BUFFER-DATA(1:BUFFER-LENGTH).
+           EXEC SQL FREE LOCATOR :RESUME, :DI-BUFFER END-EXEC.
+           EXEC SQL CLOSE C1 END-EXEC.
+           STOP RUN.
 
       ******************************************************************
        FETCH-LOOP.
       *>   Value exists. Evaluate the LOB locator.
       *>   Locate the beginning of "Department Information" section.
-           EXEC SQL VALUES (POSSTR(:RESUME, 'Department Information'))
+           EXEC SQL VALUES (POSSTR(:RESUME, "Department Information"))
               INTO :DI-BEGIN-LOC END-EXEC.
 
       *>   Locate the beginning of "Education" section (end of Dept.Info)
-           EXEC SQL VALUES (POSSTR(:RESUME, 'Education'))
+           EXEC SQL VALUES (POSSTR(:RESUME, "Education"))
               INTO :DI-END-LOC END-EXEC.
            SUBTRACT DI-BEGIN-LOC FROM DI-END-LOC.
+           ADD DI-END-LOC TO BUFFER-LENGTH.
 
       *>   Obtain ONLY the "Department Information" section by using SUBSTR
            EXEC SQL VALUES (SUBSTR(:RESUME, :DI-BEGIN-LOC, :DI-END-LOC))
               INTO :DI-BUFFER END-EXEC.
-      
+
       *>   Append the "Department Information" section to the :buffer var
-           EXEC SQL VALUES (:BUFFER || :DI-BUFFER) 
+           EXEC SQL VALUES (:BUFFER || :DI-BUFFER)
               INTO :BUFFER END-EXEC.
-          
+
            EXEC SQL FETCH C1 INTO :EMPNUM, :RESUME :LOBIND END-EXEC.
-          
+

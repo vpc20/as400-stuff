@@ -1,0 +1,42 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. LOBFILEUPD.
+
+      ******************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+      ******************************************************************
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       01  RESUMEX                  SQL TYPE IS CLOB-FILE.
+      *> 01  RESUMEX.
+      *>     49 RESUMEX-NAME-LENGTH PIC S9(9) COMP-4.
+      *>     49 RESUMEX-DATA-LENGTH PIC S9(9) COMP-4.
+      *>     49 RESUMEX-FILE-OPTIONS PIC S9(9) COMP-4.
+      *>     49 RESUMEX-NAME PIC X(255).
+       01  LOBIND                   PIC S9(4) COMP-5.
+
+      ******************************************************************
+       PROCEDURE DIVISION.
+       MAIN-PROC.
+
+           EXEC SQL SET OPTION COMMIT = *NONE END-EXEC.
+
+           MOVE "/home/VPCRZKH/resume_000140.txt" TO RESUMEX-NAME.
+           MOVE 0 to RESUMEX-NAME-LENGTH.
+           INSPECT RESUMEX-NAME TALLYING RESUMEX-NAME-LENGTH FOR
+              CHARACTERS BEFORE INITIAL SPACE.
+           MOVE SQL-FILE-READ TO RESUMEX-FILE-OPTIONS.
+           EXEC SQL
+              UPDATE EMP_RESUME
+              SET RESUME = :RESUMEX
+              WHERE EMPNO = "000140"
+              AND   RESUME_FORMAT = "ascii"
+           END-EXEC.
+
+           STOP RUN.
