@@ -213,8 +213,10 @@
               WHEN F6-ADD
                  SET ADD-OPTION TO TRUE
                  SET ENTER-DTL1 TO TRUE
-                 MOVE B'0' TO IN51 IN52
+                 MOVE B"1" TO IN51
+                 MOVE B"0" TO IN52 IN53
                  INITIALIZE DTL1-I
+                 MOVE CONFPGM OF SFLCTL1-I TO CONFPGM OF DTL1-I
                  PERFORM 3200-CONF-DTL UNTIL EXIT-DTL1
 
                  MOVE 1 TO WS-SFLRCDNBR
@@ -325,8 +327,8 @@
            END-PERFORM.
 
       *--- Check if there are more records
-      *--- IN70 is on  - display 'More...'
-      *--- IN70 is off - display 'Bottom'
+      *--- IN70 is on  - display "More..."
+      *--- IN70 is off - display "Bottom"
            IF NOT-EOF-CONFPF
               READ CONFPF NEXT RECORD
                  AT END
@@ -359,22 +361,22 @@
                  MOVE OPT OF SFLREC1-O TO WS-OPT
                  EVALUATE TRUE
                     WHEN UPDATE-OPTION
-                       MOVE B'1' TO IN51
-                       MOVE B'0' TO IN52
+                       MOVE B"1" TO IN51 IN52
+                       MOVE B"0" TO IN53
                        PERFORM 3100-GET-CONF-DTL
 
                     WHEN DELETE-OPTION
-                       MOVE '00006' TO WS-MSGCODE
+                       MOVE "00006" TO WS-MSGCODE
                        PERFORM 9900-READ-MSGPF
                        MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
-                       MOVE B'1' TO IN51 IN52
+                       MOVE B"1" TO IN51 IN52 IN53
                        PERFORM 3100-GET-CONF-DTL
 
                     WHEN INQUIRE-OPTION
-                       MOVE B'1' TO IN51 IN52
+                       MOVE B"1" TO IN51 IN52
                        PERFORM 3100-GET-CONF-DTL
                  END-EVALUATE
-                 IF WS-MSGCODE = '00005'
+                 IF WS-MSGCODE = "00005"
                     MOVE 1 TO WS-SFLRCDNBR
                  ELSE
                     MOVE WS-SFLRECNUM TO WS-SFLRCDNBR
@@ -389,6 +391,7 @@
       *================================================================*
 
        3100-GET-CONF-DTL.
+
            MOVE CORR SFLREC1-O TO CONFREC.
            READ CONFPF.
            MOVE CORR CONFREC TO DTL1-I.
@@ -405,7 +408,7 @@
               FORMAT "DTL1" INDICATORS INDIC-AREA.
            READ  WRKCONFDSP INTO DTL1-I
               FORMAT "DTL1" INDICATORS INDIC-AREA.
-           MOVE B'0' TO IN01 IN02.
+           MOVE B"0" TO IN01 IN02 IN03.
            MOVE SPACES TO MSGDESC OF DTL1-O
                           WS-MSGCODE.
 
@@ -413,35 +416,29 @@
               WHEN F0-ENTER
                  EVALUATE TRUE
                     WHEN ADD-OPTION
-                       PERFORM 3600-VALIDATE
+                       PERFORM 3600-VALIDATE THRU 3600-EXIT
                        IF VALID-ENTRY
                           MOVE CORR DTL1-I TO CONFREC
                           WRITE CONF-REC
-
                           SET EXIT-DTL1 TO TRUE
-      *                   MOVE 1 TO WS-SFLRCDNBR
-      *                   PERFORM 2900-LOAD-SUBFILE
-
-                          MOVE '00003' TO WS-MSGCODE
+                          MOVE "00003" TO WS-MSGCODE
                           PERFORM 9900-READ-MSGPF
                           MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
                        END-IF
 
                     WHEN UPDATE-OPTION
-                       PERFORM 3600-VALIDATE
+                       PERFORM 3600-VALIDATE THRU 3600-EXIT
                        IF VALID-ENTRY
-                          MOVE CORR SFLREC1-O TO CONFREC
-                          READ CONFPF
-                          DELETE CONFPF
-
                           MOVE CORR DTL1-I TO CONFREC
-                          WRITE CONF-REC
+                          READ CONFPF
+                          MOVE CONFVAL OF DTL1-I TO CONFVAL OF CONF-REC
+                          REWRITE CONF-REC
 
                           SET EXIT-DTL1 TO TRUE
       *                   MOVE 1 TO WS-SFLRCDNBR
       *                   PERFORM 2900-LOAD-SUBFILE
 
-                          MOVE '00004' TO WS-MSGCODE
+                          MOVE "00004" TO WS-MSGCODE
                           PERFORM 9900-READ-MSGPF
                           MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
                        END-IF
@@ -450,7 +447,7 @@
                        DELETE CONFPF
                        SET EXIT-DTL1 TO TRUE
 
-                       MOVE '00005' TO WS-MSGCODE
+                       MOVE "00005" TO WS-MSGCODE
                        PERFORM 9900-READ-MSGPF
                        MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
 
@@ -468,37 +465,56 @@
        3600-VALIDATE.
 
            SET VALID-ENTRY TO TRUE.
+
+      *>     IF CONFPGM OF DTL1-I = SPACES
+      *>        IF ADD-OPTION
+      *>           MOVE "00001" TO WS-MSGCODE
+      *>           PERFORM 9900-READ-MSGPF
+      *>           MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+      *>           MOVE B"1" TO IN01
+      *>           SET INVALID-ENTRY TO TRUE
+      *>           GO TO 3600-EXIT
+      *>        END-IF
+      *>     END-IF.
+
            IF CONFKEY OF DTL1-I = SPACES
               IF ADD-OPTION
-                 MOVE '00001' TO WS-MSGCODE
+                 MOVE "00001" TO WS-MSGCODE
                  PERFORM 9900-READ-MSGPF
                  MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
-                 MOVE B'1' TO IN01
+                 MOVE B"1" TO IN02
                  SET INVALID-ENTRY TO TRUE
+                 GO TO 3600-EXIT
               END-IF
            END-IF.
 
            IF CONFVAL OF DTL1-I = SPACES
               IF ADD-OPTION OR UPDATE-OPTION
-                 MOVE '00001' TO WS-MSGCODE
+                 MOVE "00001" TO WS-MSGCODE
                  PERFORM 9900-READ-MSGPF
                  MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
-                 MOVE B'1' TO IN02
+                 MOVE B"1" TO IN03
                  SET INVALID-ENTRY TO TRUE
+                 GO TO 3600-EXIT
               END-IF
            ELSE
-              MOVE CORR DTL1-I TO CONFREC
-              READ CONFPF
-                 INVALID KEY
-                    CONTINUE
-                 NOT INVALID KEY
-                    MOVE '00002' TO WS-MSGCODE
-                    PERFORM 9900-READ-MSGPF
-                    MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
-                    MOVE B'1' TO IN02
-                    SET INVALID-ENTRY TO TRUE
-              END-READ
+              IF ADD-OPTION
+                 MOVE CORR DTL1-I TO CONFREC
+                 READ CONFPF
+                    INVALID KEY
+                       CONTINUE
+                    NOT INVALID KEY
+                       MOVE "00002" TO WS-MSGCODE
+                       PERFORM 9900-READ-MSGPF
+                       MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+                       MOVE B"1" TO IN03
+                       SET INVALID-ENTRY TO TRUE
+                       GO TO 3600-EXIT
+                 END-READ
+              END-IF
            END-IF.
+
+       3600-EXIT.
 
       *================================================================*
 

@@ -60,7 +60,7 @@
      A                                      EDTWRD('0  :  :  ')
      A            MAINTDESC     30A  O  4  2COLOR(BLU)
      A                                  6  2'Program'
-     A            PGMNAME       10   B  6 15
+     A            CONFPGM       10   B  6 15
      A  01                                  DSPATR(RI)
      A  01                                  DSPATR(PC)
      A  51                                  DSPATR(PR)
