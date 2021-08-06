@@ -7,7 +7,7 @@
 
              RTVOBJD    OBJ(&OBJLIB/&OBJNAME) OBJTYPE(&OBJTYPE) +
                           TEXT(&OBJTEXT)
-             MONMSG     MSGID(CPF9811) EXEC(CHGVAR VAR(&OBJTEXT) +
+             MONMSG     MSGID(CPF9811 CPF0001) EXEC(CHGVAR VAR(&OBJTEXT) +
                           VALUE(' '))
 
              ENDPGM

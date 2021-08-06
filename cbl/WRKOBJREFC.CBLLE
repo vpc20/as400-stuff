@@ -2,23 +2,23 @@
        PROGRAM-ID. WRKOBJREFC.
        AUTHOR. VPC.
 
-      *===============================================================*
-      * Subfile Program Template                                      *
-      *                                                               *
-      *---------------------------------------------------------------*
-      * Amendment History                                             *
-      *                                                               *
-      * Date      Pgmr  Description                                   *
-      * --------  ---   --------------------------------------------- *
-      *                                                               *
-      *===============================================================*
+      *================================================================*
+      * Subfile Program Template                                       *
+      *                                                                *
+      *----------------------------------------------------------------*
+      * Amendment History                                              *
+      *                                                                *
+      * Date      Pgmr  Description                                    *
+      * --------  ---   ---------------------------------------------- *
+      *                                                                *
+      *================================================================*
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        SOURCE-COMPUTER.  IBM-AS400.
        OBJECT-COMPUTER.  IBM-AS400.
 
-      *===============================================================*
+      *================================================================*
 
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
@@ -34,7 +34,7 @@
                   RELATIVE KEY     IS WS-SFL-RECNUM
                   CONTROL-AREA     IS WS-CONTROL-AREA.
 
-      *===============================================================*
+      *================================================================*
 
        DATA DIVISION.
 
@@ -49,7 +49,7 @@
        01  WRKOBJREFDREC   PIC X(1920).
 
 
-      *===============================================================*
+      *================================================================*
 
        WORKING-STORAGE SECTION.
 
@@ -110,18 +110,15 @@
               10 WS-CMD1               PIC X(64) VALUE SPACES.
            05 WS-CMD-LEN               PIC 9(10)V9(5) COMP-3 VALUE 60.
 
-      *01  PARMHDRCB2-PARM.
-      *    05 PARMHDRCB2-PARMCODE          PIC X(10).
-      *    05 PARMHDRCB2-MAINT-MODE        PIC X(1).
-      *    05 PARMHDRCB2-MSGCODE           PIC X(6).
-      *
-      *01  PARMDTLCB1-PARM.
-      *    05 PARMDTLCB1-PARMCODE          PIC X(10).
-      *    05 PARMDTLCB1-MSGCODE           PIC X(6).
+      *================================================================*
 
-      *===============================================================*
+       LINKAGE SECTION.
+       01  PARM-WRKOBJREFC.
+           05 PARM-WHFNAM              PIC X(10).
 
-       PROCEDURE DIVISION.
+      *================================================================*
+
+       PROCEDURE DIVISION USING PARM-WRKOBJREFC.
 
        0000-MAIN.
 
@@ -130,7 +127,7 @@
            PERFORM 9000-CLEAN-UP.
            GOBACK.
 
-      *===============================================================*
+      *================================================================*
 
        1000-INITIAL.
 
@@ -142,15 +139,16 @@
                       SFLCTL1-I
                       SFLCTL1-O.
 
-           MOVE 12 TO WS-SFLSIZ.
+           MOVE 14 TO WS-SFLSIZ.
            MOVE 1 TO WS-SFLRCDNBR.
 
            SET START-PROGRAM TO TRUE.
-           MOVE SPACES TO WHFNAM OF PGMREFPF-REC
-                          WHPNAM OF PGMREFPF-REC.
+           MOVE PARM-WHFNAM TO WHFNAM OF PGMREFPF-REC
+                               WHFNAM OF SFLCTL1-I.
+           MOVE SPACES      TO WHPNAM OF PGMREFPF-REC.
            PERFORM 2900-LOAD-SUBFILE.
 
-      *===============================================================*
+      *================================================================*
 
        2000-PROCESS.
 
@@ -198,7 +196,7 @@
 
            END-EVALUATE.
 
-      *===============================================================*
+      *================================================================*
 
        2800-PAGEDOWN.
 
@@ -207,7 +205,7 @@
               PERFORM 2900-LOAD-SUBFILE
            END-IF.
 
-      *===============================================================*
+      *================================================================*
 
        2850-PAGEUP.
 
@@ -240,7 +238,7 @@
            MOVE 1 TO WS-SFLRCDNBR.
            PERFORM 2900-LOAD-SUBFILE.
 
-      *===============================================================*
+      *================================================================*
 
        2860-READ-FIRST-SFLREC.
 
@@ -251,7 +249,7 @@
               FORMAT "SFLREC1"  INDICATORS INDIC-AREA.
            MOVE WHPNAM OF SFLREC1-O TO WHPNAM OF PGMREFPF-REC.
 
-      *===============================================================*
+      *================================================================*
 
        2900-LOAD-SUBFILE.
 
@@ -273,27 +271,6 @@
               KEY >= EXTERNALLY-DESCRIBED-KEY
               INVALID KEY
                  SET EOF-PGMREFPF TO TRUE
-              NOT INVALID KEY
-                 READ PGMREFPF NEXT RECORD
-                    AT END
-                       SET EOF-PGMREFPF TO TRUE
-                    NOT AT END
-                       IF WHFNAM OF SFLCTL1-I NOT = SPACES
-                          IF WHFNAM OF PGMREFPF-REC =
-                             WHFNAM OF SFLCTL1-I
-                             READ PGMREFPF PRIOR RECORD
-                          ELSE
-                             READ PGMREFPF PRIOR RECORD
-                             READ PGMREFPF PRIOR RECORD
-                                AT END
-                                  MOVE SPACES TO WHFNAM OF PGMREFPF-REC
-                                  MOVE SPACES TO WHPNAM OF PGMREFPF-REC
-                                  START PGMREFPF
-                                     KEY >= EXTERNALLY-DESCRIBED-KEY
-                             END-READ
-                          END-IF
-                       END-IF
-                 END-READ
            END-START.
 
            PERFORM UNTIL EOF-PGMREFPF OR WS-SFL-RECNUM = WS-SFLSIZ
@@ -306,6 +283,18 @@
                     INITIALIZE SFLREC1-O
                     ADD 1 TO WS-SFL-RECNUM
                     MOVE CORR QWHDRPPR TO SFLREC1-O
+                    EVALUATE WHSPKG OF PGMREFPF-REC
+                       WHEN "P"
+                           MOVE "PGM" TO WHSPKGD OF SFLREC1-O
+                       WHEN "S"
+                           MOVE "SQLPKG" TO WHSPKGD OF SFLREC1-O
+                       WHEN "V"
+                           MOVE "SRVPGM" TO WHSPKGD OF SFLREC1-O
+                       WHEN "M"
+                           MOVE "MODULE" TO WHSPKGD OF SFLREC1-O
+                       WHEN "Q"
+                           MOVE "QRYDFN" TO WHSPKGD OF SFLREC1-O
+                    END-EVALUATE
                     WRITE SUBFILE WRKOBJREFDREC FROM SFLREC1-O
                        FORMAT "SFLREC1"  INDICATORS INDIC-AREA
                  ELSE
@@ -337,11 +326,7 @@
               MOVE B"1" TO IN80
            END-IF.
 
-      *    IF WS-SFL-RECNUM > WS-SFLRCDNBR
-      *       MOVE WS-SFL-RECNUM TO SFLRCDNBR OF SFLCTL1-I
-      *    END-IF.
-
-      *===============================================================*
+      *================================================================*
 
        3000-PROCESS-SUBFILE.
 
@@ -397,34 +382,7 @@
                  FORMAT "SFLREC1"  INDICATORS INDIC-AREA
            END-IF.
 
-      *===============================================================*
-
-      *3100-CALL-PARMHDRCB2.
-      *
-      *    INITIALIZE PARMHDRCB2-PARM.
-      *    IF NOT ADD-OPTION
-      *       MOVE PARMCODE OF SFLREC1-O
-      *         TO PARMHDRCB2-PARMCODE OF PARMHDRCB2-PARM
-      *    END-IF
-      *    EVALUATE TRUE
-      *       WHEN ADD-OPTION
-      *          MOVE "A" TO PARMHDRCB2-MAINT-MODE
-      *       WHEN UPDATE-OPTION
-      *          MOVE "U" TO PARMHDRCB2-MAINT-MODE
-      *       WHEN DELETE-OPTION
-      *          MOVE "D" TO PARMHDRCB2-MAINT-MODE
-      *       WHEN INQUIRE-OPTION
-      *          MOVE "I" TO PARMHDRCB2-MAINT-MODE
-      *    END-EVALUATE.
-      *
-      *    CALL "PARMHDRCB2" USING PARMHDRCB2-PARM.
-      *
-********** IF  DELETE-OPTION
-********** AND PARMHDRCB2-MSGCODE = "M00003"
-**********     SET DELETE-OK TO TRUE
-********** END-IF.
-
-      *===============================================================*
+      *================================================================*
 
        9000-CLEAN-UP.
 
