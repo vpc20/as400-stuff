@@ -1,0 +1,91 @@
+     A*%%TS  SD  20210806  004543  VPCRZKH     REL-V7R4M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      INDARA
+     A          R SFLREC1                   SFL
+     A*%%TS  SD  20210806  002829  VPCRZKH     REL-V7R4M0  5770-WDS
+     A            OPT            2Y 0B  9  2EDTCDE(4)
+     A                                      VALUES(0 2 4 5 6)
+     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A            CONFKEY       16A  O  9  7
+     A            CONFVAL       80A  O  9 25
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
+     A*%%TS  SD  20210806  003832  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      CA03
+     A                                      CA06
+     A                                      PAGEUP
+     A                                      PAGEDOWN
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  81                                  SFLCLR
+     A                                      SFLSIZ(0016)
+     A                                      SFLPAG(0015)
+     A            SFLRCDNBR      4S 0H      SFLRCDNBR(CURSOR)
+     A                                  1  2'CONFCB1'
+     A                                  1 55'Rechenzentrum Kreuznach'
+     A                                      DSPATR(HI)
+     A                                  1125DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2 53'Work with Configuration File'
+     A                                      DSPATR(HI)
+     A                                  2125TIME
+     A                                      EDTWRD('0  :  :  ')
+     A                                  4  2'Program'
+     A            CONFPGM       10A  B  4 10
+     A                                  4105'Position to'
+     A            POSCODE       16A  I  4117
+     A                                  6  2'Options: 2=Update  4=Delete  5=Inq-
+     A                                      uire'
+     A                                      COLOR(BLU)
+     A                                  8  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  8  7'Config Key'
+     A                                      DSPATR(HI)
+     A                                  8 25'Configuration Value           '
+     A                                      DSPATR(HI)
+     A          R DTL1
+     A*%%TS  SD  20210806  004543  VPCRZKH     REL-V7R4M0  5770-WDS
+     A                                      CA12
+     A                                  1  2'CONFCB1'
+     A                                  1 55'Rechenzentrum Kreuznach'
+     A                                      DSPATR(HI)
+     A                                  1125DATE
+     A                                      EDTWRD('0  /  /  ')
+     A                                  2  2USER
+     A                                  2 53'Work with Configuration File'
+     A                                      DSPATR(HI)
+     A                                  2125TIME
+     A                                      EDTWRD('0  :  :  ')
+     A            MAINTDESC     30A  O  4  2COLOR(BLU)
+     A                                  6  2'Program'
+     A            PGMNAME       10   B  6 15
+     A  01                                  DSPATR(RI)
+     A  01                                  DSPATR(PC)
+     A  51                                  DSPATR(PR)
+     A N51                                  DSPATR(UL)
+     A                                  7  2'Config Key'
+     A            CONFKEY       16A  B  7 15
+     A  02                                  DSPATR(RI)
+     A  02                                  DSPATR(PC)
+     A  52                                  DSPATR(PR)
+     A N52                                  DSPATR(UL)
+     A                                  8  2'Config Value'
+     A            CONFVAL       80A  B  8 15
+     A  03                                  DSPATR(RI)
+     A  03                                  DSPATR(PC)
+     A  53                                  DSPATR(PR)
+     A N53                                  DSPATR(UL)
+     A                                 22  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A            MSGDESC       60A  O 24  2DSPATR(HI)
+     A          R FKEY1
+     A*%%TS  SD  20210806  002829  VPCRZKH     REL-V7R4M0  5770-WDS
+     A  70                             24125'More...'
+     A                                      COLOR(WHT)
+     A N70                             24125'Bottom'
+     A                                      COLOR(WHT)
+     A                                 25  2'F3=Exit   F6=Add'
+     A                                      COLOR(BLU)
+     A            MSGDESC       60A  O 27  2DSPATR(HI)

@@ -1,0 +1,512 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. WRKCONFCBL.
+       AUTHOR. VPC.
+
+      *================================================================*
+      * Work with Configuration File                                   *
+      *                                                                *
+      *----------------------------------------------------------------*
+      * Amendment History                                              *
+      *                                                                *
+      * Date      Pgmr  Description                                    *
+      * --------  ---   ---------------------------------------------- *
+      *                                                                *
+      *================================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+      *================================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT CONFPF           ASSIGN TO DATABASE-CONFPF
+                  ORGANIZATION     IS INDEXED
+                  ACCESS           IS DYNAMIC
+                  RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+
+           COPY MSGFC.
+
+           SELECT WRKCONFDSP       ASSIGN TO WORKSTATION-WRKCONFDSP-SI
+                  ORGANIZATION     IS TRANSACTION
+                  ACCESS MODE      IS DYNAMIC
+                  RELATIVE KEY     IS WS-SFLRECNUM
+                  CONTROL-AREA     IS WS-CONTROL-AREA.
+
+      *================================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  CONFPF
+           LABEL RECORDS ARE STANDARD.
+       01  CONF-REC.
+           COPY DDS-ALL-FORMATS OF CONFPF.
+
+           COPY MSGFD.
+
+       FD  WRKCONFDSP
+           LABEL RECORDS ARE STANDARD.
+       01  WRKCONFDSPREC   PIC X(3564).
+
+
+      *================================================================*
+
+       WORKING-STORAGE SECTION.
+
+      *--- Display file records
+       01  WS-SFLREC1-I.
+           COPY DDS-SFLREC1-I OF WRKCONFDSP
+                REPLACING SFLREC1 BY SFLREC1-I.
+       01  WS-SFLREC1-O.
+           COPY DDS-SFLREC1-O OF WRKCONFDSP
+                REPLACING SFLREC1 BY SFLREC1-O.
+
+       01  WS-SFLCTL1-I.
+           COPY DDS-SFLCTL1-I OF WRKCONFDSP.
+       01  WS-SFLCTL1-O.
+           COPY DDS-SFLCTL1-O OF WRKCONFDSP.
+
+       01  WS-DTL1-I.
+           COPY DDS-DTL1-I OF WRKCONFDSP.
+       01  WS-DTL1-O.
+           COPY DDS-DTL1-O OF WRKCONFDSP.
+
+       01  WS-FKEY1-O.
+           COPY DDS-FKEY1-O   OF WRKCONFDSP.
+
+      *--- Display file indicators
+       01  INDIC-AREA.
+           COPY DDS-ALL-FORMATS-INDIC OF WRKCONFDSP.
+
+      *--- Display file control area
+       01  WS-CONTROL-AREA.
+           05 FKEY-PRESSED             PIC X(2).
+              88 F0-ENTER              VALUE "00".
+              88 F3-EXIT               VALUE "03".
+              88 F6-ADD                VALUE "06".
+              88 F12-CANCEL            VALUE "12".
+              88 F90-PAGEDOWN          VALUE "90".
+              88 F91-PAGEUP            VALUE "91".
+
+       01  PROGRAM-SWITCHES.
+           05 END-PROGRAM-SW           PIC 9.
+              88 START-PROGRAM         VALUE 0.
+              88 END-PROGRAM           VALUE 1.
+           05 EXIT-DTL1-SW             PIC 9.
+              88 ENTER-DTL1            VALUE 0.
+              88 EXIT-DTL1             VALUE 1.
+           05 CONFPF-EOF-SW            PIC 9.
+              88 NOT-EOF-CONFPF        VALUE 0.
+              88 EOF-CONFPF            VALUE 1.
+           05 SFLREC-FOUND-SW          PIC 9.
+              88 SFLREC-NOT-FOUND      VALUE 0.
+              88 SFLREC-FOUND          VALUE 1.
+           05 VALID-ENTRY-SW           PIC 9.
+              88 INVALID-ENTRY         VALUE 0.
+              88 VALID-ENTRY           VALUE 1.
+           05 ADD-OK-SW                PIC 9.
+              88 ADD-NOT-OK            VALUE 0.
+              88 ADD-OK                VALUE 1.
+           05 UPDATE-OK-SW             PIC 9.
+              88 UPDATE-NOT-OK         VALUE 0.
+              88 UPDATE-OK             VALUE 1.
+
+       01  WS-WORK-AREAS.
+           05 WS-OPT                   PIC 9  VALUE ZEROES.
+              88 ADD-OPTION            VALUE 1.
+              88 UPDATE-OPTION         VALUE 2.
+              88 DELETE-OPTION         VALUE 4.
+              88 INQUIRE-OPTION        VALUE 5.
+           05 WS-SFLRECNUM            PIC 9(4)  VALUE ZEROES.
+           05 WS-SFLSIZ                PIC 9(4)  VALUE ZEROES.
+           05 WS-SFLRCDNBR             PIC 9(4)  VALUE ZEROES.
+           05 WS-CTR                   PIC 9(4)  VALUE ZEROES.
+           05 WS-PREV-CONFPGM          PIC X(10) VALUE SPACES.
+
+           COPY MSGVAR.
+
+      *================================================================*
+
+       LINKAGE SECTION.
+       01  PARM-WRKCONFCBL.
+           05 PARM-CONFPGM                 PIC X(10).
+
+      *================================================================*
+
+       PROCEDURE DIVISION USING PARM-WRKCONFCBL.
+
+       0000-MAIN.
+
+           PERFORM 1000-INITIAL.
+           PERFORM 2000-PROCESS UNTIL END-PROGRAM.
+           PERFORM 9000-CLEAN-UP.
+           GOBACK.
+
+      *================================================================*
+
+       1000-INITIAL.
+
+           OPEN INPUT MSGPF
+                I-O   CONFPF
+                      WRKCONFDSP.
+
+           INITIALIZE SFLREC1-I
+                      SFLREC1-O
+                      SFLCTL1-I
+                      SFLCTL1-O
+                      DTL1-I
+                      DTL1-O
+                      FKEY1-O.
+
+           MOVE 15 TO WS-SFLSIZ.
+           MOVE 1 TO WS-SFLRCDNBR.
+
+           SET START-PROGRAM TO TRUE.
+           MOVE PARM-CONFPGM TO CONFPGM OF CONF-REC
+                                CONFPGM OF SFLCTL1-I
+                                WS-PREV-CONFPGM.
+           MOVE SPACES       TO CONFKEY OF CONF-REC.
+           PERFORM 2900-LOAD-SUBFILE.
+
+      *================================================================*
+
+       2000-PROCESS.
+
+           WRITE WRKCONFDSPREC FROM FKEY1-O
+              FORMAT "FKEY1"    INDICATORS INDIC-AREA.
+           MOVE CORR SFLCTL1-I  TO SFLCTL1-O.
+           WRITE WRKCONFDSPREC  FROM SFLCTL1-O
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+           READ  WRKCONFDSP INTO SFLCTL1-I
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+           MOVE SPACES TO MSGDESC OF FKEY1-O.
+
+           EVALUATE TRUE
+              WHEN F0-ENTER
+                 IF CONFPGM OF SFLCTL1-I NOT = WS-PREV-CONFPGM
+                 OR POSCODE OF SFLCTL1-I NOT = SPACES
+                    MOVE 1 TO WS-SFLRCDNBR
+                    MOVE CONFPGM OF SFLCTL1-I TO CONFPGM OF CONF-REC
+                    MOVE POSCODE OF SFLCTL1-I TO CONFKEY OF CONF-REC
+                    PERFORM 2900-LOAD-SUBFILE
+                    MOVE CONFPGM OF SFLCTL1-I TO WS-PREV-CONFPGM
+                 ELSE
+                    SET SFLREC-FOUND TO TRUE
+                    MOVE ZEROES TO WS-SFLRECNUM
+                    PERFORM 3000-PROCESS-SUBFILE
+                       UNTIL SFLREC-NOT-FOUND
+                    IF UPDATE-OPTION
+                       MOVE 1 TO WS-SFLRCDNBR
+                    ELSE
+                       PERFORM 2860-READ-FIRST-SFLREC
+                    END-IF
+                    PERFORM 2900-LOAD-SUBFILE
+                 END-IF
+
+              WHEN F3-EXIT
+                 SET END-PROGRAM TO TRUE
+
+              WHEN F6-ADD
+                 SET ADD-OPTION TO TRUE
+                 SET ENTER-DTL1 TO TRUE
+                 MOVE B'0' TO IN51 IN52
+                 INITIALIZE DTL1-I
+                 PERFORM 3200-CONF-DTL UNTIL EXIT-DTL1
+
+                 MOVE 1 TO WS-SFLRCDNBR
+                 PERFORM 2900-LOAD-SUBFILE
+
+              WHEN F90-PAGEDOWN
+                 PERFORM 2800-PAGEDOWN
+
+              WHEN F91-PAGEUP
+                 PERFORM 2850-PAGEUP
+           END-EVALUATE.
+
+      *================================================================*
+
+       2800-PAGEDOWN.
+
+           IF IN70 = B"1"
+              MOVE 1 TO WS-SFLRCDNBR
+              PERFORM 2900-LOAD-SUBFILE
+           END-IF.
+
+      *================================================================*
+
+       2850-PAGEUP.
+
+           MOVE ZEROES TO WS-CTR.
+           SET NOT-EOF-CONFPF TO TRUE.
+
+           PERFORM 2860-READ-FIRST-SFLREC.
+           START CONFPF
+              KEY >= EXTERNALLY-DESCRIBED-KEY
+              INVALID KEY
+                 SET EOF-CONFPF TO TRUE
+           END-START.
+
+           PERFORM UNTIL EOF-CONFPF OR WS-CTR = WS-SFLSIZ
+              READ CONFPF PRIOR RECORD
+                 AT END
+                    SET EOF-CONFPF TO TRUE
+                 NOT AT END
+                    IF CONFPGM OF CONF-REC NOT = CONFPGM OF SFLCTL1-I
+                       SET EOF-CONFPF TO TRUE
+                    END-IF
+              END-READ
+              IF EOF-CONFPF
+                 INITIALIZE CONFREC
+              ELSE
+                 ADD 1 TO WS-CTR
+              END-IF
+           END-PERFORM.
+
+           MOVE 1 TO WS-SFLRCDNBR.
+           PERFORM 2900-LOAD-SUBFILE.
+
+      *================================================================*
+
+       2860-READ-FIRST-SFLREC.
+
+           MOVE 1 TO WS-SFLRECNUM.
+           READ SUBFILE WRKCONFDSP INTO SFLREC1-O
+              FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+              INVALID KEY
+                 MOVE HIGH-VALUES TO CONFREC
+              NOT INVALID KEY
+                 MOVE CORR SFLREC1-O TO CONFREC
+           END-READ.
+
+      *================================================================*
+
+       2900-LOAD-SUBFILE.
+
+           MOVE WS-SFLRCDNBR TO SFLRCDNBR OF SFLCTL1-I.
+           MOVE B"1" TO IN70.
+
+      *--- Clear subfile
+           MOVE B"1" TO IN81.
+           WRITE WRKCONFDSPREC
+              FORMAT "SFLCTL1"  INDICATORS INDIC-AREA.
+           MOVE B"0" TO IN81.
+
+      *--- Load subfile
+           MOVE ZEROES TO WS-SFLRECNUM.
+           MOVE B"0" TO IN80.
+           SET NOT-EOF-CONFPF TO TRUE.
+
+           START CONFPF
+              KEY >= EXTERNALLY-DESCRIBED-KEY
+              INVALID KEY
+                 SET EOF-CONFPF TO TRUE
+           END-START.
+
+           PERFORM UNTIL EOF-CONFPF OR WS-SFLRECNUM = WS-SFLSIZ
+              READ CONFPF NEXT RECORD
+                 AT END
+                    SET EOF-CONFPF TO TRUE
+              END-READ
+              IF NOT-EOF-CONFPF
+                 IF CONFPGM OF CONF-REC = CONFPGM OF SFLCTL1-I
+                    INITIALIZE SFLREC1-O
+                    ADD 1 TO WS-SFLRECNUM
+                    MOVE CORR CONFREC TO SFLREC1-O
+                    WRITE SUBFILE WRKCONFDSPREC FROM SFLREC1-O
+                       FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+                 ELSE
+                    SET EOF-CONFPF TO TRUE
+                 END-IF
+              END-IF
+           END-PERFORM.
+
+      *--- Check if there are more records
+      *--- IN70 is on  - display 'More...'
+      *--- IN70 is off - display 'Bottom'
+           IF NOT-EOF-CONFPF
+              READ CONFPF NEXT RECORD
+                 AT END
+                    MOVE B"0" TO IN70
+                 NOT AT END
+                    MOVE B"1" TO IN70
+              END-READ
+           ELSE
+              MOVE B"0" TO IN70
+           END-IF.
+
+      *--- Turn on SFLDSP indicator if subfile record is created
+           IF WS-SFLRECNUM > 0
+              MOVE B"1" TO IN80
+           END-IF.
+
+      *================================================================*
+
+       3000-PROCESS-SUBFILE.
+
+           ADD 1 TO WS-SFLRECNUM.
+           READ SUBFILE WRKCONFDSP INTO SFLREC1-O
+              FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+              INVALID KEY
+                 SET SFLREC-NOT-FOUND TO TRUE
+           END-READ.
+
+           IF SFLREC-FOUND
+              IF OPT OF SFLREC1-O NOT = ZEROES
+                 MOVE OPT OF SFLREC1-O TO WS-OPT
+                 EVALUATE TRUE
+                    WHEN UPDATE-OPTION
+                       MOVE B'1' TO IN51
+                       MOVE B'0' TO IN52
+                       PERFORM 3100-GET-CONF-DTL
+
+                    WHEN DELETE-OPTION
+                       MOVE '00006' TO WS-MSGCODE
+                       PERFORM 9900-READ-MSGPF
+                       MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+                       MOVE B'1' TO IN51 IN52
+                       PERFORM 3100-GET-CONF-DTL
+
+                    WHEN INQUIRE-OPTION
+                       MOVE B'1' TO IN51 IN52
+                       PERFORM 3100-GET-CONF-DTL
+                 END-EVALUATE
+                 IF WS-MSGCODE = '00005'
+                    MOVE 1 TO WS-SFLRCDNBR
+                 ELSE
+                    MOVE WS-SFLRECNUM TO WS-SFLRCDNBR
+                 END-IF
+              END-IF
+
+              MOVE ZEROES TO OPT OF SFLREC1-O
+              REWRITE SUBFILE WRKCONFDSPREC FROM SFLREC1-O
+                 FORMAT "SFLREC1"  INDICATORS INDIC-AREA
+           END-IF.
+
+      *================================================================*
+
+       3100-GET-CONF-DTL.
+           MOVE CORR SFLREC1-O TO CONFREC.
+           READ CONFPF.
+           MOVE CORR CONFREC TO DTL1-I.
+
+           SET ENTER-DTL1 TO TRUE.
+           PERFORM 3200-CONF-DTL UNTIL EXIT-DTL1.
+
+      *================================================================*
+
+       3200-CONF-DTL.
+
+           MOVE CORR DTL1-I TO DTL1-O.
+           WRITE WRKCONFDSPREC FROM DTL1-O
+              FORMAT "DTL1" INDICATORS INDIC-AREA.
+           READ  WRKCONFDSP INTO DTL1-I
+              FORMAT "DTL1" INDICATORS INDIC-AREA.
+           MOVE B'0' TO IN01 IN02.
+           MOVE SPACES TO MSGDESC OF DTL1-O
+                          WS-MSGCODE.
+
+           EVALUATE TRUE
+              WHEN F0-ENTER
+                 EVALUATE TRUE
+                    WHEN ADD-OPTION
+                       PERFORM 3600-VALIDATE
+                       IF VALID-ENTRY
+                          MOVE CORR DTL1-I TO CONFREC
+                          WRITE CONF-REC
+
+                          SET EXIT-DTL1 TO TRUE
+      *                   MOVE 1 TO WS-SFLRCDNBR
+      *                   PERFORM 2900-LOAD-SUBFILE
+
+                          MOVE '00003' TO WS-MSGCODE
+                          PERFORM 9900-READ-MSGPF
+                          MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
+                       END-IF
+
+                    WHEN UPDATE-OPTION
+                       PERFORM 3600-VALIDATE
+                       IF VALID-ENTRY
+                          MOVE CORR SFLREC1-O TO CONFREC
+                          READ CONFPF
+                          DELETE CONFPF
+
+                          MOVE CORR DTL1-I TO CONFREC
+                          WRITE CONF-REC
+
+                          SET EXIT-DTL1 TO TRUE
+      *                   MOVE 1 TO WS-SFLRCDNBR
+      *                   PERFORM 2900-LOAD-SUBFILE
+
+                          MOVE '00004' TO WS-MSGCODE
+                          PERFORM 9900-READ-MSGPF
+                          MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
+                       END-IF
+
+                    WHEN DELETE-OPTION
+                       DELETE CONFPF
+                       SET EXIT-DTL1 TO TRUE
+
+                       MOVE '00005' TO WS-MSGCODE
+                       PERFORM 9900-READ-MSGPF
+                       MOVE WS-MSGDESC TO MSGDESC OF FKEY1-O
+
+                    WHEN INQUIRE-OPTION
+                       SET EXIT-DTL1 TO TRUE
+                 END-EVALUATE
+
+
+              WHEN F12-CANCEL
+                 SET EXIT-DTL1 TO TRUE
+           END-EVALUATE.
+
+      *================================================================*
+
+       3600-VALIDATE.
+
+           SET VALID-ENTRY TO TRUE.
+           IF CONFKEY OF DTL1-I = SPACES
+              IF ADD-OPTION
+                 MOVE '00001' TO WS-MSGCODE
+                 PERFORM 9900-READ-MSGPF
+                 MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+                 MOVE B'1' TO IN01
+                 SET INVALID-ENTRY TO TRUE
+              END-IF
+           END-IF.
+
+           IF CONFVAL OF DTL1-I = SPACES
+              IF ADD-OPTION OR UPDATE-OPTION
+                 MOVE '00001' TO WS-MSGCODE
+                 PERFORM 9900-READ-MSGPF
+                 MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+                 MOVE B'1' TO IN02
+                 SET INVALID-ENTRY TO TRUE
+              END-IF
+           ELSE
+              MOVE CORR DTL1-I TO CONFREC
+              READ CONFPF
+                 INVALID KEY
+                    CONTINUE
+                 NOT INVALID KEY
+                    MOVE '00002' TO WS-MSGCODE
+                    PERFORM 9900-READ-MSGPF
+                    MOVE WS-MSGDESC TO MSGDESC OF DTL1-O
+                    MOVE B'1' TO IN02
+                    SET INVALID-ENTRY TO TRUE
+              END-READ
+           END-IF.
+
+      *================================================================*
+
+       9000-CLEAN-UP.
+
+           CLOSE CONFPF
+                 MSGPF
+                 WRKCONFDSP.
+
+           COPY MSGRTN.
+
