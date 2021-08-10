@@ -1,0 +1,313 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. LSTSPL.
+
+      ******************************************************************
+      *
+      * Program: List Spooled Files for Current User
+      *
+      * Language: ILE COBOL
+      *
+      * Description: This example shows the steps necessary to
+      * process keyed output from an API.
+      *
+      * APIs Used: QUSLSPL - List Spooled Files
+      * QUSCRTUS - Create User Space
+      * QUSPTRUS - Retrieve Pointer to User Space
+      *
+      ******************************************************************
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT LISTING ASSIGN TO PRINTER-QPRINT
+                  ORGANIZATION IS SEQUENTIAL.
+
+      ******************************************************************
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  LISTING RECORD CONTAINS 132 CHARACTERS
+                   LABEL RECORDS ARE STANDARD
+                   DATA RECORD IS LIST-LINE.
+       01 LIST-LINE PIC X(132).
+
+      ******************************************************************
+
+       WORKING-STORAGE SECTION.
+      *
+      * Error Code parameter include. As this sample program
+      * uses COPY to include the error code structure, only the first
+      * 16 bytes of the error code structure are available. If the
+      * application program needs to access the variable length
+      * exception data for the error, the developer should physically
+      * copy the QSYSINC include and modify the copied include to
+      * define additional storage for the exception data.
+      *
+      
+       COPY QUSEC OF QSYSINC-QLBLSRC.
+       01  QUS-EC.                                                       
+           05  BYTES-PROVIDED                      PIC S9(00009) BINARY. 
+           05  BYTES-AVAILABLE                     PIC S9(00009) BINARY. 
+           05  EXCEPTION-ID                        PIC  X(00007).        
+           05  RESERVED                            PIC  X(00001).        
+      *    05  EXCEPTION-DATA                      PIC  X(00001).        
+      *                                                                  
+      *                                      Varying length              
+       01  QUS-ERRC0200.                                                 
+           05  KEY-FIELD                           PIC S9(00009) BINARY. 
+           05  BYTES-PROVIDED                      PIC S9(00009) BINARY. 
+           05  BYTES-AVAILABLE                     PIC S9(00009) BINARY. 
+           05  EXCEPTION-ID                        PIC  X(00007).        
+           05  RESERVED                            PIC  X(00001).        
+           05  CCSID                               PIC S9(00009) BINARY. 
+           05  OFFSET-EXC-DATA                     PIC S9(00009) BINARY. 
+           05  LENGTH-EXC-DATA                     PIC S9(00009) BINARY. 
+      *    05  RESERVED2                           PIC  X(00001).        
+      *                                                                  
+      *    05  EXCEPTION-DATA                      PIC  X(00001).        
+      *                                                                  
+      *                                      Varying Length    §B1A      
+      
+      *
+      * Listing text
+      *
+       01  PRTLIN.
+           05 PRTFIL              PIC X(10).
+           05 FILLER              PIC X(05).
+           05 PAGES               PIC S9(09).
+           05 FILLER              PIC X(05)
+           05 OPNDAT              PIC X(07).
+       01  LSTERR.
+           05 TEXT1   PIC X(22) VALUE "List data not valid".
+       01  HDRERR.
+           05 TEXT2   PIC X(22) VALUE "Unknown Generic Header".
+
+       01  MISC.
+           05 SPC-NAME           PIC X(20) VALUE "SPCNAME   QTEMP ".
+           05 SPC-SIZE           PIC S9(09) VALUE 2000 BINARY.
+           05 SPC-INIT           PIC X(01) VALUE X"00".
+           05 SPCPTR             POINTER.
+           05 SPC-TYPE           PIC X(10) VALUE "*USRSPC".
+           05 EXT-ATTR           PIC X(10) VALUE "QUSLSPL ".
+           05 SPC-AUT            PIC X(10) VALUE "*ALL".
+           05 SPC-TEXT           PIC X(50).
+           05 SPC-REPLAC         PIC X(10) VALUE "*YES".
+           05 SPC-DOMAIN         PIC X(10) VALUE "*USER".
+           05 LST-FORMAT-NAME    PIC X(08) VALUE "SPLF0200".
+           05 USR-PRF            PIC X(10) VALUE "*CURRENT ".
+           05 OUTQ               PIC X(20) VALUE "*ALL".
+           05 FORMTYP            PIC X(10) VALUE "*ALL".
+           05 USRDTA             PIC X(10) VALUE "*ALL".
+           05 JOBNAM             PIC X(26).
+       01  KEYS.
+           05 KEY1               PIC S9(09) BINARY VALUE 201.
+           05 KEY2               PIC S9(09) BINARY VALUE 216.
+           05 KEY3               PIC S9(09) BINARY VALUE 211.
+       01  NUMBER-OF-KEYS        PIC S9(09) BINARY VALUE 3.
+       01  MISC2.
+           05 PAGESA             PIC X(04).
+           05 PAGESN REDEFINES PAGESA  PIC S9(09) BINARY.
+
+      ******************************************************************
+
+       LINKAGE SECTION.
+      *
+      * String to map User Space offsets into
+      *
+       01 STRING-SPACE PIC X(32000).
+      *
+      * User Space Generic Header include. These includes will be
+      * mapped over a User Space.
+      *
+       COPY QUSGEN OF QSYSINC-QLBLSRC.
+      *****************************************************************  
+      *Type Definition for the User Space Generic Header.                
+      *****************************************************************  
+       01  QUS-GENERIC-HEADER-0100.                                      
+           05  USER-AREA                           PIC  X(00064).        
+           05  SIZE-GENERIC-HEADER                 PIC S9(00009) BINARY. 
+           05  STRUCTURE-RELEASE-LEVEL             PIC  X(00004).        
+           05  FORMAT-NAME                         PIC  X(00008).        
+           05  API-USED                            PIC  X(00010).        
+           05  DATE-TIME-CREATED                   PIC  X(00013).        
+           05  INFORMATION-STATUS                  PIC  X(00001).        
+           05  SIZE-USER-SPACE                     PIC S9(00009) BINARY. 
+           05  OFFSET-INPUT-PARAMETER              PIC S9(00009) BINARY. 
+           05  SIZE-INPUT-PARAMETER                PIC S9(00009) BINARY. 
+           05  OFFSET-HEADER-SECTION               PIC S9(00009) BINARY. 
+           05  SIZE-HEADER-SECTION                 PIC S9(00009) BINARY. 
+           05  OFFSET-LIST-DATA                    PIC S9(00009) BINARY. 
+           05  SIZE-LIST-DATA                      PIC S9(00009) BINARY. 
+           05  NUMBER-LIST-ENTRIES                 PIC S9(00009) BINARY. 
+           05  SIZE-EACH-ENTRY                     PIC S9(00009) BINARY. 
+           05  CCSID-LIST-ENT                      PIC S9(00009) BINARY. 
+           05  COUNTRY-ID                          PIC  X(00002).        
+           05  LANGUAGE-ID                         PIC  X(00003).        
+           05  SUBSET-LIST-INDICATOR               PIC  X(00001).        
+           05  RESERVED                            PIC  X(00042).         
+      *****************************************************************   
+      *Type Definition for the User Space Generic Header, 300 format.     
+      *****************************************************************   
+       01  QUS-GENERIC-HEADER-0300.                                       
+           05  USER-AREA                           PIC  X(00064).         
+           05  SIZE-GENERIC-HEADER                 PIC S9(00009) BINARY.  
+           05  STRUCTURE-RELEASE-LEVEL             PIC  X(00004).         
+           05  FORMAT-NAME                         PIC  X(00008).         
+           05  API-USED                            PIC  X(00010).         
+           05  DATE-TIME-CREATED                   PIC  X(00013).         
+           05  INFORMATION-STATUS                  PIC  X(00001).         
+           05  SIZE-USER-SPACE                     PIC S9(00009) BINARY.  
+           05  OFFSET-INPUT-PARAMETER              PIC S9(00009) BINARY.  
+           05  SIZE-INPUT-PARAMETER                PIC S9(00009) BINARY.  
+           05  OFFSET-HEADER-SECTION               PIC S9(00009) BINARY.  
+           05  SIZE-HEADER-SECTION                 PIC S9(00009) BINARY.  
+           05  OFFSET-LIST-DATA                    PIC S9(00009) BINARY.  
+           05  SIZE-LIST-DATA                      PIC S9(00009) BINARY.  
+           05  NUMBER-LIST-ENTRIES                 PIC S9(00009) BINARY.  
+           05  SIZE-EACH-ENTRY                     PIC S9(00009) BINARY.  
+           05  CCSID-LIST-ENT                      PIC S9(00009) BINARY.  
+           05  COUNTRY-ID                          PIC  X(00002).         
+           05  LANGUAGE-ID                         PIC  X(00003).         
+           05  SUBSET-LIST-INDICATOR               PIC  X(00001).    
+           05  RESERVED-1                          PIC  X(00042).    
+           05  ENTRY-POINT-NAME                    PIC  X(00256).    
+           05  RESERVED-2                          PIC  X(00128).    
+      *
+      * List Spool Files API include. These includes will be
+      * mapped over a User Space. The include is copied into the
+      * source so that we can define the variable length portion
+      * of QUS-LSPL-KEY-INFO.
+      *
+       01  QUS-LSPL-KEY-INFO.
+           05 LEN-FIELD-INFO-RETD PIC S9(00009) BINARY.
+           05 KEY-FIELD-FOR-FIELD-RETD PIC S9(00009) BINARY.
+           05 TYPE-OF-DATA PIC X(00001).
+           05 RESERV3 PIC X(00003).
+           05 DATA-LENGTH PIC S9(00009) BINARY.
+           05 DATA-FIELD PIC X(00100).
+      *
+      * Varying length
+      * 05 RESERVED PIC X(00001).
+      * Varying length
+
+       01  QUS-SPLF0200.
+           05 NUM-FIELDS-RETD PIC S9(00009) BINARY.
+           05 KEY-INFO.
+              09 LEN-FIELD-INFO-RETD PIC S9(00009) BINARY.
+              09 KEY-FIELD-FOR-FIELD-RETD PIC S9(00009) BINARY.
+              09 TYPE-OF-DATA PIC X(00001).
+              09 RESERV3 PIC X(00003).
+              09 DATA-LENGTH PIC S9(00009) BINARY.
+              09 DATA-FIELD PIC X(00001).
+              09 RESERVED PIC X(00001).
+      *
+      * Varying length
+      *
+
+      ******************************************************************
+
+       PROCEDURE DIVISION.
+       MAIN-LINE.
+           OPEN OUTPUT LISTING.
+      *
+      * Set Error Code structure to use exceptions
+      *
+           MOVE 0 TO BYTES-PROVIDED OF QUS-EC.
+      *
+      * Create a User Space for the List generated by QUSLSPL
+      *
+           CALL "QUSCRTUS" USING SPC-NAME, EXT-ATTR, SPC-SIZE,
+           SPC-INIT, SPC-AUT, SPC-TEXT,
+           SPC-REPLAC, QUS-EC, SPC-DOMAIN.
+      *
+      * Call QUSLSPL to get all spooled files for *CURRENT user
+      *
+           CALL "QUSLSPL" USING SPC-NAME, LST-FORMAT-NAME, USR-PRF,
+           OUTQ, FORMTYP, USRDTA, QUS-EC,
+           JOBNAM, KEYS, NUMBER-OF-KEYS.
+      *
+      * Get a resolved pointer to the User Space for performance
+      *
+           CALL "QUSPTRUS" USING SPC-NAME, SPCPTR, QUS-EC.
+      *
+      * If valid information was returned
+      *
+           SET ADDRESS OF QUS-GENERIC-HEADER-0100 TO SPCPTR.
+           IF STRUCTURE-RELEASE-LEVEL OF QUS-GENERIC-HEADER-0100
+           NOT EQUAL "0100"
+               WRITE LIST-LINE FROM HDRERR,
+               STOP RUN.
+           IF (INFORMATION-STATUS OF QUS-GENERIC-HEADER-0100 = "C"
+           OR INFORMATION-STATUS OF QUS-GENERIC-HEADER-0100 = "P")
+           AND NUMBER-LIST-ENTRIES OF QUS-GENERIC-HEADER-0100 > 0
+      *
+      * address current list entry
+      *
+              SET ADDRESS OF STRING-SPACE TO SPCPTR,
+              SET ADDRESS OF QUS-SPLF0200 TO
+              ADDRESS OF STRING-SPACE((OFFSET-LIST-DATA
+              OF QUS-GENERIC-HEADER-0100 + 1):1),
+      *
+      * and process all of the entries
+      *
+              PERFORM PROCES
+              NUMBER-LIST-ENTRIES OF QUS-GENERIC-HEADER-0100 TIMES,
+           ELSE
+              WRITE LIST-LINE FROM LSTERR.
+
+           STOP RUN.
+
+      ******************************************************************
+
+       PROCES.
+      *
+      * address the first variable length record for this entry
+      *
+           SET ADDRESS OF QUS-LSPL-KEY-INFO TO ADDRESS OF
+           QUS-SPLF0200(5:).
+      *
+      * process all variable length records associated with this entry
+      *
+           PERFORM PROCES2 NUM-FIELDS-RETD TIMES.
+           WRITE LIST-LINE FROM PRTLIN.
+      *
+      * after each entry, increment to the next entry
+      *
+           SET ADDRESS OF STRING-SPACE TO ADDRESS OF QUS-SPLF0200.
+           SET ADDRESS OF QUS-SPLF0200 TO ADDRESS OF STRING-SPACE
+           ((SIZE-EACH-ENTRY OF QUS-GENERIC-HEADER-0100 + 1):1).
+      *
+      * Process each variable length record based on key
+      *
+      ******************************************************************
+       PROCES2.
+      *
+      * extract spooled file name for report
+      *
+           IF KEY-FIELD-FOR-FIELD-RETD OF QUS-LSPL-KEY-INFO = 201
+              MOVE SPACES TO PRTFIL,
+              MOVE DATA-FIELD OF QUS-LSPL-KEY-INFO(
+              1:DATA-LENGTH OF QUS-LSPL-KEY-INFO)
+              TO PRTFIL.
+      *
+      * extract number of pages for report
+      *
+           IF KEY-FIELD-FOR-FIELD-RETD OF QUS-LSPL-KEY-INFO = 211
+              MOVE DATA-FIELD OF QUS-LSPL-KEY-INFO(
+              1:DATA-LENGTH OF QUS-LSPL-KEY-INFO)
+              TO PAGESA,
+              MOVE PAGESN TO PAGES.
+      *
+      * extract age of spooled file for report
+      *
+           IF KEY-FIELD-FOR-FIELD-RETD OF QUS-LSPL-KEY-INFO = 216
+              MOVE SPACES TO OPNDAT,
+              MOVE DATA-FIELD OF QUS-LSPL-KEY-INFO(
+              1:DATA-LENGTH OF QUS-LSPL-KEY-INFO)
+              TO OPNDAT.
+      *
+      * address next variable length entry
+      *
+           SET ADDRESS OF STRING-SPACE TO ADDRESS OF QUS-LSPL-KEY-INFO.
+           SET ADDRESS OF QUS-LSPL-KEY-INFO TO ADDRESS OF
+           STRING-SPACE(
+           LEN-FIELD-INFO-RETD OF QUS-LSPL-KEY-INFO + 1:1).
