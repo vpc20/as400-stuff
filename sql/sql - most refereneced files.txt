@@ -17,6 +17,11 @@ delete FROM tmppgmref
 WHERE WHFNAM < 'A'                         
 13 rows deleted from TMPPGMREF in QTEMP.   
 
+delete from qtemp/tmpdbr              
+where whrefi = ' '                    
+or    whtype <> 'D'                   
+53 rows deleted from TMPDBR in QTEMP. 
+
 // update the lf names to pf names
 // update qtemp/pgmref p                                            
 // set p.whfnam = coalesce((select whrfi from dbrpf                
