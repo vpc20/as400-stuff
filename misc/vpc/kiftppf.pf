@@ -1,0 +1,9 @@
+     A*---------------------------------------------------------------*
+     A*  AUTHOR : VPC                                                 *
+     A*  DATE   : 20 JUL 2000                                         *
+     A*  DESC   : FTP PF TO GENERATE DATAPOST FTP SCRIPT              *
+     A*---------------------------------------------------------------*
+     A          R KIFTPREC
+     A            SRCSEQ         6S 2
+     A            SRCDAT         6S 0
+     A            SRCDTA        80A

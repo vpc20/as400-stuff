@@ -1,0 +1,24 @@
+     H Dftactgrp(*NO) Actgrp(*NEW) BNDDIR('QC2LE') debug
+     H COPYRIGHT  ('Giuseppe Costagliola 2005 - beppecosta@yahoo.it')
+      //-------------------------------------------------------------------
+      // Parameters
+      //-------------------------------------------------------------------
+     DEntryParms       PR                  extpgm('SPL2PDFD')
+     D Path                          70A
+     DEntryParms       PI
+     D Path                          70A
+      * get path name of current working directory
+     Dgetcwd           PR              *   extproc('getcwd')
+     D curDir                          *   value
+     D dirSize                       10U 0 value
+     D curDir          S             70A
+      /free
+              // retrieves the current directory
+       if (getcwd(%addr(Curdir): %size(curdir)) = *NULL);
+       Path = ' ';
+       else;
+       Path = %str(%addr(Curdir));
+       endif;
+       *inlr = *on;
+      /end-free
+

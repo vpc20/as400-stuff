@@ -1,0 +1,218 @@
+       IDENTIFICATION DIVISION.
+      *****************************************************************
+      **                       KPL System                            **
+      **                       ----------                            **
+      ** Program Id    -  KIXXXXXX    KIBS Batch Run Status Report   **
+      **                                                             **
+      *****************************************************************
+      **                                                             **
+      **  CHANGES DETAILS                                            **
+      **                                                             **
+      **  Change No. Date      BY  Description                       **
+      **  ---------- -----     --  -----------------------           **
+      **                                                             **
+      *****************************************************************
+
+       PROGRAM-ID.    KIXXXXXX.
+       AUTHOR.        VPC.
+       INSTALLATION.  KEPPEL TATLEE.
+       DATE-WRITTEN.  03/02/2001.
+
+      *---------------------------------------------------------------*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+       SPECIAL-NAMES. LOCAL-DATA IS LOCAL-DATA-AREA.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT KIXXXXXX-FILE ASSIGN TO FORMATFILE-KIXXXXXX.
+
+      *---------------------------------------------------------------*
+
+       DATA DIVISION.
+       FILE SECTION.
+
+       FD  KIXXXXXX-FILE
+           LABEL RECORDS OMITTED.
+       01  KIXXXXXX-REC    PIC X(500).
+
+       WORKING-STORAGE SECTION.
+
+           COPY CPDATAWS     OF    QCBLSRC.
+           COPY LDABATWS     OF    QCBLSRC.
+           COPY CVTDTPRMWS   OF QCBLSRC.
+
+       01  WS-WORK-AREAS.
+           05 WS-LINE-CTR               PIC 9(2)  VALUE ZEROES.
+           05 WS-START-POS              PIC 9(2)  VALUE ZEROES.
+           05 WS-STR-LENGTH             PIC 9(2)  VALUE ZEROES.
+           05 WS-OUT-RPTTTLT            PIC X(50) VALUE SPACES.
+
+       01  WS-SYSTEM-VARIABLES.
+           05 WS-SYSTEM-DATE             PIC 9(6).
+           05 WS-SYSTEM-TIME             PIC 9(8).
+           05 WS-SYSDATE-CCYYMMDD-NUM    PIC 9(8).
+           05 WS-SYSDATE-CCYYMMDD REDEFINES WS-SYSDATE-CCYYMMDD-NUM.
+              10 WS-SYSDATE-CC           PIC X(2).
+              10 WS-SYSDATE-YYMMDD       PIC X(6).
+           05 WS-SYSTIME-HHMMSSMS.
+              10 WS-SYSTIME-HHMMSS       PIC 9(6).
+              10 WS-SYSTIME-MS           PIC 9(2).
+
+      * Parameters for Retrieve Data Area API
+       01  WS-QWCRDTAA-PARAMETER.
+           05 WS-API-RECEIVER-VAR.
+              10  FILL1                  PIC X(36).
+              10  WS-API-RECEIVER-DATA   PIC X(10).
+           05 WS-API-RECEIVER-VAR-LEN    PIC S9(9) BINARY VALUE 46.
+           05 WS-API-DTAARA-NAME         PIC X(20)
+              VALUE "KICMDTAARA*LIBL     ".
+           05 WS-API-START-POS           PIC S9(9) BINARY VALUE 31.
+           05 WS-API-DATA-LENGTH         PIC S9(9) BINARY VALUE 10.
+           05 WS-ERROR-CODE.
+              10  BYTESPROVIDED     PIC S9(9) BINARY VALUE ZEROES.
+              10  BYTESRETURNED     PIC S9(9) BINARY VALUE ZEROES.
+              10  EXCEPTIONID       PIC X(7).
+              10  EXCEPTIONDATA     PIC X(100).
+
+       01 WS-HDR1.
+          COPY DDS-HDR1-O   OF KIXXXXXX.
+
+       01 WS-DTL1.
+          COPY DDS-DTL1-O   OF KIXXXXXX.
+
+       01 WS-RPTFTR.
+          COPY DDS-RPTFTR-O OF KIXXXXXX.
+
+       01 WS-TTLFTRX.
+          COPY TTLFTRWS OF QCBLSRC.
+
+      *LINKAGE SECTION.
+      *
+      *01 PROGNAME        PIC X(10).
+      *01 FILENAME        PIC X(10).
+      *01 REPTYPE         PIC X(3).
+
+      *---------------------------------------------------------------*
+
+       PROCEDURE DIVISION.
+
+      *DECLARATIVES.
+      *  COPY   DCLBATPD    OF  QCBLSRC.
+      *END DECLARATIVES.
+
+       BEGIN-NON-DECLARATIVES SECTION.
+       A000-MAIN-PARA.
+
+           PERFORM A1000-INIT-PARA    THRU A1000-EXIT.
+
+           PERFORM B1000-PROCESS-PARA THRU B1000-EXIT.
+
+           PERFORM C1000-CLOSE-PARA   THRU C1000-EXIT.
+
+       A000-EXIT.
+           GOBACK.
+
+      *---------------------------------------------------------------*
+
+       A1000-INIT-PARA.
+
+           INITIALIZE WS-LDA.
+           ACCEPT WS-LDA FROM LOCAL-DATA-AREA.
+           MOVE "KIXXXXXX" TO PROGRAM-NAME.
+
+           OPEN OUTPUT KIXXXXXX-FILE.
+
+           INITIALIZE  WS-WORK-AREAS
+                       HDR1-O
+                       DTL1-O
+                       RPTFTR-O
+                       WS-SYSTEM-VARIABLES.
+
+           MOVE LDA-USER-ID TO USERID OF HDR1-O.
+
+           ACCEPT WS-SYSTEM-DATE FROM DATE.
+           MOVE   WS-SYSTEM-DATE TO   IN-DATEN.
+           MOVE    1             TO   IN-FMT1.
+           MOVE    1             TO   IN-FMT2.
+           CALL   "CVTDATX" USING IN-DATEN
+                                  IN-FMT
+                                  OUT-DATEN
+                                  OUT-DATEC
+                                  RESULT.
+           CANCEL "CVTDATX".
+           MOVE   OUT-DATEC TO CURDATE OF HDR1-O.
+
+           PERFORM  Z9500-GET-TTLFTR THRU Z9500-EXIT.
+
+       A1000-EXIT.
+           EXIT.
+
+      *---------------------------------------------------------------*
+
+       B1000-PROCESS-PARA.
+
+           CALL "QWCRDTAA" USING
+              WS-API-RECEIVER-VAR
+              WS-API-RECEIVER-VAR-LEN
+              WS-API-DTAARA-NAME
+              WS-API-START-POS
+              WS-API-DATA-LENGTH
+              WS-ERROR-CODE.
+           DISPLAY "EXCEPTIONID = " EXCEPTIONID.
+           DISPLAY "WS-API-RECEIVER-DATA = " WS-API-RECEIVER-DATA.
+
+           WRITE KIXXXXXX-REC FROM HDR1-O FORMAT IS "HDR1".
+           WRITE KIXXXXXX-REC FROM DTL1-O FORMAT IS "DTL1".
+
+
+       B1000-EXIT.
+           EXIT.
+
+      *---------------------------------------------------------------*
+
+       C1000-CLOSE-PARA.
+
+           MOVE OUT-RPTFTRT TO RPTFTRT OF RPTFTR-O.
+           WRITE KIXXXXXX-REC FROM RPTFTR-O FORMAT IS "RPTFTR".
+
+           CLOSE  KIXXXXXX-FILE.
+
+       C1000-EXIT.
+           EXIT.
+
+      *---------------------------------------------------------------*
+
+       Z9500-GET-TTLFTR.
+
+           INITIALIZE TTLFTRX-PARM OF WS-TTLFTRX.
+           MOVE LDA-BANK-CODE             TO IN-BANKC.
+           MOVE PROGRAM-NAME              TO IN-RPTN.
+           MOVE LDA-CURPROCD              TO IN-DATE-TTLFTR.
+
+           PERFORM ZBI940-CALL-TTLFTRX THRU
+                   ZBI940-EXIT.
+
+           UNSTRING OUT-RPTTTLT
+                    DELIMITED BY "  "
+                    INTO WS-OUT-RPTTTLT
+                    COUNT WS-STR-LENGTH.
+           COMPUTE  WS-START-POS = (50 - WS-STR-LENGTH) / 2.
+           IF WS-START-POS = ZEROES
+              MOVE 1 TO WS-START-POS
+           END-IF.
+
+           MOVE SPACES TO WS-OUT-RPTTTLT.
+           MOVE OUT-RPTTTLT(1:WS-STR-LENGTH)
+                TO WS-OUT-RPTTTLT(WS-START-POS:WS-STR-LENGTH).
+           MOVE WS-OUT-RPTTTLT TO RPTTTLT OF HDR1-O.
+
+       Z9500-EXIT.
+           EXIT.
+
+       COPY   TTLFTRPD    OF   QCBLSRC.
+

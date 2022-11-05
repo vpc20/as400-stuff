@@ -1,0 +1,49 @@
+     FN3XDSPF CF  E                    WORKSTN      KINFDS INFDS
+     IINFDS       DS
+     I                                      369 369 KEY
+      * Named hexadecimal constants for function keys
+     I              X'31'                 C         F01
+     I              X'32'                 C         F02
+     I              X'33'                 C         F03
+     I              X'34'                 C         F04
+     I              X'35'                 C         F05
+     I              X'36'                 C         F06
+     I              X'37'                 C         F07
+     I              X'38'                 C         F08
+     I              X'39'                 C         F09
+     I              X'3A'                 C         F10
+     I              X'3B'                 C         F11
+     I              X'3C'                 C         F12
+     I              X'B1'                 C         F13
+     I              X'B2'                 C         F14
+     I              X'B3'                 C         F15
+     I              X'B4'                 C         F16
+     I              X'B5'                 C         F17
+     I              X'B6'                 C         F18
+     I              X'B7'                 C         F19
+     I              X'B8'                 C         F20
+     I              X'B9'                 C         F21
+     I              X'BA'                 C         F22
+     I              X'BB'                 C         F23
+     I              X'BC'                 C         F24
+     I              X'BD'                 C         CLEAR
+     I              X'F1'                 C         ENTER
+     I              X'F3'                 C         HELP
+     I              X'F4'                 C         PAGEUP
+     I              X'F5'                 C         PAGEDN
+     I              X'F6'                 C         PRINT
+      *   .
+      *   .
+      *   .
+     C                     EXFMTN3X01
+     C                     SELEC
+     C           KEY       WHEQ F03
+     C           KEY       OREQ F12
+     C                     MOVE *ON       *INLR
+     C                     RETRN
+     C           KEY       WHEQ F05
+     C                     EXSR REFRES
+     C           KEY       WHEQ ENTER
+     C                     EXSR PROCES
+     C                     ENDSL
+      *

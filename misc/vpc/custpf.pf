@@ -1,0 +1,39 @@
+      *==============================================================*
+      * Sample Customer File (Partial)                               *
+      *==============================================================*
+      *
+     A                                      UNIQUE
+     A          R CUSTPR                    TEXT('Customer Record')
+      *
+     A            CUSTNO         7P 0       COLHDG('Customer' 'Number')
+     A                                      TEXT('Customer number')
+     A            CNAME         30A         COLHDG('Customer name')
+     A                                      TEXT('Customer name')
+     A            CSTRT         30A         COLHDG('Street address')
+     A                                      TEXT('Street address')
+     A            CCITY         20A         COLHDG('City')
+     A                                      TEXT('City')
+     A            CSTATE         2A         COLHDG('State')
+     A                                      TEXT('State')
+     A            CZIP           9A         COLHDG('Zip code')
+     A                                      TEXT('Zip code')
+     A            CCONT         30A         COLHDG('Customer contact')
+     A                                      TEXT('Customer contact')
+     A            CCTITL        30A         COLHDG('Contact title')
+     A                                      TEXT('Contact title')
+     A            CPHONE        10P 0       COLHDG('Contact' 'Phone' 'Number')
+     A                                      TEXT('Contact phone number')
+     A            NOTES1        40A         COLHDG('Notes 1')
+     A                                      TEXT('Notes 1')
+     A            NOTES2        40A         COLHDG('Notes 2')
+     A                                      TEXT('Notes 2')
+     A            CLORDT         6S 0       COLHDG('Last order date')
+     A                                      TEXT('Last order date')
+     A            CBALNC        11P 2       COLHDG('Current' 'Balance')
+     A                                      TEXT('Current balance')
+     A                                      EDTCDE(J)
+     A            CCRFLG         1A         COLHDG('Good Credit Y/N?')
+     A                                      TEXT('Credit Flag')
+     A                                      VALUES('Y' 'N')
+      *
+     A          K CUSTNO

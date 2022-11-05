@@ -1,0 +1,332 @@
+      *==============================================================*
+      * Program name: CUSTRPG2                                       *
+      * Purpose.....: Customer Maintenance Program                   *
+      *                                                              *
+      * Indicators:                                                  *
+      *     01  -  Customer Record not found                         *
+      *     02  -  Customer Record already exists                    *
+      *     03  -  Prompt not allowed at current cursor position     *
+      *     04  -  Customer Number should not be blanks              *
+      *     60  -  Cursor Location Indicator                         *
+      *     75  -  Protect fields before delete                      *
+      *     90  -  Customer record chain indicator                   *
+      *==============================================================*
+      *
+      *==============================================================*
+      * Files Declaration                                            *
+      *==============================================================*
+      *
+     FCUSTPF  UF  E           K        DISK                      A
+     FCUSTDSP2CF  E                    WORKSTN      KINFDS INFDS
+      *
+      *==============================================================*
+      * Data Structures                                              *
+      *==============================================================*
+      *
+     IINFDS       DS
+     I                                      369 369 KEY
+     I                                    B 370 3710CURSOR
+      *
+      *==============================================================*
+      * Constants Declaration                                        *
+      *==============================================================*
+      *
+      * Function keys
+     I              X'33'                 C         F03
+     I              X'34'                 C         F04
+     I              X'36'                 C         F06
+     I              X'37'                 C         F07
+     I              X'38'                 C         F08
+     I              X'39'                 C         F09
+     I              X'3C'                 C         F12
+     I              X'F1'                 C         ENTER
+      *
+      *==============================================================*
+      * Main Loop                                                    *
+      *==============================================================*
+      *
+     C           KEY       DOUEQF03
+      *
+     C                     SELEC
+     C           SCRVAR    WHEQ 1
+     C                     EXSR @SCR1
+     C           SCRVAR    WHEQ 2
+     C                     EXSR @SCR2
+     C                     ENDSL
+      *
+     C                     ENDDO
+      *
+      * End of program
+     C                     MOVE *ON       *INLR
+     C                     RETRN
+      *
+      *==============================================================*
+      * Screen 1                                                     *
+      *==============================================================*
+      *
+     C           @SCR1     BEGSR
+      *
+     C           SCRVAR    DOUNE1
+      *
+     C                     EXFMTREC1
+     C                     EXSR @RESET
+     C                     MOVE *OFF      *IN60
+      *
+     C           KEY       IFEQ ENTER
+     C                     EXSR @PROC1
+     C                     ELSE
+     C                     EXSR @FKEYS
+     C                     ENDIF
+      *
+     C                     ENDDO
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Processing routine for screen 1 when enter key is pressed    *
+      *==============================================================*
+      *
+     C           @PROC1    BEGSR
+      *
+      * Validate input
+      * If no error, proceed to screen 2
+     C                     EXSR @VAL1
+     C           VALID     IFEQ *ON
+     C                     ADD  1         SCRVAR
+     C                     ENDIF
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Validation Routine for Screen 1                              *
+      *==============================================================*
+      *
+     C           @VAL1     BEGSR
+      *
+     C                     DO
+     C                     MOVE *ON       VALID   1
+      *
+      * Customer number should not be blanks
+     C           CUSTNO    IFEQ *ZEROS
+     C                     MOVE *ON       *IN04
+     C                     MOVE *OFF      VALID   1
+     C                     LEAVE
+     C                     ENDIF
+      *
+     C           CUSTNO    CHAINCUSTPF               90
+      *
+      * Customer record should exist for change, delete and
+      * display mode
+     C           *IN90     IFEQ *ON
+     C           MODE      IFEQ 'CHANGE'
+     C           MODE      OREQ 'DELETE'
+     C           MODE      OREQ 'DISPLAY'
+     C                     MOVE *ON       *IN01
+     C                     MOVE *OFF      VALID   1
+     C                     ENDIF
+     C                     ENDIF
+      *
+      * Customer should not exist for add mode
+     C           *IN90     IFEQ *OFF
+     C           MODE      IFEQ 'ADD'
+     C                     MOVE *ON       *IN02
+     C                     MOVE *OFF      VALID
+     C                     ENDIF
+     C                     ENDIF
+     C                     ENDDO
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Screen 2                                                     *
+      *==============================================================*
+      *
+     C           @SCR2     BEGSR
+      *
+     C                     EXSR @INIT2
+      *
+     C           SCRVAR    DOUNE2
+      *
+     C                     EXFMTREC2
+     C                     EXSR @RESET
+     C                     MOVE *OFF      *IN60
+      *
+     C           KEY       IFEQ ENTER
+     C                     EXSR @PROC2
+     C                     ELSE
+     C                     EXSR @FKEYS
+     C                     ENDIF
+      *
+     C                     ENDDO
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Initialization Routine for Screen 2                          *
+      *==============================================================*
+      *
+     C           @INIT2    BEGSR
+      *
+     C                     SELEC
+      *
+      * For add mode, clear and unprotect all fields
+     C           MODE      WHEQ 'ADD'
+     C                     MOVE CUSTNO    SVCUST
+     C                     CLEARCUSTPR
+     C                     MOVE SVCUST    CUSTNO
+     C                     MOVE *OFF      *IN75
+      *
+      * For change mode, unprotect all fields
+     C           MODE      WHEQ 'CHANGE'
+     C                     MOVE *OFF      *IN75
+      *
+      * For delete mode, protect all fields
+      * and display message to confirm deletion
+     C           MODE      WHEQ 'DELETE'
+     C                     MOVE *ON       *IN75
+     C                     WRITEREC2
+      *
+      * For display mode, protect all fields
+     C           MODE      WHEQ 'DISPLAY'
+     C                     MOVE *ON       *IN75
+      *
+     C                     ENDSL
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Processing routine for screen 2 when enter key is pressed    *
+      *==============================================================*
+      *
+     C           @PROC2    BEGSR
+      *
+     C                     SELEC
+      *
+      * For add and change mode, validate data
+      * If no error proceed with add or update
+     C           MODE      WHEQ 'ADD'
+     C           MODE      OREQ 'CHANGE'
+     C                     EXSR @VAL2
+     C           VALID     IFEQ *ON
+     C                     EXSR @ADUPD
+     C                     Z-ADD1         SCRVAR
+     C                     ENDIF
+      *
+      * For delete mode, delete record then go back to screen 1
+     C           MODE      WHEQ 'DELETE'
+     C                     DELETCUSTPF
+     C                     Z-ADD1         SCRVAR
+      *
+      * For dsiplay mode,  go back to screen 1
+     C           MODE      WHEQ 'DISPLAY'
+     C                     Z-ADD1         SCRVAR
+      *
+     C                     ENDSL
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Validation Routine for Screen 2                              *
+      *==============================================================*
+      *
+     C           @VAL2     BEGSR
+      *
+     C                     MOVE *ON       VALID
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Add/Update Customer Master                                   *
+      *==============================================================*
+      *
+     C           @ADUPD    BEGSR
+      *
+     C                     SELEC
+      *
+     C           MODE      WHEQ 'ADD'
+     C                     WRITECUSTPR
+      *
+     C           MODE      WHEQ 'CHANGE'
+     C                     UPDATCUSTPR
+      *
+     C                     ENDSL
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Reset indicators                                             *
+      *==============================================================*
+      *
+     C           @RESET    BEGSR
+      *
+     C                     MOVE *OFF      *IN01
+     C                     MOVE *OFF      *IN02
+     C                     MOVE *OFF      *IN03
+     C                     MOVE *OFF      *IN04
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Routine to handle processing of different function keys      *
+      *==============================================================*
+      *
+     C           @FKEYS    BEGSR
+      *
+     C                     SELEC
+      * F3=Exit
+     C           KEY       WHEQ F03
+     C                     Z-ADD0         SCRVAR
+      *
+      * F4=Prompt
+     C           KEY       WHEQ F04
+     C           CURSOR    DIV  256       ROW     30
+     C                     MVR            COL     30
+      *
+     C           CURREC    IFEQ 'REC1'
+     C           CURFLD    ANDEQ'CUSTNO'
+     C                     CALL 'CUSTRPG1'
+     C                     PARM           CUSTNO
+     C                     ELSE
+     C                     MOVE *ON       *IN03
+     C                     ENDIF
+      *
+     C                     Z-ADDROW       CURROW
+     C                     Z-ADDCOL       CURCOL
+     C                     MOVE *ON       *IN60
+      *
+      * F6=Add
+     C           KEY       WHEQ F06
+     C                     MOVEL'ADD'     MODE      P
+      *
+      * F7=Change
+     C           KEY       WHEQ F07
+     C                     MOVEL'CHANGE'  MODE      P
+      *
+      * F8=Delete
+     C           KEY       WHEQ F08
+     C                     MOVEL'DELETE'  MODE      P
+      *
+      * F9=Display
+     C           KEY       WHEQ F09
+     C                     MOVEL'DISPLAY' MODE      P
+      *
+      * F12=Cancel
+     C           KEY       WHEQ F12
+     C                     SUB  1         SCRVAR
+      *
+     C                     ENDSL
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Initial Routine                                              *
+      *==============================================================*
+      *
+     C           *INZSR    BEGSR
+      *
+      * Variable declarations and initialization
+     C                     MOVEL'CHANGE'  MODE      P
+     C                     Z-ADD1         SCRVAR  20
+      *
+     C           *LIKE     DEFN CUSTNO    SVCUST
+      *
+     C                     ENDSR

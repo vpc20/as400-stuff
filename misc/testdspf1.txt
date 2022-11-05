@@ -1,0 +1,27 @@
+     A*%%TS  SD  20030430  140655  TMPCVP      REL-V4R4M0  5769-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R REC1
+     A*%%TS  SD  20030430  140655  TMPCVP      REL-V4R4M0  5769-PW1
+     A                                      CF03(03)
+     A                                      OVERLAY
+     A                                  2  2'TEST'
+     A            TESTFLD1       1A  B  4  3
+     A          R MSGSFL                    SFL
+     A*%%TS  SD  20030430  114038  TMPCVP      REL-V4R4M0  5769-PW1
+     A                                      SFLMSGRCD(24)
+     A            MSGKEY                    SFLMSGKEY
+     A            PGMQ                      SFLPGMQ
+     A          R MSGCTL                    SFLCTL(MSGSFL)
+     A*%%TS  SD  20030430  114038  TMPCVP      REL-V4R4M0  5769-PW1
+     A                                      SFLSIZ(0010)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSPCTL
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A  81                                  SFLEND
+     A*N80                                  SFLDSP
+     A* 82                                  SFLINZ
+     A* 80                                  SFLCLR
+     A* 81                                  SFLEND
+     A            PGMQ                      SFLPGMQ

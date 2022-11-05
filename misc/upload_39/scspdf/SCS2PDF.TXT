@@ -1,0 +1,84 @@
+/********************************************************************/
+/*  SCS2PDF: CONVERT A SPOOL SCS INTO PDF DOCUMENT                  */
+/********************************************************************/
+
+  CMD PROMPT('Convert SCS SpoolFile into PDF')
+
+  PARM FILE       TYPE(*NAME) LEN(10) MIN(1) +
+                  PROMPT('Spoolfile name')
+
+  PARM JOB        TYPE(JOB) DFT(*) SNGVAL((*)) +
+                  PROMPT('Job name')
+
+  PARM SPLNBR     TYPE(*DEC) LEN(6) DFT(*LAST) RANGE(1 999999) +
+                  SPCVAL((*ONLY 0) (*LAST -1)) EXPR(*YES) +
+                  PROMPT('Spoolfile number')
+
+  PARM PDFPATH    TYPE(*PNAME) LEN(70) +
+                  DFT(*CURDIR) SPCVAL((*CURDIR)) MIN(0) EXPR(*YES) +
+                  PROMPT('IFS folder')
+
+  PARM PDFNAME    TYPE(*SNAME) LEN(30) DFT(*FILE) +
+                  SPCVAL((*FILE)) MIN(0) EXPR(*YES) +
+                  PROMPT('PDF document name')
+
+  PARM BASEFONT   TYPE(*CHAR) LEN(21) RSTD(*YES) +
+                  DFT(*DFT) VALUES(*DFT 'Courier' +
+                  'Courier-Bold' 'Courier-Oblique' +
+                  'Courier-BoldOblique' 'Times-Roman' +
+                  'Times-Bold' 'Times-Italic' +
+                  'Times-BoldItalic' 'Helvetica' +
+                  'Helvetica-Bold' 'Helvetica-Oblique' +
+                  'Helvetica-BoldOblique' 'Symbol' +
+                  'ZapfDingbats') CHOICE('Courier ..') +
+                  PROMPT('BaseFont')
+
+  PARM PAGESIZE   TYPE(*CHAR) LEN(15) RSTD(*YES) +
+                  DFT(*AUTO) VALUES(*AUTO *PORTRAIT80 *PORTRAIT132 +
+                  *LANDSCAPE132 *LANDSCAPE198 *USRDFN) CHOICE('*AUTO +
+                  ...') PROMPT('Pagesize') +
+
+  PARM PAGEWIDTH  TYPE(*DEC) LEN(4) DFT(*A4) RANGE(1 2000) +
+                  SPCVAL((*A4 595) (*A3 842) (*LETTER 612)) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Page Width')
+
+  PARM PAGEHEIGHT TYPE(*DEC) LEN(4) DFT(*A4) RANGE(1 2000) +
+                  SPCVAL((*A4 842) (*A3 1190) (*LETTER 792)) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Page Height')
+
+  PARM POINTSIZE  TYPE(*DEC) LEN(2) DFT(10) RANGE(5 15) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Point Size')
+
+  PARM VERTSPACE  TYPE(*DEC) LEN(2) DFT(8) RANGE(5 15) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Vertical Space')
+
+  PARM COLS       TYPE(*DEC) LEN(4) DFT(*SPL) RANGE(1 198) +
+                  SPCVAL((*SPL -1)) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Page Height')
+
+  PARM LETFMARGIN TYPE(*DEC) LEN(3) DFT(40) RANGE(0 200) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Left Margin')
+
+  PARM TOPMARGIN  TYPE(*DEC) LEN(3) DFT(40) RANGE(0 200) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Top Margin')
+
+  PARM ORIENT     TYPE(*CHAR) LEN(10) RSTD(*YES) +
+                  DFT(*PORTRAIT) VALUES(*PORTRAIT *LANDSCAPE) +
+                  PMTCTL(USRSIZE) +
+                  PROMPT('Orientation')
+
+JOB: QUAL TYPE(*NAME) DFT(*)
+     QUAL TYPE(*NAME) LEN(10) PROMPT('User')
+     QUAL TYPE(*CHAR) LEN(6) RANGE(000000 999999) +
+          PROMPT('Number')
+
+USRSIZE: PMTCTL CTL(PAGESIZE) COND((*EQ *USRDFN))
+
+

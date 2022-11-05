@@ -1,0 +1,26 @@
+             PGM
+
+             DCLF       FILE(TESTDSPF1)
+
+             CHGVAR     VAR(&PGMQ) VALUE('TESTCL1   ')
+
+
+ /*          CHGVAR     VAR(&IN80) VALUE('1')         */
+ /*          SNDF       RCDFMT(MSGCTL)                */
+ /*          CHGVAR     VAR(&IN80) VALUE('0')         */
+
+             CHGVAR     VAR(&IN81) VALUE('1')
+
+ LOOP:       SNDRCVF    RCDFMT(REC1)
+             IF         COND(&IN03 *EQ '1') THEN(GOTO CMDLBL(ENDP))
+             RMVMSG     CLEAR(*ALL)
+
+             IF         COND(&TESTFLD1 *NE ' ') THEN(DO)
+             SNDPGMMSG  MSG('TEST1') TOPGMQ(*SAME)
+             SNDPGMMSG  MSG('TEST2') TOPGMQ(*SAME)
+             ENDDO
+
+             SNDF       RCDFMT(MSGCTL)
+             GOTO       CMDLBL(LOOP)
+
+ ENDP:       ENDPGM

@@ -1,0 +1,72 @@
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    1
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHS05X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+     10      A*%%TS  SD  20031218  114836  TMPCVP      REL-V5R2M0  5722-WDS                                             03/12/18
+     20      A*%%EC                                                                                                     03/12/18
+     30      A                                      DSPSIZ(24 80 *DS3)                                                  03/12/18
+     40      A                                      ERRSFL                                                              03/12/18
+     50      A          R CIHS05REC1                                                                                    03/12/17
+     60      A*%%TS  SD  20031217  170023  TMPCVP      REL-V5R2M0  5722-WDS                                             03/12/17
+     70      A                                      CF03(03)                                                            03/12/17
+     80      A                                      CF06(06)                                                            03/12/17
+     90      A                                      CF07(07)                                                            03/12/17
+    100      A                                      CF08(08)                                                            03/12/17
+    110      A                                      CF09(09)                                                            03/12/17
+    120      A                                  1  2'CIHMAN04X'                                                         03/12/17
+    130      A                                  1 31'United Overseas Bank'                                              03/12/17
+    140      A                                      DSPATR(HI)                                                          03/12/17
+    150      A                                  1 71DATE(*JOB *YY)                                                      03/12/17
+    160      A                                      EDTWRD('0  /  /    ')                                               03/12/17
+    170      A                                  2  2USER                                                                03/12/17
+    180      A                                  2 27'Transaction Code Maintenance'                                      03/12/17
+    190      A                                      COLOR(WHT)                                                          03/12/17
+    200      A                                  2 72TIME                                                                03/12/17
+    210      A                                      EDTWRD('0  :  :  ')                                                 03/12/17
+    220      A            MAINTMODE     15A  O  4  2COLOR(BLU)                                                          03/12/17
+    230      A                                  6  2'Channel'                                                           03/12/17
+    240      A            CHANNEL        5A  B  6 20                                                                    03/12/17
+    250      A  30                                  ERRMSG('Record already exist.')                                     03/12/17
+    260      A  31                                  ERRMSG('Record does not exist.')                                    03/12/17
+    270      A  32                                  ERRMSG('Channel should not be blank-                                03/12/17
+    280      A                                      s.')                                                                03/12/17
+    290      A                                  7  2'Transaction Code'                                                  03/12/17
+    300      A            TRANCODE      10A  B  7 20                                                                    03/12/17
+    310      A  33                                  ERRMSG('Transaction code should not-                                03/12/17
+    320      A                                       be blanks.')                                                       03/12/17
+    330      A                                 23  2'F3=Exit   F6=Add   F7=Edit   F8=De-                                03/12/17
+    340      A                                      lete   F9=Display'                                                  03/12/17
+    350      A                                      COLOR(BLU)                                                          03/12/17
+    360      A          R CIHS05REC2                                                                                    03/12/18
+    370      A*%%TS  SD  20031218  114836  TMPCVP      REL-V5R2M0  5722-WDS                                             03/12/18
+    380      A                                      CF12(12)                                                            03/12/18
+    390      A                                  1  2'CIHMAN04X'                                                         03/12/18
+    400      A                                  1 31'United Overseas Bank'                                              03/12/18
+    410      A                                      DSPATR(HI)                                                          03/12/18
+    420      A                                  1 71DATE(*JOB *YY)                                                      03/12/18
+    430      A                                      EDTWRD('0  /  /    ')                                               03/12/18
+    440      A                                  2  2USER                                                                03/12/18
+    450      A                                  2 27'Transaction Code Maintenance'                                      03/12/18
+    460      A                                      COLOR(WHT)                                                          03/12/18
+    470      A                                  2 72TIME                                                                03/12/18
+    480      A                                      EDTWRD('0  :  :  ')                                                 03/12/18
+    490      A            MAINTMODE     15A  O  4  2COLOR(BLU)                                                          03/12/18
+    500      A                                  6  2'Channel'                                                           03/12/18
+    510      A            CHANNEL        5A  O  6 20                                                                    03/12/18
+    520      A                                  7  2'Transaction Code'                                                  03/12/18
+    530      A            TRANCODE      10A  O  7 20                                                                    03/12/18
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    2
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHS05X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+    540      A                                  8  2'Short Name'                                                        03/12/18
+    550      A            SHRTNAME      10A  B  8 20                                                                    03/12/18
+    560      A  60                                  DSPATR(PR)                                                          03/12/18
+    561      A N60                                  DSPATR(UL)                                                          03/12/18
+    570      A                                  9  2'Description'                                                       03/12/18
+    580      A            TRANDESC      40A  B  9 20CHECK(LC)                                                           03/12/18
+    590      A  60                                  DSPATR(PR)                                                          03/12/18
+    591      A N60                                  DSPATR(UL)                                                          03/12/18
+    600      A                                 23  2'F12=Cancel'                                                        03/12/18
+    610      A                                      COLOR(BLU)                                                          03/12/18
+                                  * * * *  E N D  O F  S O U R C E  * * * *

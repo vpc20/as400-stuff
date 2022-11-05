@@ -1,0 +1,30 @@
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/17 09:02:10    AS400T1      PAGE    1
+  SOURCE FILE . . . . . . .  ATMTSRC/QCLSRC
+  MEMBER  . . . . . . . . .  BSDCPYSPL
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+    100              PGM                                                                                                04/11/23
+    200                                                                                                                 04/11/23
+    300              DCL        VAR(&JOBNAME)    TYPE(*CHAR) LEN(10)                                                    08/10/09
+    400              DCL        VAR(&JOBUSER)    TYPE(*CHAR) LEN(10)                                                    08/10/09
+    500              DCL        VAR(&JOBNBR)     TYPE(*CHAR) LEN(6)                                                     08/10/09
+    600                                                                                                                 08/10/09
+    700              DCLF       FILE(TMPSPLFPF)                                                                         08/10/09
+    800                                                                                                                 08/10/09
+    900                                                                                                                 04/11/23
+   1000       /***   Get job attributes   ***/                                                                          08/10/09
+   1100              RTVJOBA    JOB(&JOBNAME) USER(&JOBUSER) NBR(&JOBNBR)                                               08/10/09
+   1200                                                                                                                 08/10/09
+   1300                                                                                                                 08/10/09
+   1400       /***   Get list of spooled file   ***/                                                                    08/10/09
+   1500              WRKSPLF    OUTPUT(*PRINT)                                                                          04/11/23
+   1600              CPYSPLF    FILE(QPRTSPLF) TOFILE(TMPSPLFPF) +                                                      08/10/09
+   1700                           JOB(&JOBNBR/&JOBUSER/&JOBNAME) +                                                      08/10/09
+   1800                           SPLNBR(*LAST) MBROPT(*REPLACE)                                                        08/10/09
+   1900                                                                                                                 04/11/23
+   2000  LOOP:       RCVF                                                                                               08/10/09
+   2100              MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL(EOF))                                                   08/10/09
+   2200                                                                                                                 08/10/09
+   2300              GOTO       CMDLBL(LOOP)                                                                            08/10/09
+   2400                                                                                                                 04/11/23
+   2500  EOF:        ENDPGM                                                                                             08/10/09
+                                  * * * *  E N D  O F  S O U R C E  * * * *

@@ -1,0 +1,9 @@
+             CMD        PROMPT('Run FTP Script')
+             PARM       KWD(INTNETADR) TYPE(*CHAR) LEN(17) MIN(1) +
+                          PROMPT('Internet Address')
+             PARM       KWD(SRCFILE) TYPE(QUAL1) MIN(1) +
+                          PROMPT('Source File')
+             PARM       KWD(SRCMBR) TYPE(*NAME) LEN(10) MIN(1) +
+                          PROMPT('Source Member')
+ QUAL1:      QUAL       TYPE(*NAME) LEN(10) MIN(1)
+             QUAL       TYPE(*NAME) LEN(10) PROMPT('Library')

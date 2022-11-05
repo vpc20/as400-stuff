@@ -1,0 +1,22 @@
+
+New subsystems are created using the CRTSBSD command.
+
+If you want to submit a job to run under a particular subsystem, you
+should do the following steps :
+
+  1. Create a new job queue using the CRTJOBQ command.
+  2. Add this job queue to a specified subsystem using the ADDJOBQE
+     command.
+  3. Submit the job specifying the job queue under which you want
+     to run the program.
+
+An example of this is the submit command from KISTRESACL program :
+
+   SBMJOB     CMD(CALL PGM(KIESA01CL)) JOB(&JOBNM1)  +
+                JOBQ(CPFESA) LOG(*JOBD *JOBD *NOLIST) +
+                LOGCLPGM(*NO)
+
+
+The CPFESA job queue is an entry in the CPFESA subsystem so instead
+of running in the default subsystem QBATCH, it will run under CPFESA.
+

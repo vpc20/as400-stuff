@@ -1,0 +1,29 @@
+     DQUSEC            DS
+      * Qus EC
+     D QUSBPRV                 1      4B 0
+      * Bytes Provided
+     D QUSBAVL                 5      8B 0
+      * Bytes Available
+     D QUSEI                   9     15
+      * Exception Id
+     D QUSERVED               16     16
+      * Varying length
+      *
+     DQUSC0200         DS
+      * Qus ERRC0200
+     D QUSK01                  1      4B 0
+      * Key
+     D QUSBPRV00               5      8B 0
+      * Bytes Provided
+     D QUSBAVL14               9     12B 0
+      * Bytes Available
+     D QUSEI00                13     19
+      * Exception Id
+     D QUSERVED39             20     20
+      * Reserved
+     D  QUSCCSID11            21     24B 0
+      * CCSID
+     D QUSOED01               25     28B 0
+      * Offset Exc Data
+     D QUSLED01               29     32B 0
+

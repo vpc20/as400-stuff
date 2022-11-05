@@ -1,0 +1,11 @@
+      *
+      * Data Structure for Local Data Area
+     ILDA        UDS                           1024
+     I                                        1  10 USERID
+     I                                       11  20 JOBNM
+      *
+      * Retrieve Local Data Area
+     C           *NAMVAR   DEFN *LDA      LDA
+     C                     IN   LDA
+      *
+     C                     SETON                     LR

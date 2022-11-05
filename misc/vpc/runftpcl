@@ -1,0 +1,49 @@
+             PGM        PARM(&INTNETADR &SRCFILE &SRCMBR)
+
+             DCL        VAR(&INTNETADR) TYPE(*CHAR) LEN(17)
+             DCL        VAR(&SRCFILE)   TYPE(*CHAR) LEN(20)
+             DCL        VAR(&FILENAME)  TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBNAME)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCMBR)    TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&MSGID)  TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGF)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(ERROR))
+
+             DLTF       FILE(QTEMP/FTPLOGPF)
+             MONMSG     MSGID(CPF0000)
+             CRTPF      FILE(QTEMP/FTPLOGPF) RCDLEN(80)
+             MONMSG     MSGID(CPF0000)
+
+             CHGVAR     VAR(&FILENAME) VALUE(%SST(&SRCFILE 1 10))
+             CHGVAR     VAR(&LIBNAME)  VALUE(%SST(&SRCFILE 11 10))
+
+             CHKOBJ     OBJ(&LIBNAME/&FILENAME) OBJTYPE(*FILE) +
+                          MBR(&SRCMBR)
+
+             OVRDBF     FILE(INPUT) TOFILE(&LIBNAME/&FILENAME) +
+                          MBR(&SRCMBR)
+             OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/FTPLOGPF)
+
+             FTP        RMTSYS(*INTNETADR) INTNETADR(&INTNETADR)
+
+             DLTOVR     FILE(INPUT OUTPUT)
+
+             RUNQRY     QRY(*NONE) QRYFILE((QTEMP/FTPLOGPF))
+
+             RETURN
+
+ ERROR:      RCVMSG     MSGTYPE(*DIAG) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF)
+             IF         COND(&MSGID *NE ' ') THEN(DO)
+             SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGF) MSGDTA(&MSGDTA)
+             GOTO       CMDLBL(ERROR)
+             ENDDO
+             RCVMSG     MSGTYPE(*EXCP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF)
+             SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGF) MSGDTA(&MSGDTA)
+
+             ENDPGM

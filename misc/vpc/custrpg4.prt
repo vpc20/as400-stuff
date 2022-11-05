@@ -1,0 +1,35 @@
+      *==============================================================*
+      * Program name: CUSTRPG                                        *
+      * Purpose.....: Print list of customers                        *
+      *                                                              *
+      * Indicators:                                                  *
+      *     90  -  Page Overflow                                     *
+      *     99  -  EOF for CUSTLFNM                                  *
+      *==============================================================*
+      *
+      *==============================================================*
+      * Files Declaration                                            *
+      *==============================================================*
+      *
+     FCUSTLFNMIF  E           K        DISK
+     FCUSTPRT4O   E             90     PRINTER
+      *
+      *
+      *==============================================================*
+      * Main Loop                                                    *
+      *==============================================================*
+      *
+     C                     WRITEHDR1
+     C                     READ CUSTLFNM                 99
+      *
+     C           *IN99     DOWEQ*OFF
+     C           *IN90     IFEQ *ON
+     C                     WRITEHDR1
+     C                     MOVE *OFF      *IN90
+     C                     ENDIF
+     C                     WRITEDTL1
+     C                     READ CUSTLFNM                 99
+     C                     ENDDO
+      *
+     C                     MOVE *ON       *INLR
+      *

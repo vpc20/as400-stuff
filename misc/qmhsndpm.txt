@@ -1,0 +1,132 @@
+
+      *
+      * dds for message subfile
+      *
+
+     A          R MSGSFL                    SFL
+     A*%%TS  SD  20001010  094848  ITVICTOR    REL-V4R2M0  5769-PW1
+     A                                      SFLMSGRCD(24)
+     A            MSGKEY                    SFLMSGKEY
+     A            PGMQ                      SFLPGMQ(10)
+     A          R MSGCTL                    SFLCTL(MSGSFL)
+     A*%%TS  SD  20001010  094848  ITVICTOR    REL-V4R2M0  5769-PW1
+     A                                      KEEP
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A  90                                  SFLINZ
+     A  90                                  SFLEND
+     A                                      SFLSIZ(0050)
+     A                                      SFLPAG(0001)
+     A            PGMQ                      SFLPGMQ(10)
+
+
+      *
+      * working-storage entries
+      *
+
+       01  WS-MSGSFL-O.
+           COPY DDS-MSGSFL-O      OF DISPLAY-FILE.
+
+       01  WS-MSGCTL-O.
+           COPY DDS-MSGCTL-O      OF DISPLAY-FILE.
+
+       01  WS-INDICATOR-AREA.
+           COPY DDS-ALL-FORMATS-O-INDIC OF DISPLAY-FILE.
+
+      *****************************************************************
+      *
+      *                MESSAGE HANDLING API PARAMETERS
+      *
+      *****************************************************************
+       01  MESSAGE-ID             PIC X(7).
+
+       01  MESSAGE-FILE.
+           05  MESSAGE-FILE-NAME  PIC X(10) VALUE "USRMSGF".
+           05  MESSAGE-FILE-LIB   PIC X(10) VALUE "*LIBL".
+
+       01  MESSAGE-DATA           PIC X(512) VALUE SPACES.
+
+       01  MESSAGE-LENGTH         PIC S9(9) BINARY VALUE 512.
+
+       01  MESSAGE-TYPE           PIC X(10) VALUE "*INFO".
+           88 COMPLETIONMESSAGE    VALUE "*COMP".
+           88 DIAGNOSTICMESSAGE    VALUE "*DIAG".
+           88 ESCAPEMESSAGE        VALUE "*ESCAPE".
+           88 INFORMATIONALMESSAGE VALUE "*INFO".
+           88 INQUIRYMESSAGE       VALUE "*INQ".
+           88 NOTIFYMESSAGE        VALUE "*NOTIFY".
+           88 REQUESTMESSAGE       VALUE "*RQS".
+           88 STATUSMESSAGE        VALUE "*STATUS".
+
+       01  CALL-STACK-ENTRY      PIC X(10) VALUE "*".
+       01  CALL-STACK-COUNTER    PIC S9(9) BINARY VALUE 0.
+
+       01  MESSAGE-KEY           PIC X(4).
+
+       01  API-ERROR-CODE.
+           05  BYTESPROVIDED     PIC S9(9) BINARY VALUE 100.
+           05  BYTESRETURNED     PIC S9(9) BINARY.
+           05  EXCEPTIONID       PIC X(7).
+           05  EXCEPTIONDATA     PIC X(100).
+
+       01  MESSAGE-TO-REMOVE     PIC X(10) VALUE "*ALL".
+
+
+
+      *
+      * specify program name in PGMQ
+      *
+
+           MOVE "PGM1" TO PGMQ OF WS-MSGSFL-O
+                               PGMQ OF WS-MSGCTL-O.
+
+
+      *
+      * remove message in subfile
+      *
+
+           PERFORM XXXXX-REMOVE-PROGRAM-MESSAGE.
+           MOVE B"1" TO IN90.
+           WRITE DISPLAY-REC  FROM WS-MSGCTL-O
+                 FORMAT IS "MSGCTL"
+                 INDICATORS ARE WS-INDICATOR-AREA.
+
+
+      *
+      * writing message to subfile
+      *
+           MOVE "USR7936" TO MESSAGE-ID.
+           PERFORM XXXXX-SEND-PROGRAM-MESSAGE.
+           WRITE DISPLAY-REC  FROM WS-MSGCTL-O
+                 FORMAT IS "MSGCTL"
+                 INDICATORS ARE WS-INDICATOR-AREA.
+
+
+      *
+      * routine to send program message
+      *
+
+       XXXXX-SEND-PROGRAM-MESSAGE.
+           CALL "QMHSNDPM" USING MESSAGE-ID
+                                 MESSAGE-FILE
+                                 MESSAGE-DATA
+                                 MESSAGE-LENGTH
+                                 MESSAGE-TYPE
+                                 CALL-STACK-ENTRY
+                                 CALL-STACK-COUNTER
+                                 MESSAGE-KEY
+                                 API-ERROR-CODE.
+
+
+      *
+      * routine to remove program message
+      *
+
+       XXXXX-REMOVE-PROGRAM-MESSAGE.
+           MOVE SPACES TO MESSAGEKEY.
+           CALL "QMHRMVPM" USING CALL-STACK-ENTRY
+                                 CALL-STACK-COUNTER
+                                 MESSAGE-KEY
+                                 MESSAGE-TO-REMOVE
+                                 API-ERROR-CODE.
+

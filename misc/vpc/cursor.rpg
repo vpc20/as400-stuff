@@ -1,0 +1,13 @@
+     FN3XDSPF CF  E                    WORKSTN      KINFDS INFDS
+      *                .
+      *                .
+      *                .
+     IINFDS       DS
+     I                                    B 370 3710CURSOR
+      *                .
+      *                .
+      *                .
+     C                     EXFMTN3X01
+     C           CURSOR    DIV  256       ROW     30
+     C                     MVR            COL     30
+      *

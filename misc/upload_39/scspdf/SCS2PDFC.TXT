@@ -1,0 +1,185 @@
+             PGM        PARM(&FILE &JOB &SPLNBR &PDFPATH &PDFNAME +
+                          &BASEFONT &PAGESIZE &PAGEWIDTH +
+                          &PAGEHEIGHT &POINTSIZE &VERTSPACE &COLS +
+                          &LEFTMARGIN &TOPMARGIN &ORIENT)
+             COPYRIGHT  TEXT('Giuseppe Costagliola 2005 - +
+                          beppecosta@yahoo.it')
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOB) TYPE(*CHAR) LEN(26)
+             DCL        VAR(&SPLNBR) TYPE(*DEC) LEN(6)
+             DCL        VAR(&PDFPATH) TYPE(*CHAR) LEN(70)
+             DCL        VAR(&PDFNAME) TYPE(*CHAR) LEN(30)
+             DCL        VAR(&BASEFONT) TYPE(*CHAR) LEN(21)
+             DCL        VAR(&PAGESIZE) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&PAGEWIDTH) TYPE(*DEC) LEN(4)
+             DCL        VAR(&PAGEHEIGHT) TYPE(*DEC) LEN(4)
+             DCL        VAR(&POINTSIZE) TYPE(*DEC) LEN(2)
+             DCL        VAR(&VERTSPACE) TYPE(*DEC) LEN(2)
+             DCL        VAR(&COLS) TYPE(*DEC) LEN(4)
+             DCL        VAR(&LEFTMARGIN) TYPE(*DEC) LEN(3)
+             DCL        VAR(&TOPMARGIN) TYPE(*DEC) LEN(3)
+             DCL        VAR(&ORIENT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOBNBR) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&FILENBR) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&DEVTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RCDLEN) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&OVRFLW) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&BINNBR) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&RCVLEN) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&SPLA0100) TYPE(*CHAR) LEN(2048)
+             DCL        VAR(&APIERR) TYPE(*CHAR) LEN(100)
+             DCL        VAR(&STEP) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&J) TYPE(*DEC) LEN(3)
+             DCL        VAR(&TSTPATH) TYPE(*CHAR) LEN(101)
+             DCL        VAR(&PDF) TYPE(*CHAR) LEN(100)
+             DCL        VAR(&NULL) TYPE(*CHAR) LEN(1) VALUE(X'00')
+             DCL        VAR(&STRUCT) TYPE(*CHAR) LEN(128)
+             DCL        VAR(&RETVAL) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&SECONDS) TYPE(*CHAR) LEN(9)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PROP) TYPE(*CHAR) LEN(300)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(80)
+             DCL        VAR(&ERRORSW) TYPE(*LGL)
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(ERROR))
+/*----------------------------------------------------------------*/
+/* Get the attributes of the spooled file                         */
+/*----------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('1')
+             IF         COND(&JOB = '*') THEN(RTVJOBA JOB(&JOBNAME) +
+                          USER(&USER) NBR(&JOBNBR))
+             ELSE       CMD(DO)
+             CHGVAR     VAR(&JOBNAME) VALUE(%SST(&JOB 1 10))
+             CHGVAR     VAR(&USER) VALUE(%SST(&JOB 11 10))
+             CHGVAR     VAR(&JOBNBR) VALUE(%SST(&JOB 21 6))
+             ENDDO
+             CHGVAR     VAR(&FILENBR) VALUE(&SPLNBR)
+             CHGVAR     VAR(%BIN(&BINNBR)) VALUE(&FILENBR)
+             CHGVAR     VAR(%BIN(&RCVLEN)) VALUE(2048)
+             CHGVAR     VAR(&APIERR) VALUE(X'0000006400000000')
+             CALL       PGM(QUSRSPLA) PARM(&SPLA0100 &RCVLEN +
+                          'SPLA0100' &JOB ' ' ' ' &FILE &BINNBR +
+                          &APIERR)
+             CHGVAR     VAR(&MSGID) VALUE(%SST(&APIERR 9 7))
+             IF         COND(&MSGID *NE ' ') THEN(DO)
+             CHGVAR     VAR(&MSGDTA) VALUE(%SST(&APIERR 17 80))
+             SNDPGMMSG  MSGID(&MSGID) MSGF(QCPFMSG) MSGDTA(&MSGDTA) +
+                          MSGTYPE(*ESCAPE)
+             ENDDO
+/*----------------------------------------------------------------*/
+/* Check the device type                                          */
+/*----------------------------------------------------------------*/
+             CHGVAR     VAR(&DEVTYPE) VALUE(%SST(&SPLA0100 319 10))
+             IF         COND(&DEVTYPE *NE '*SCS') THEN(SNDPGMMSG +
+                          MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Spool is not *SCS') MSGTYPE(*ESCAPE))
+/*----------------------------------------------------------------*/
+/* Check if the requester is authorized to the spool              */
+/*----------------------------------------------------------------*/
+             IF         COND(&SPLNBR = -1) THEN(CHGVAR VAR(&FILENBR) +
+                          VALUE(*LAST))
+             ELSE       CMD(IF COND(&SPLNBR = 0) THEN(CHGVAR +
+                          VAR(&FILENBR) VALUE(*ONLY)))
+             CHGSPLFA   FILE(&FILE) JOB(&JOBNBR/&USER/&JOBNAME) +
+                          SPLNBR(&FILENBR)
+/*----------------------------------------------------------------*/
+/* Check path                                                     */
+/*----------------------------------------------------------------*/
+/* Path missing */
+             IF         COND(&PDFPATH = ' ') THEN(SNDPGMMSG +
+                          MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Parameter PDFPATH missing') +
+                          MSGTYPE(*ESCAPE))
+/* Default PATH */
+             IF         COND(&PDFPATH = '*CURDIR') THEN(CALL +
+                          PGM(SCS2PDFD) PARM(&PDFPATH))
+/* Check Path existence */
+             CHGVAR     VAR(&STEP) VALUE('2')
+             CHGVAR     VAR(&J) VALUE(71)
+SCANPATH:
+             CHGVAR     VAR(&J) VALUE(&J - 1)
+             IF         COND(%SST(&PDFPATH &J 1) = '/') THEN(GOTO +
+                          CMDLBL(CHECKPATH))
+             IF         COND(%SST(&PDFPATH &J 1) = ' ') THEN(GOTO +
+                          CMDLBL(SCANPATH))
+             CHGVAR     VAR(&PDFPATH) VALUE(&PDFPATH *TCAT '/')
+CHECKPATH:
+             CHGVAR     VAR(&TSTPATH) VALUE(&PDFPATH *TCAT &NULL)
+             CALLPRC    PRC('stat') PARM((&TSTPATH) (&STRUCT)) +
+                          RTNVAL(%BIN(&RETVAL))
+             IF         COND(%BIN(&RETVAL) *NE 0) THEN(SNDPGMMSG +
+                          MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Wrong Path') MSGTYPE(*ESCAPE))
+/*----------------------------------------------------------------*/
+/* Check PDF Name                                                 */
+/*----------------------------------------------------------------*/
+/* PDFNAME missing */
+             IF         COND(&PDFNAME = ' ') THEN(SNDPGMMSG +
+                          MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('PDF +
+                          name missing') MSGTYPE(*ESCAPE))
+/* Default PDFNAME */
+             IF         COND(&PDFNAME = '*FILE') THEN(CHGVAR +
+                          VAR(&PDFNAME) VALUE(&FILE))
+/*----------------------------------------------------------------*/
+/* Copy the Spool into a PF                                       */
+/*----------------------------------------------------------------*/
+/* Get the spool page size */
+             CHGVAR     VAR(&RCDLEN) VALUE(%SST(&SPLA0100 429 4))
+             CHGVAR     VAR(&OVRFLW) VALUE(%SST(&SPLA0100 437 4))
+/* Add a member for this spool */
+             CHGVAR     VAR(&STEP) VALUE('3')
+             RTVSYSVAL  SYSVAL(QTIME) RTNVAR(&SECONDS)
+             CHGVAR     VAR(&MEMBER) VALUE('A' *CAT &SECONDS)
+             CLRPFM     FILE(QGPL/CPYSPOOL) MBR(&MEMBER)
+             MONMSG     MSGID(CPF3141) EXEC(ADDPFM +
+                          FILE(QGPL/CPYSPOOL) MBR(&MEMBER))
+             MONMSG     MSGID(CPF0000) EXEC(SNDPGMMSG MSGID(CPF9898) +
+                          MSGF(QCPFMSG) MSGDTA('PDF work not +
+                          valid') MSGTYPE(*ESCAPE))
+/* Copy the spoolfile into the member */
+             CHGVAR     VAR(&STEP) VALUE('4')
+             CPYSPLF    FILE(&FILE) TOFILE(QGPL/CPYSPOOL) +
+                          JOB(&JOBNBR/&USER/&JOBNAME) +
+                          SPLNBR(&FILENBR) TOMBR(&MEMBER) +
+                          MBROPT(*ADD) CTLCHAR(*FCFC)
+/*----------------------------------------------------------------*/
+/* Create PDF                                                     */
+/*----------------------------------------------------------------*/
+             CHGVAR     VAR(&PDF) VALUE(&PDFPATH *TCAT &PDFNAME +
+                          *TCAT '.pdf')
+             CALL       PGM(SCS2PDFR) PARM(&FILE &MEMBER &RCDLEN +
+                          &OVRFLW &PDF &BASEFONT &PAGESIZE +
+                          &PAGEWIDTH &PAGEHEIGHT &POINTSIZE +
+                          &VERTSPACE &COLS &LEFTMARGIN &TOPMARGIN +
+                          &ORIENT)
+/*----------------------------------------------------------------*/
+/* Terminate                                                      */
+/*----------------------------------------------------------------*/
+/* Remove the temporary copy of the spool */
+             RMVM       FILE(QGPL/CPYSPOOL) MBR(&MEMBER)
+             RMVMSG     MSGQ(*PGMQ) CLEAR(*ALL)
+/* Send a completion message */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Spool +
+                          file' *BCAT &FILE *BCAT 'converted into' +
+                          *BCAT &PDFPATH *TCAT &PDFNAME *TCAT +
+                          '.pdf') MSGTYPE(*COMP)
+RETURN
+/********************************************************************/
+/* Errors                                                           */
+/********************************************************************/
+ERROR:
+             IF         COND(&ERRORSW) THEN(SNDPGMMSG MSGID(CPF9899) +
+                          MSGF(QCPFMSG) MSGTYPE(*ESCAPE)) /* +
+                          FUNCTION CHECK           */
+             CHGVAR     VAR(&ERRORSW) VALUE('1') /* SET SWITCH TO +
+                          ERROR      */
+             CALL       PGM(QMHRSNEM) PARM('    ' +
+                          X'0000000F0000000040404040404040' +
+                          X'000000015CD5D6D5C540404040405CD5D6D5C5404+
+                          0404040000000095CD7C7D4C2C4E840404040404040+
+                          404040404040' X'00000030' RSNM0100 * +
+                          X'00000000')
+             ENDPGM
+

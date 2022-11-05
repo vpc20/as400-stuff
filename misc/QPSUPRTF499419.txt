@@ -1,0 +1,491 @@
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    1
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+    100        IDENTIFICATION DIVISION.                                                                                 01/03/24
+    200        PROGRAM-ID. CIHMAN04X.                                                                                   03/10/03
+    300        AUTHOR.    VPC.                                                                                          03/06/17
+    301                                                                                                                 03/04/17
+    700       *===============================================================*                                         04/01/08
+    701       * Program description                                           *                                         04/01/08
+    702       *                                                               *                                         04/01/08
+    703       *---------------------------------------------------------------*                                         04/01/08
+    704       * Amendment History                                             *                                         04/01/08
+    705       *                                                               *                                         04/01/08
+    706       * Date      Pgmr  Description                                   *                                         04/01/08
+    707       * --------  ---   --------------------------------------------- *                                         04/01/08
+    708       *                                                               *                                         04/01/08
+    714       *===============================================================*                                         04/01/08
+    715                                                                                                                 03/04/17
+    800        ENVIRONMENT DIVISION.                                                                                    01/03/24
+    900        CONFIGURATION SECTION.                                                                                   01/03/24
+   1000        SOURCE-COMPUTER.    IBM-AS400.                                                                           01/03/24
+   1100        OBJECT-COMPUTER.    IBM-AS400.                                                                           01/03/24
+   1200                                                                                                                 01/03/24
+   1501       *===============================================================*                                         04/01/08
+   1502                                                                                                                 03/04/17
+   1600        INPUT-OUTPUT SECTION.                                                                                    01/03/24
+   1700        FILE-CONTROL.                                                                                            01/03/24
+   1701                                                                                                                 03/04/17
+   1702       *--- Transaction Code Mapping File                                                                        04/01/08
+   1703            SELECT TRANCODE-FILE    ASSIGN TO DATABASE-CIHPTRCD                                                  03/10/03
+   1704                   ORGANIZATION     IS INDEXED                                                                   03/10/03
+   1705                   ACCESS           IS DYNAMIC                                                                   03/10/03
+   1706                   RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.                                                 03/10/03
+   1708                                                                                                                 03/04/17
+   1709       *--- Transaction Code Mapping Display File                                                                04/01/08
+   1710            SELECT TRANCODE-DSP-FILE ASSIGN TO WORKSTATION-CIHS04X-SI                                            03/10/03
+   1711                   ORGANIZATION      IS TRANSACTION                                                              03/04/17
+   1712                   ACCESS MODE       IS DYNAMIC                                                                  03/04/17
+   1713                   RELATIVE KEY      IS WS-SFL-RECNUM                                                            03/06/17
+   1714                   CONTROL-AREA      IS WS-CONTROL-AREA.                                                         03/04/17
+   1715                                                                                                                 03/04/17
+   2314       *===============================================================*                                         04/01/08
+   2315                                                                                                                 03/04/17
+   2900        DATA DIVISION.                                                                                           01/03/24
+   2901                                                                                                                 03/04/17
+   3000        FILE SECTION.                                                                                            01/03/24
+   3002        FD  TRANCODE-FILE                                                                                        03/10/03
+   3003            LABEL RECORDS ARE STANDARD.                                                                          03/04/17
+   3004        01  TRANCODE-REC.                                                                                        03/10/03
+   3006            COPY DDS-ALL-FORMATS OF CIHPTRCD.                                                                    03/06/17
+   3008                                                                                                                 01/03/24
+   3009        FD  TRANCODE-DSP-FILE                                                                                    03/06/17
+   3010            LABEL RECORDS ARE STANDARD.                                                                          03/04/17
+   3011        01  TRANCODE-DSP-REC   PIC X(1920).                                                                      03/06/17
+   3014                                                                                                                 01/03/24
+   3019                                                                                                                 03/04/17
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    2
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+   3020       *===============================================================*                                         04/01/08
+   4100                                                                                                                 01/03/24
+   4200        WORKING-STORAGE SECTION.                                                                                 01/03/24
+   4201                                                                                                                 03/04/17
+   4202       *--- Display file records                                                                                 04/01/08
+   4300        01  WS-CIHS04REC1-I.                                                                                     03/06/17
+   4301            COPY DDS-CIHS04REC1-I OF CIHS04X.                                                                    03/10/03
+   4302        01  WS-CIHS04REC1-O.                                                                                     03/06/17
+   4303            COPY DDS-CIHS04REC1-O OF CIHS04X.                                                                    03/10/03
+   4306                                                                                                                 03/04/17
+   4314        01  WS-CIHS04SFL1-I.                                                                                     03/10/03
+   4315            COPY DDS-CIHS04SFL1-I OF CIHS04X                                                                     03/10/03
+   4316                 REPLACING CIHS04SFL1 BY CIHS04SFL1-I.                                                           03/10/03
+   4317        01  WS-CIHS04SFL1-O.                                                                                     03/10/03
+   4318            COPY DDS-CIHS04SFL1-O OF CIHS04X                                                                     03/10/03
+   4319                 REPLACING CIHS04SFL1 BY CIHS04SFL1-O.                                                           03/10/03
+   4322                                                                                                                 03/04/17
+   4323        01  WS-CIHS04CTL1-I.                                                                                     03/10/03
+   4324            COPY DDS-CIHS04CTL1-I OF CIHS04X.                                                                    03/10/03
+   4325        01  WS-CIHS04CTL1-O.                                                                                     03/10/03
+   4326            COPY DDS-CIHS04CTL1-O OF CIHS04X.                                                                    03/10/03
+   4327                                                                                                                 03/10/03
+   4334       *--- Display file indicators                                                                              04/01/08
+   4335        01  INDIC-AREA.                                                                                          03/06/17
+   4336            COPY DDS-ALL-FORMATS-INDIC OF CIHS04X.                                                               03/10/03
+   4800                                                                                                                 01/03/24
+   4804       *--- Display file control area                                                                            04/01/08
+   4900        01  WS-CONTROL-AREA.                                                                                     03/04/17
+   5000            05 FKEY-PRESSED             PIC X(2).                                                                03/04/17
+   5200               88 F0-ENTER              VALUE "00".                                                              03/04/17
+   5201               88 F3-EXIT               VALUE "03".                                                              03/04/17
+   5202               88 F6-ADD                VALUE "06".                                                              03/10/03
+   5203               88 F12-CANCEL            VALUE "12".                                                              03/06/17
+   5204               88 F90-PAGEDOWN          VALUE "90".                                                              03/06/17
+   5205               88 F91-PAGEUP            VALUE "91".                                                              03/06/17
+   5206                                                                                                                 01/03/24
+   9800        01  PROGRAM-SWITCHES.                                                                                    03/04/17
+   9801            05 END-PROGRAM-SW           PIC 9.                                                                   03/04/17
+   9802               88 START-PROGRAM         VALUE 0.                                                                 03/04/17
+   9803               88 END-PROGRAM           VALUE 1.                                                                 03/04/17
+   9804            05 VALID-ENTRY-SW           PIC 9.                                                                   03/06/17
+   9805               88 INVALID-ENTRY         VALUE 0.                                                                 03/06/17
+   9806               88 VALID-ENTRY           VALUE 1.                                                                 03/06/17
+   9807            05 RECORD-FOUND-SW          PIC 9.                                                                   03/06/17
+   9808               88 RECORD-NOT-FOUND      VALUE 0.                                                                 03/06/17
+   9809               88 RECORD-FOUND          VALUE 1.                                                                 03/06/17
+   9810            05 TRANCODE-EOF-SW          PIC 9.                                                                   03/10/03
+   9811               88 NOT-EOF-TRANCODE      VALUE 0.                                                                 03/10/03
+   9812               88 EOF-TRANCODE          VALUE 1.                                                                 03/10/03
+   9813            05 DISPLAY-DTL-SCREEN-SW    PIC 9.                                                                   03/10/03
+   9814               88 EXIT-DTL-SCREEN       VALUE 0.                                                                 03/10/03
+   9815               88 DISPLAY-DTL-SCREEN    VALUE 1.                                                                 03/10/03
+   9816            05 SFLREC-FOUND-SW          PIC 9.                                                                   03/10/03
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    3
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+   9817               88 SFLREC-NOT-FOUND      VALUE 0.                                                                 03/10/03
+   9818               88 SFLREC-FOUND          VALUE 1.                                                                 03/10/03
+   9820                                                                                                                 03/04/17
+   9821        01  WS-WORK-AREAS.                                                                                       03/04/17
+   9900            05 WS-OPT                  PIC X  VALUE SPACES.                                                      03/10/03
+   9902               88 ADD-OPTION           VALUE "1".                                                                03/10/03
+   9903               88 EDIT-OPTION          VALUE "2".                                                                03/10/03
+   9904               88 DELETE-OPTION        VALUE "4".                                                                03/10/03
+   9905               88 DISPLAY-OPTION       VALUE "5".                                                                03/10/03
+   9906            05 WS-SFL-RECNUM           PIC 9(4)  VALUE ZEROES.                                                   03/06/17
+   9907            05 WS-SFLSIZ               PIC 9(4)  VALUE ZEROES.                                                   03/06/17
+   9908            05 WS-SFLRCDNO             PIC 9(4)  VALUE ZEROES.                                                   03/10/03
+   9909            05 WS-CTR                  PIC 9(4)  VALUE ZEROES.                                                   03/06/17
+   9910            05 WS-CHANNEL              PIC X(5)  VALUE SPACES.                                                   03/06/17
+   9911            05 WS-TRANCODE             PIC X(10) VALUE SPACES.                                                   03/06/17
+   9912            05 WS-LINE-CTR             PIC 9(2)  VALUE ZEROES.                                                   03/06/19
+   9913            05 WS-DATE-YYYYMMDD        PIC 9(8)  VALUE ZEROES.                                                   03/06/23
+   9914            05 WS-DATE-YYYYMMDD-X REDEFINES WS-DATE-YYYYMMDD.                                                    03/06/23
+   9915               10 WS-DATE-YYYY         PIC 9(4).                                                                 03/06/23
+   9916               10 WS-DATE-MM           PIC 9(2).                                                                 03/06/23
+   9917               10 WS-DATE-DD           PIC 9(2).                                                                 03/06/23
+   9918            05 WS-DATE-DDMMYYYY        PIC 9(8)  VALUE ZEROES.                                                   03/06/23
+   9919            05 WS-DATE-DDMMYYYY-X REDEFINES WS-DATE-DDMMYYYY.                                                    03/06/23
+   9920               10 WS-DATE-DD           PIC 9(2).                                                                 03/06/23
+   9921               10 WS-DATE-MM           PIC 9(2).                                                                 03/06/23
+   9922               10 WS-DATE-YYYY         PIC 9(4).                                                                 03/06/23
+  11001                                                                                                                 01/03/24
+  11002        01  WS-TRANCODE-REC.                                                                                     03/10/03
+  11003            COPY DDS-ALL-FORMATS OF CIHPTRCD                                                                     03/06/20
+  11004               REPLACING TRNCDREC BY TRNCDRECX.                                                                  03/06/20
+  11012                                                                                                                 03/06/19
+  11013        01  WS-SYSTEM-VARS.                                                                                      03/06/19
+  11014            05 WS-SYSTEM-DATE          PIC 9(6)  VALUE ZEROES.                                                   03/06/19
+  11015            05 WS-SYSDATE-YYYYMMDD     PIC 9(8)  VALUE ZEROES.                                                   03/06/19
+  11016            05 WS-SYSTEM-TIME          PIC 9(8)  VALUE ZEROES.                                                   03/06/19
+  11017            05 WS-SYSTIME REDEFINES WS-SYSTEM-TIME.                                                              03/06/19
+  11018               10 WS-SYSTIME-HHMMSS    PIC 9(6).                                                                 03/06/19
+  11019               10 WS-SYSTIME-MS        PIC 9(2).                                                                 03/06/19
+  11020                                                                                                                 03/06/19
+  11021        01  WS-LDA.                                                                                              03/06/19
+  11022            05 LDA-USERID              PIC X(10) VALUE SPACES.                                                   03/06/19
+  11023                                                                                                                 03/06/19
+  11024       *===============================================================*                                         04/01/08
+  11025                                                                                                                 01/03/24
+  12300        PROCEDURE DIVISION.                                                                                      01/03/24
+  12400                                                                                                                 01/03/24
+  12500        0000-MAIN.                                                                                               03/04/17
+  12600                                                                                                                 01/03/24
+  12700            PERFORM 1000-INITIAL.                                                                                03/04/17
+  12800            PERFORM 2000-PROCESS UNTIL END-PROGRAM.                                                              03/04/17
+  13000            PERFORM 9000-CLEAN-UP.                                                                               03/04/17
+  13100            GOBACK.                                                                                              03/04/17
+  13200                                                                                                                 01/03/24
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    4
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  13400       *===============================================================*                                         04/01/08
+  13500                                                                                                                 03/04/17
+  13600        1000-INITIAL.                                                                                            03/04/17
+  13601                                                                                                                 03/04/17
+  13602            OPEN I-O TRANCODE-FILE                                                                               03/10/03
+  13604                     TRANCODE-DSP-FILE.                                                                          03/10/03
+  13606                                                                                                                 03/04/17
+  13607            INITIALIZE CIHS04REC1-I                                                                              03/10/03
+  13608                       CIHS04REC1-O                                                                              03/10/03
+  13611                       CIHS04SFL1-I                                                                              03/10/03
+  13612                       CIHS04SFL1-O                                                                              03/10/03
+  13613                       CIHS04CTL1-I.                                                                             03/10/03
+  13614                                                                                                                 03/06/17
+  13622            MOVE 14 TO WS-SFLSIZ.                                                                                03/06/17
+  13623            MOVE 1 TO WS-SFLRCDNO.                                                                               03/10/03
+  13624                                                                                                                 03/06/19
+  13626            SET START-PROGRAM TO TRUE.                                                                           03/06/19
+  13627            PERFORM 2900-LOAD-SUBFILE.                                                                           03/10/03
+  13628                                                                                                                 03/04/17
+  13700       *===============================================================*                                         04/01/08
+  13800                                                                                                                 03/04/17
+  13900        2000-PROCESS.                                                                                            03/04/17
+  14000                                                                                                                 03/04/17
+  14001            WRITE TRANCODE-DSP-REC                                                                               03/10/03
+  14002               FORMAT "CIHS04FKY1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14003            MOVE CORR CIHS04CTL1-I  TO CIHS04CTL1-O.                                                             03/10/03
+  14004            WRITE TRANCODE-DSP-REC  FROM CIHS04CTL1-O                                                            03/10/03
+  14005               FORMAT "CIHS04CTL1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14006            READ  TRANCODE-DSP-FILE INTO CIHS04CTL1-I                                                            03/10/03
+  14007               FORMAT "CIHS04CTL1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14009                                                                                                                 03/10/03
+  14010                                                                                                                 03/10/03
+  14016            EVALUATE TRUE                                                                                        03/06/17
+  14017                                                                                                                 03/06/17
+  14018               WHEN F0-ENTER                                                                                     03/06/17
+  14019                  IF POSCHNL  OF CIHS04CTL1-I NOT = SPACES                                                       03/10/03
+  14020                  OR POSTRNCD OF CIHS04CTL1-I NOT = SPACES                                                       03/10/03
+  14021                     MOVE 1 TO WS-SFLRCDNO                                                                       03/10/03
+  14022                     MOVE POSCHNL  OF CIHS04CTL1-I                                                               03/10/03
+  14023                       TO CHANNEL  OF TRANCODE-REC                                                               03/10/03
+  14024                     MOVE POSTRNCD OF CIHS04CTL1-I                                                               03/10/03
+  14025                       TO TRANCODE OF TRANCODE-REC                                                               03/10/03
+  14026                     PERFORM 2900-LOAD-SUBFILE                                                                   03/10/03
+  14027                  ELSE                                                                                           03/10/03
+  14028                     SET SFLREC-FOUND TO TRUE                                                                    03/10/03
+  14029                     MOVE ZEROES TO WS-SFL-RECNUM                                                                03/10/03
+  14030                     PERFORM 3000-PROCESS-SUBFILE                                                                03/10/03
+  14031                        UNTIL SFLREC-NOT-FOUND                                                                   03/10/03
+  14032                     PERFORM 2860-READ-FIRST-SFLREC                                                              03/10/03
+  14033                     PERFORM 2900-LOAD-SUBFILE                                                                   03/10/03
+  14034                  END-IF                                                                                         03/10/03
+  14035                                                                                                                 03/06/17
+  14036               WHEN F3-EXIT                                                                                      03/06/17
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    5
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  14037                  SET END-PROGRAM TO TRUE                                                                        03/06/17
+  14038                                                                                                                 03/06/17
+  14039               WHEN F6-ADD                                                                                       03/10/03
+  14040                  MOVE "Add Record" TO MAINTMODE OF CIHS04REC1-O                                                 03/10/03
+  14041                  MOVE B"0" TO IN40 IN41                                                                         03/10/03
+  14042                  INITIALIZE CIHS04REC1-I                                                                        03/10/03
+  14043                  SET ADD-OPTION TO TRUE                                                                         03/10/03
+  14044                  SET DISPLAY-DTL-SCREEN TO TRUE                                                                 03/10/03
+  14045                  PERFORM 4000-PROCESS-TRANCODE-DETAILS                                                          03/10/03
+  14046                     UNTIL EXIT-DTL-SCREEN                                                                       03/10/03
+  14048                                                                                                                 03/10/03
+  14049               WHEN F90-PAGEDOWN                                                                                 03/10/03
+  14050                  PERFORM 2800-PAGEDOWN                                                                          03/10/03
+  14051                                                                                                                 03/10/03
+  14052               WHEN F91-PAGEUP                                                                                   03/10/03
+  14053                  PERFORM 2850-PAGEUP                                                                            03/10/03
+  14054                                                                                                                 03/10/03
+  14055            END-EVALUATE.                                                                                        03/06/17
+  14056                                                                                                                 03/06/17
+  14632       *===============================================================*                                         04/01/08
+  14633                                                                                                                 03/10/03
+  14634        2800-PAGEDOWN.                                                                                           03/10/03
+  14635                                                                                                                 03/06/17
+  14636            IF IN70 = B"1"                                                                                       03/06/17
+  14637               MOVE 1 TO WS-SFLRCDNO                                                                             03/10/03
+  14638               PERFORM 2900-LOAD-SUBFILE                                                                         03/10/03
+  14639            END-IF.                                                                                              03/06/17
+  14640                                                                                                                 03/06/17
+  14641       *===============================================================*                                         04/01/08
+  14642                                                                                                                 03/06/17
+  14643        2850-PAGEUP.                                                                                             03/10/03
+  14644                                                                                                                 03/06/17
+  14645            MOVE ZEROES TO WS-CTR.                                                                               03/06/17
+  14646            SET NOT-EOF-TRANCODE TO TRUE.                                                                        03/10/03
+  14647                                                                                                                 03/06/17
+  14648            PERFORM 2860-READ-FIRST-SFLREC.                                                                      03/10/03
+  14656            START TRANCODE-FILE                                                                                  03/10/03
+  14657               KEY >= EXTERNALLY-DESCRIBED-KEY                                                                   03/06/17
+  14658               INVALID KEY                                                                                       03/06/17
+  14659                  SET EOF-TRANCODE TO TRUE                                                                       03/10/03
+  14660            END-START.                                                                                           03/06/17
+  14661                                                                                                                 03/06/17
+  14662            PERFORM UNTIL EOF-TRANCODE OR WS-CTR = WS-SFLSIZ                                                     03/10/03
+  14663               READ TRANCODE-FILE PRIOR RECORD                                                                   03/10/03
+  14664                  AT END                                                                                         03/06/17
+  14665                     SET EOF-TRANCODE TO TRUE                                                                    03/10/03
+  14666                     INITIALIZE TRNCDREC                                                                         03/10/03
+  14667               END-READ                                                                                          03/06/17
+  14668               IF NOT-EOF-TRANCODE                                                                               03/10/03
+  14669                  ADD 1 TO WS-CTR                                                                                03/06/17
+  14670               END-IF                                                                                            03/06/17
+  14671            END-PERFORM.                                                                                         03/06/17
+  14672                                                                                                                 03/06/17
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    6
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  14673            MOVE 1 TO WS-SFLRCDNO.                                                                               03/10/03
+  14674            PERFORM 2900-LOAD-SUBFILE.                                                                           03/10/03
+  14675                                                                                                                 03/06/17
+  14676       *===============================================================*                                         04/01/08
+  14677                                                                                                                 03/06/17
+  14678        2860-READ-FIRST-SFLREC.                                                                                  03/10/03
+  14679                                                                                                                 03/06/17
+  14680            MOVE 1 TO WS-SFL-RECNUM.                                                                             03/10/03
+  14681            READ SUBFILE TRANCODE-DSP-FILE INTO CIHS04SFL1-O                                                     03/10/03
+  14682               FORMAT "CIHS04SFL1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14683            MOVE CHANNEL  OF CIHS04SFL1-O                                                                        03/10/03
+  14684              TO CHANNEL  OF TRANCODE-REC.                                                                       03/10/03
+  14685            MOVE TRANCODE OF CIHS04SFL1-O                                                                        03/10/03
+  14686              TO TRANCODE OF TRANCODE-REC.                                                                       03/10/03
+  14687                                                                                                                 03/10/03
+  14688       *===============================================================*                                         04/01/08
+  14689                                                                                                                 03/10/03
+  14690        2900-LOAD-SUBFILE.                                                                                       03/10/03
+  14691                                                                                                                 03/10/03
+  14692            MOVE WS-SFLRCDNO TO SFLRCDNO OF CIHS04CTL1-I.                                                        03/10/03
+  14693            MOVE B"1" TO IN70.                                                                                   03/06/17
+  14694                                                                                                                 03/06/17
+  14695       *--- Clear subfile                                                                                        04/01/08
+  14696            MOVE B"0" TO IN81.                                                                                   03/06/17
+  14697            WRITE TRANCODE-DSP-REC                                                                               03/06/17
+  14698               FORMAT "CIHS04CTL1"  INDICATORS INDIC-AREA.                                                       03/06/17
+  14699            MOVE B"1" TO IN81.                                                                                   03/06/17
+  14700                                                                                                                 03/06/17
+  14701       *--- Load subfile                                                                                         04/01/08
+  14702            MOVE ZEROES TO WS-SFL-RECNUM.                                                                        03/06/17
+  14703            MOVE B"0" TO IN80.                                                                                   03/06/17
+  14704            SET NOT-EOF-TRANCODE TO TRUE.                                                                        03/10/03
+  14705                                                                                                                 03/10/03
+  14706            START TRANCODE-FILE                                                                                  03/10/03
+  14707               KEY >= EXTERNALLY-DESCRIBED-KEY                                                                   03/10/03
+  14708               INVALID KEY                                                                                       03/10/03
+  14709                  READ TRANCODE-FILE LAST  RECORD                                                                03/10/03
+  14710                  READ TRANCODE-FILE PRIOR RECORD                                                                03/10/03
+  14711            END-START.                                                                                           03/10/03
+  14712                                                                                                                 03/10/03
+  14713            PERFORM UNTIL EOF-TRANCODE OR WS-SFL-RECNUM = WS-SFLSIZ                                              03/10/03
+  14714               READ TRANCODE-FILE NEXT RECORD                                                                    03/10/03
+  14715                  AT END                                                                                         03/06/17
+  14716                     SET EOF-TRANCODE TO TRUE                                                                    03/10/03
+  14717               END-READ                                                                                          03/06/17
+  14718               IF NOT-EOF-TRANCODE                                                                               03/10/03
+  14719                  INITIALIZE CIHS04SFL1-O                                                                        03/10/03
+  14720                  ADD 1 TO WS-SFL-RECNUM                                                                         03/06/17
+  14721                  MOVE CORR TRNCDREC TO CIHS04SFL1-O                                                             03/10/03
+  14722                  WRITE SUBFILE TRANCODE-DSP-REC FROM CIHS04SFL1-O                                               03/10/03
+  14723                     FORMAT "CIHS04SFL1"  INDICATORS INDIC-AREA                                                  03/06/17
+  14724               END-IF                                                                                            03/06/17
+  14725            END-PERFORM.                                                                                         03/06/17
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    7
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  14726                                                                                                                 03/06/17
+  14727       *--- Check if there are more records                                                                      04/01/08
+  14728       *--- IN70 is on  - display 'More...'                                                                      04/01/08
+  14729       *--- IN70 is off - display 'Bottom'                                                                       04/01/08
+  14730            IF NOT-EOF-TRANCODE                                                                                  03/10/03
+  14731               READ TRANCODE-FILE NEXT RECORD                                                                    03/10/03
+  14732                  AT END                                                                                         03/06/17
+  14733                     MOVE B"0" TO IN70                                                                           03/06/17
+  14734                  NOT AT END                                                                                     03/06/17
+  14735                     MOVE B"1" TO IN70                                                                           03/06/17
+  14736               END-READ                                                                                          03/06/17
+  14737            ELSE                                                                                                 03/06/17
+  14738               MOVE B"0" TO IN70                                                                                 03/06/17
+  14739            END-IF.                                                                                              03/06/17
+  14740                                                                                                                 03/06/17
+  14741       *--- Turn on SFLDSP indicator if subfile record is created                                                04/01/08
+  14742            IF WS-SFL-RECNUM > 0                                                                                 03/06/17
+  14743               MOVE B"1" TO IN80                                                                                 03/06/17
+  14744            END-IF.                                                                                              03/06/17
+  14745                                                                                                                 03/06/17
+  14746       *===============================================================*                                         04/01/08
+  14747                                                                                                                 03/10/03
+  14748        3000-PROCESS-SUBFILE.                                                                                    03/10/03
+  14749                                                                                                                 03/10/03
+  14750            ADD 1 TO WS-SFL-RECNUM.                                                                              03/10/03
+  14751            READ SUBFILE TRANCODE-DSP-FILE INTO CIHS04SFL1-O                                                     03/10/03
+  14752               FORMAT "CIHS04SFL1"  INDICATORS INDIC-AREA                                                        03/10/03
+  14753               INVALID KEY                                                                                       03/10/03
+  14754                  SET SFLREC-NOT-FOUND TO TRUE                                                                   03/10/03
+  14755            END-READ.                                                                                            03/10/03
+  14756                                                                                                                 03/10/03
+  14757            IF SFLREC-FOUND                                                                                      03/10/03
+  14758               IF OPT OF CIHS04SFL1-O NOT = SPACES                                                               03/10/03
+  14759                  PERFORM 3100-GET-TRANCODE-DETAILS                                                              03/10/03
+  14760                  SET DISPLAY-DTL-SCREEN TO TRUE                                                                 03/10/03
+  14761                  PERFORM 4000-PROCESS-TRANCODE-DETAILS                                                          03/10/03
+  14762                     UNTIL EXIT-DTL-SCREEN                                                                       03/10/03
+  14763                  MOVE WS-SFL-RECNUM TO WS-SFLRCDNO                                                              03/10/03
+  14764               END-IF                                                                                            03/10/03
+  14765                                                                                                                 03/10/03
+  14766               MOVE SPACES TO OPT OF CIHS04SFL1-O                                                                03/10/03
+  14767               REWRITE SUBFILE TRANCODE-DSP-REC FROM CIHS04SFL1-O                                                03/10/03
+  14768                  FORMAT "CIHS04SFL1"  INDICATORS INDIC-AREA                                                     03/10/03
+  14769            END-IF.                                                                                              03/10/03
+  14770                                                                                                                 03/10/03
+  14771       *===============================================================*                                         04/01/08
+  14772                                                                                                                 03/10/03
+  14773        3100-GET-TRANCODE-DETAILS.                                                                               03/10/03
+  14774                                                                                                                 03/10/03
+  14775            MOVE CHANNEL  OF CIHS04SFL1-O TO CHANNEL  OF TRANCODE-REC.                                           03/10/03
+  14776            MOVE TRANCODE OF CIHS04SFL1-O TO TRANCODE OF TRANCODE-REC.                                           03/10/03
+  14777                                                                                                                 03/10/03
+  14778            READ TRANCODE-FILE                                                                                   03/10/03
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    8
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  14779               INVALID KEY                                                                                       03/10/03
+  14780                  CONTINUE                                                                                       03/10/03
+  14781            END-READ.                                                                                            03/10/03
+  14782                                                                                                                 03/10/03
+  14783            MOVE CORR TRNCDREC TO CIHS04REC1-I.                                                                  03/10/03
+  14784                                                                                                                 03/10/03
+  14785            MOVE OPT OF CIHS04SFL1-O TO WS-OPT.                                                                  03/10/03
+  14786            EVALUATE TRUE                                                                                        03/10/03
+  14787               WHEN EDIT-OPTION                                                                                  03/10/03
+  14788                  MOVE "Edit Record"    TO MAINTMODE OF CIHS04REC1-O                                             03/10/03
+  14789                  MOVE B"1" TO IN40                                                                              03/10/03
+  14790                  MOVE B"0" TO IN41                                                                              03/10/03
+  14791               WHEN DELETE-OPTION                                                                                03/10/03
+  14792                  MOVE "Delete Record"  TO MAINTMODE OF CIHS04REC1-O                                             03/10/03
+  14793                  MOVE B"1" TO IN40 IN41                                                                         03/10/03
+  14794               WHEN DISPLAY-OPTION                                                                               03/10/03
+  14795                  MOVE "Display Record" TO MAINTMODE OF CIHS04REC1-O                                             03/10/03
+  14796                  MOVE B"1" TO IN40 IN41                                                                         03/10/03
+  14797            END-EVALUATE.                                                                                        03/10/03
+  14798                                                                                                                 03/10/03
+  14799       *===============================================================*                                         04/01/08
+  14800                                                                                                                 03/10/03
+  14801        4000-PROCESS-TRANCODE-DETAILS.                                                                           03/10/03
+  14802                                                                                                                 03/10/03
+  14803            MOVE CORR CIHS04REC1-I TO CIHS04REC1-O.                                                              03/10/03
+  14804            WRITE TRANCODE-DSP-REC  FROM CIHS04REC1-O                                                            03/10/03
+  14805               FORMAT "CIHS04REC1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14806            READ  TRANCODE-DSP-FILE INTO CIHS04REC1-I                                                            03/10/03
+  14807               FORMAT "CIHS04REC1"  INDICATORS INDIC-AREA.                                                       03/10/03
+  14808                                                                                                                 03/10/03
+  14809            EVALUATE TRUE                                                                                        03/10/03
+  14810                                                                                                                 03/10/03
+  14811               WHEN F0-ENTER                                                                                     03/10/03
+  14812                  IF ADD-OPTION OR EDIT-OPTION                                                                   03/10/03
+  14813                     PERFORM 4100-VALIDATE                                                                       03/10/03
+  14814                     IF VALID-ENTRY                                                                              03/10/03
+  14815                        PERFORM 4500-UPDATE                                                                      03/10/03
+  14816                     END-IF                                                                                      03/10/03
+  14817                  END-IF                                                                                         03/10/03
+  14818                  IF DELETE-OPTION                                                                               03/10/03
+  14819                     PERFORM 4500-UPDATE                                                                         03/10/03
+  14820                  END-IF                                                                                         03/10/03
+  14821                  SET EXIT-DTL-SCREEN TO TRUE                                                                    03/10/03
+  14822                                                                                                                 03/10/03
+  14823               WHEN F12-CANCEL                                                                                   03/10/03
+  14824                  SET EXIT-DTL-SCREEN TO TRUE                                                                    03/10/03
+  14825                                                                                                                 03/10/03
+  14826            END-EVALUATE.                                                                                        03/10/03
+  14827                                                                                                                 03/10/03
+  14828       *===============================================================*                                         04/01/08
+  14829                                                                                                                 03/06/19
+  14830        4100-VALIDATE.                                                                                           03/10/03
+  14831                                                                                                                 03/10/03
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:37    AS400T1      PAGE    9
+  SOURCE FILE . . . . . . .  ATMTSRC/TMPCVPSRC
+  MEMBER  . . . . . . . . .  CIHMAN04X
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+  14832            SET VALID-ENTRY TO TRUE.                                                                             03/10/03
+  14833                                                                                                                 03/06/19
+  14834       *===============================================================*                                         04/01/08
+  14835                                                                                                                 03/10/03
+  14836        4500-UPDATE.                                                                                             03/10/03
+  14837                                                                                                                 03/10/03
+  14838            EVALUATE TRUE                                                                                        03/10/03
+  14839                                                                                                                 03/10/03
+  14840               WHEN ADD-OPTION                                                                                   03/10/03
+  14841                  MOVE CORR CIHS04REC1-I TO TRNCDREC                                                             03/10/03
+  14842                  WRITE TRANCODE-REC                                                                             03/10/03
+  14843                  PERFORM 2900-LOAD-SUBFILE                                                                      03/10/03
+  14845                                                                                                                 03/10/03
+  14846               WHEN EDIT-OPTION                                                                                  03/10/03
+  14847                  MOVE CORR CIHS04REC1-I TO TRNCDREC                                                             03/10/03
+  14848                  REWRITE TRANCODE-REC                                                                           03/10/03
+  14851                                                                                                                 03/10/03
+  14852               WHEN DELETE-OPTION                                                                                03/10/03
+  14853                  DELETE TRANCODE-FILE                                                                           03/10/03
+  14856                                                                                                                 03/10/03
+  14857            END-EVALUATE.                                                                                        03/10/03
+  14858                                                                                                                 03/10/03
+  14861                                                                                                                 03/10/03
+  14862       *===============================================================*                                         04/01/08
+  14863                                                                                                                 03/10/03
+  14864        9000-CLEAN-UP.                                                                                           03/10/03
+  14865                                                                                                                 03/10/03
+  14866            CLOSE TRANCODE-FILE                                                                                  03/10/03
+  14867                  TRANCODE-DSP-FILE.                                                                             03/10/03
+  14868                                                                                                                 03/04/17
+                                  * * * *  E N D  O F  S O U R C E  * * * *

@@ -1,0 +1,822 @@
+     H Dftactgrp(*NO) BNDDIR('QC2LE') debug
+     H COPYRIGHT  ('Giuseppe Costagliola 2005 - beppecosta@yahoo.it')
+
+      //-------------------------------------------------------------------
+      // Spool file
+      //-------------------------------------------------------------------
+     FCPYSPOOL  IF   E             DISK    EXTMBR(pMEMBER) USROPN
+
+      //-------------------------------------------------------------------
+      // Cmd Parameters
+      //-------------------------------------------------------------------
+     DEntryParms       PR                  extpgm('SCS2PDFR')
+     D pFILE                         10A
+     D pMEMBER                       10A
+     D pRCDLEN                        9B 0
+     D pOVRFLW                        9B 0
+     D pTOPDF                       100A
+     D pBASEFONT                     21A
+     D pPAGESIZE                     13A
+     D pPAGEWIDTH                     4P 0
+     D pPAGEHEIGHT                    4P 0
+     D pPOINTSIZE                     2P 0
+     D pVERTSPACE                     2P 0
+     D pCOLS                          4P 0
+     D pLEFTMARGIN                    3P 0
+     D pTOPMARGIN                     3P 0
+     D pORIENT                       10A
+     DEntryParms       PI
+     D pFILE                         10A
+     D pMEMBER                       10A
+     D pRCDLEN                        9B 0
+     D pOVRFLW                        9B 0
+     D pTOPDF                       100A
+     D pBASEFONT                     21A
+     D pPAGESIZE                     13A
+     D pPAGEWIDTH                     4P 0
+     D pPAGEHEIGHT                    4P 0
+     D pPOINTSIZE                     2P 0
+     D pVERTSPACE                     2P 0
+     D pCOLS                          4P 0
+     D pLEFTMARGIN                    3P 0
+     D pTOPMARGIN                     3P 0
+     D pORIENT                       10A
+
+     DQUSEC            DS
+      * Qus EC
+     D QUSBPRV                 1      4B 0
+      * Bytes Provided
+     D QUSBAVL                 5      8B 0
+      * Bytes Available
+     D QUSEI                   9     15
+      * Exception Id
+     D QUSERVED               16     16
+      * Varying length
+      *
+     DQUSC0200         DS
+      * Qus ERRC0200
+     D QUSK01                  1      4B 0
+      * Key
+     D QUSBPRV00               5      8B 0
+      * Bytes Provided
+     D QUSBAVL14               9     12B 0
+      * Bytes Available
+     D QUSEI00                13     19
+      * Exception Id
+     D QUSERVED39             20     20
+      * Reserved
+     D  QUSCCSID11            21     24B 0
+      * CCSID
+     D QUSOED01               25     28B 0
+      * Offset Exc Data
+     D QUSLED01               29     32B 0
+     DQUSED01                        60
+
+      // Stream file APIs --------------------------------------------------.
+     Dunlink           PR             9B 0 EXTPROC('unlink')
+     D                                 *   VALUE
+     Dopen             PR            10I 0 EXTPROC('open')
+     D                                 *   VALUE
+     D                               10I 0 VALUE
+     D                               10U 0 VALUE OPTIONS(*NOPASS)
+     D                               10U 0 VALUE OPTIONS(*NOPASS)
+     D O_CREAT         S             10I 0 INZ(8)
+     D O_WRONLY        S             10I 0 INZ(2)
+     D O_TRUNC         S             10I 0 INZ(64)
+     D O_CODEPAGE      S             10I 0 INZ(8388608)
+     D S_IRWXU         S             10I 0 INZ(448)
+     D S_IROTH         S             10I 0 INZ(4)
+     Dwrite            PR            10I 0 EXTPROC('write')
+     D                               10I 0 VALUE
+     D                                 *   VALUE
+     D                               10I 0 VALUE
+     Dclose            PR            10I 0 EXTPROC('close')
+     D                               10I 0 VALUE
+      //
+     Dfd               S             10I 0
+
+      // Local procedures --------------------------------------------------
+     DSetupPage        PR
+     DCrtPDFstmf       PR
+     D pTOPDF                       100A   VALUE
+
+     DWriteHeader      PR
+     D Title                        100A   VALUE
+
+     DWritePages       PR
+
+     DWritePagesTree   PR
+
+     DWriteXRef        PR
+
+     DWriteTrailer     PR
+
+     DStartPage        PR            10I 0
+
+     DEndPage          PR
+     D StreamStart                   10I 0
+
+     DWriteData        PR
+     D Buffer                      1024A   VALUE
+     D Len                           10I 0 VALUE
+
+     DClosePDFstmf     PR
+
+     DInzTblAscii      PR           256
+
+     DGetErrInfo       PR           128
+
+     DSndPgmMsg        PR
+     D type                          10A   CONST
+     D function                      20A   CONST
+     D msgId                          7A   CONST
+     D msg                          128A   CONST
+
+
+      // Conversion table --------------------------------------------------
+     DTblAscii         s            256
+
+      // Misc variables ----------------------------------------------------
+     DLF               C                   x'25'
+
+      // PDF Variables -----------------------------------------------------
+     DPageNo           S              5I 0 INZ(0)
+     DPageObject       S              5I 0 DIM(500)
+     DxObject          S              5I 0 INZ(5)
+     DxOffset          S             10U 0 INZ(0)
+     DxRef             S             10I 0 INZ(0)
+     DLocations        S             10I 0 DIM(1000)
+
+     DPointSize        S              5I 0 INZ(0)
+     DVertSpace        S              5I 0 INZ(0)
+     DCols             S              5I 0 INZ(0)
+     DLeftMargin       S              5I 0 INZ(0)
+     DTopMargin        S              5I 0 INZ(0)
+
+     DPageWidth        S              5I 0 INZ(0)
+     DPageHeight       S              5I 0 INZ(0)
+
+
+     DDefaultFont      C                   'Courier'
+     DFont             S             20A
+
+      // Program status ----------------------------------------------------
+     DPgmSts          SDS                  NoOpt
+     D JobNbr                         6a   Overlay(PgmSts:264)
+
+      //********************************************************************
+      // MAIN
+      //********************************************************************
+
+      /free
+
+       // Setup page
+       SetupPage ();
+
+       // Create the PDF stream file
+       CrtPDFstmf (pTOPDF);
+
+       // Initialize conversion table
+       TblAscii = InzTblAscii();
+
+       // Write document
+       WriteHeader(pFILE);
+       WritePages();
+       WritePagesTree();
+       WriteXRef();
+       WriteTrailer();
+
+       // close stream file
+       ClosePDFstmf ();
+
+       *inlr = *on;
+       return;
+
+      /end-free
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Set Page
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PSetupPage        B
+     DSetupPage        PI
+      /free
+
+       if pPAGESIZE = '*AUTO';
+         select;
+           when pRCDLEN <= 80;
+             pPAGESIZE = '*PORTRAIT80';
+           when pRCDLEN <= 132;
+             pPAGESIZE = '*LANDSCAPE132';
+           other;
+             pPAGESIZE = '*LANDSCAPE198';
+         endsl;
+       endif;
+
+       select;
+         when pPAGESIZE = '*PORTRAIT80';
+           PageWidth  = 595;
+           PageHeight = 842;
+           PointSize  = 12;
+           VertSpace  = 12;
+           Cols       = 80;
+           LeftMargin = 30;
+           TopMargin  = 30;
+         when pPAGESIZE = '*PORTRAIT132';
+           PageWidth  = 595;
+           PageHeight = 842;
+           PointSize  = 7;
+           VertSpace  = 11;
+           Cols       = 132;
+           LeftMargin = 35;
+           TopMargin  = 50;
+         when pPAGESIZE = '*LANDSCAPE132';
+           PageWidth  = 842;
+           PageHeight = 595;
+           PointSize  = 10;
+           VertSpace  = 9;
+           Cols       = 132;
+           LeftMargin = 20;
+           TopMargin  = 20;
+         when pPAGESIZE = '*LANDSCAPE198';
+           PageWidth  = 842;
+           PageHeight = 595;
+           PointSize  = 7;
+           VertSpace  = 9;
+           Cols       = 198;
+           LeftMargin = 5;
+           TopMargin  = 10;
+         when pPAGESIZE = '*USRDFN';
+           PageWidth  = pPAGEWIDTH;
+           PageHeight = pPAGEHEIGHT;
+           PointSize  = pPOINTSIZE;
+           VertSpace  = pVERTSPACE;
+           if pCols = -1;
+             Cols = pRCDLEN;
+           else;
+             Cols     = pCOLS;
+           endif;
+           LeftMargin = pLEFTMARGIN;
+           TopMargin  = pTOPMARGIN;
+         endsl;
+
+       if pOrient = '*LANDSCAPE';
+           PageWidth  = pPageHeight;
+           PageHeight = pPageWidth;
+       endif;
+
+      /end-free
+     PSetupPage        E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Create an empty PDF stream file
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PCrtPDFstmf       B
+     DCrtPDFstmf       PI
+     D pTOPDF                       100A   VALUE
+
+     DFileName         S            101A
+     DErrMsg           S            128A
+
+      /free
+
+       FileName = %TRIM(pTOPDF) + X'00';
+
+       // Check whether stream file exists or not.
+       fd = open(%Addr(FileName) : 1);
+
+       // If Stream file exists, then unlink the stream file
+       If fd <> -1;
+         If close(fd) = -1;
+           ErrMsg = 'close() failed. ' + geterrinfo;
+         EndIf;
+         If unlink(%Addr(Filename)) = -1;
+           ErrMsg = 'unlink() failed. ' + geterrinfo;
+         Endif;
+       EndIf;
+
+       // if errors exit
+       if ErrMsg <> ' ';
+         SndPgmMsg ('*ESCAPE':'CrtPDFstmf': ' ' : ErrMsg);
+       Endif;
+
+       // Open(Create) stream file
+       fd = open(%Addr(Filename)
+            : O_CREAT + O_WRONLY + O_TRUNC + O_CODEPAGE
+            : S_IRWXU + S_IROTH : 819);
+       If fd = -1;
+         ErrMsg = 'open() failed. ' + geterrinfo;
+       EndIf;
+
+       // if errors exit
+       if ErrMsg <> ' ';
+         SndPgmMsg ('*ESCAPE':'CrtPDFstmt': ' ' : ErrMsg);
+       Endif;
+
+      /end-free
+
+     PCrtPDFstmf       E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write data
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWriteData        B
+     DWriteData        PI
+     D Buffer                      1024A   VALUE
+     D Len                           10I 0 VALUE
+
+      // xlateb MI
+     Dxlateb           PR                  EXTPROC('_XLATEB')
+     D                                 *   VALUE
+     D                                 *   VALUE
+     D                               10U 0 VALUE
+
+     DBytesW           S             10I 0
+     DErrMsg           S            128A
+
+      /free
+
+       // convert to ascii
+       xlateb (%addr(Buffer):%addr(TblAscii):Len);
+
+       // write data to stream file
+       BytesW = write(fd:%addr(Buffer):Len);
+       If BytesW <> Len;
+         ErrMsg = 'write() failed. ' + geterrinfo;
+       Endif;
+
+       // increase final position
+       xOffset += BytesW;
+
+      /end-free
+
+     PWriteData        E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write header
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWriteHeader      B
+     DWriteHeader      PI
+     D Title                        100A   VALUE
+
+     D CreationDate    S             14A
+     D Element         S            128A
+
+      /free
+
+       // declare PDF version and some "HiBit" stuff
+       WriteData('%PDF-1.1'+LF:9);
+       WriteData('%' + x'424677ee'+LF:6);
+
+       // document info
+       Locations(1) = xOffset;
+       WriteData('1 0 obj'+LF:8);
+       WriteData('<<'+LF:3);
+       CreationDate = %char(%date():*ISO0)+%char(%time():*HMS0);
+       WriteData('/CreationDate (D:' + CreationDate + ')'+ LF:33);
+       WriteData('/Producer (SCS2PDF v1.0 (\251 BeppeCosta, 2005))'+LF:49);
+       Element = '/Title (' + %trim(Title) + ')' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+       // root node
+       Locations(2) = xOffset;
+       WriteData('2 0 obj'+LF:8);
+       WriteData('<<'+LF:3);
+       WriteData('/Type /Catalog'+LF:15);
+       WriteData('/Pages 3 0 R'+LF:13);
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+       // font
+       Locations(4) = xOffset;
+       WriteData('4 0 obj'+LF:8);
+       WriteData('<<'+LF:3);
+       WriteData('/Type /Font'+LF:12);
+       WriteData('/Subtype /Type1'+LF:16);
+       WriteData('/Name /F1'+LF:10);
+       if pBASEFONT = '*DFT';
+         Font = DefaultFont;
+       else;
+         Font = pBASEFONT;
+       endif;
+       Element = '/BaseFont /' + %trim(Font) + LF;
+       WriteData(Element:%len(%trimr(Element)));
+       WriteData('/Encoding /WinAnsiEncoding'+LF:27);
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+       // page list
+       Locations(5) = xOffset;
+       WriteData('5 0 obj'+LF:8);
+       WriteData('<<'+LF:3);
+       WriteData('  /Font << /F1 4 0 R >>'+LF:24);
+       WriteData('  /ProcSet [ /PDF /Text ]'+LF:26);
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+      /end-free
+     PWriteHeader      E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write pages
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWritePages       B
+     DWritePages       PI
+
+     D Element         S            128A
+
+     D BeginStream     S             10I 0
+
+     D c               S              5I 0
+     D r               S              5I 0
+     D s               S              5I 0
+     D Parentheses     C                   '\()'
+     D PdfText         S            256A
+
+      /free
+
+       open CPYSPOOL;
+
+       dow not %eof(CPYSPOOL);
+         // open a new page
+         beginstream = StartPage();
+         // read a spool line
+         read CPYSPOOL;
+         dow not %eof(CPYSPOOL);
+           WriteData('(':1);
+           PdfText = LINE;
+           // escape parentheses
+           for c = 1 to %len(Parentheses);
+             r = 0;
+             s = 1;
+             dou s = 0;
+               s = %scan(%subst(Parentheses:c:1):%subst(PdfText:r+1));
+               if s > 0;
+                 r += s;
+                 PdfText = %replace('\':PdfText:r:0);
+                 r += 1;
+               endif;
+             enddo;
+           endfor;
+           // write spool line
+           WriteData(%trimr(PdfText):%len(%trimr(PdfText)));
+           WriteData(')'''+LF:3);
+           // read next line
+           read CPYSPOOL;
+           if not %eof(CPYSPOOL);
+             // handle FCFC instruction
+             select;
+               when FCFC = '1';
+                 EndPage(beginstream);
+                 beginstream = StartPage();
+               when FCFC = '0';
+                WriteData('()'''+LF:4);
+               when FCFC = '-';
+                WriteData('()'''+LF:4);
+                WriteData('()'''+LF:4);
+             endsl;
+           endif;
+         enddo;
+         // close page
+         EndPage(beginstream);
+       enddo;
+
+       close CPYSPOOL;
+
+      /end-free
+     PWritePages       E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Start page
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PStartPage        B
+     DStartPage        PI            10I 0
+
+     D strmPos         S             10I 0
+     D Element         S            128A
+
+      /free
+
+       // page
+       xObject += 1;
+       Locations(xObject) = xOffset;
+       pageNo += 1;
+       PageObject(pageNo) = xObject;
+       Element = %char(xObject) + ' 0 obj' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+       WriteData('<<'+LF:3);
+       WriteData('/Type /Page'+LF:12);
+       WriteData('/Parent 3 0 R'+LF:14);
+       WriteData('/Resources 5 0 R'+LF:17);
+       xObject += 1;
+       Element = '/Contents ' + %char(xObject) + ' 0 R' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+       Locations(xObject) = xOffset;
+       Element = %char(xObject) + ' 0 obj' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       WriteData('<<'+LF:3);
+       Element = '/Length ' + %char(xObject + 1) + ' 0 R' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       WriteData('>>'+LF:3);
+       WriteData('stream'+LF:7);
+       strmPos = xOffset;
+
+       // BT begin a text block
+       WriteData('BT'+LF:3);
+
+       // set working font
+       Element = '/F1 ' + %char(pointSize) + ' Tf' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // set margins (x,y)
+       Element = '1 0 0 1 ' + %char(leftMargin) +
+                ' ' + %char(pageHeight - topMargin) + ' Tm' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // set vertical space
+       Element = %char(vertSpace) + ' TL' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       return strmPos;
+
+      /end-free
+     PStartPage        E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // End page
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PEndPage          B
+     DEndPage          PI
+     D StreamStart                   10I 0
+
+     D Element         S            128A
+     D StreamEnd       S             10I 0
+      /free
+
+         // ET ends the text block
+         WriteData('ET'+LF:3);
+         streamEnd = xOffset;
+         WriteData('endstream'+LF:10);
+         WriteData('endobj'+LF:7);
+
+         xObject += 1;
+         Locations(xObject) = xOffset;
+
+         Element = %char(xObject) + ' 0 obj' + LF;
+         WriteData(Element:%len(%trimr(Element)));
+
+         Element = %char(StreamEnd - streamStart) + LF;
+         WriteData(Element:%len(%trimr(Element)));
+
+         WriteData('endobj'+LF:7);
+
+      /end-free
+     PEndPage          E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write pages tree
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWritePagesTree   B
+     DWritePagesTree   PI
+
+     D i               S              5I 0
+
+     D Element         S            128A
+
+      /free
+
+       Locations(3) = xOffset;
+       WriteData('3 0 obj'+LF:8);
+       WriteData('<<'+LF:3);
+       WriteData('/Type /Pages'+LF:13);
+
+       // define page count
+       Element = '/Count ' + %char(pageNo) + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // define papersize
+       Element = '/MediaBox [ 0 0 ' + %char(pageWidth) +
+                ' ' + %char(pageHeight) + ' ]' +LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // define object reference to each page
+       WriteData('/Kids [':7);
+       for i = 1 to pageNo;
+         if %rem(i:10) = 0;
+           WriteData(LF:1);
+         endif;
+         Element = ' ' + %char(PageObject(i)) + ' 0 R';
+         WriteData(Element:%len(%trimr(Element)));
+       endfor;
+
+       WriteData(' ]'+LF:3);
+       WriteData('>>'+LF:3);
+       WriteData('endobj'+LF:7);
+
+      /end-free
+     PWritePagesTree   E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write xRef
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWriteXRef        B
+     DWriteXRef        PI
+
+     D i               S              5I 0
+
+     D Element         S            128A
+
+      /free
+
+       // write xRef table
+       xRef = xOffset;
+       WriteData('xref'+LF:5);
+
+       // ... number of entries
+       Element = '0 ' + %char(xObject + 1) + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // ... free entry - head of linked list
+       Element = '0000000000 65535 f ' + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // ... xRef entries
+       for i = 1 to xObject;
+         Element = %trim(%editc(%dec(Locations(i):10:0):'X')) +
+                  ' 00000 n ' + LF;
+         WriteData(Element:%len(%trimr(Element)));
+       endfor;
+
+      /end-free
+     PWriteXRef        E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Write trailer
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PWriteTrailer     B
+     DWriteTrailer     PI
+
+     D Element         S            128A
+
+      /free
+
+       WriteData('trailer'+LF:8);
+       WriteData('<<'+LF:3);
+
+       // total number of entries in xRef
+       Element = '/Size ' + %char(xObject + 1) + LF;
+       WriteData(Element:%len(%trimr(Element)));
+       WriteData('/Root 2 0 R'+LF:12);     // reference to Catalog
+       WriteData('/Info 1 0 R'+LF:12);     // reference to Info dictionary
+       WriteData('>>'+LF:3);
+
+       // offset of xRef
+       WriteData('startxref'+LF:10);
+       Element = %char(xRef) + LF;
+       WriteData(Element:%len(%trimr(Element)));
+
+       // final
+       WriteData('%%EOF'+LF:5);
+
+      /end-free
+     PWriteTrailer     E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Close PDF stream file
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PClosePDFstmf     B
+     DClosePDFstmf     PI
+     DErrMsg           S            128A
+
+      /free
+       If close(fd) = -1;
+         ErrMsg = 'close() failed. ' + geterrinfo;
+         SndPgmMsg ('*ESCAPE':'CloPDFstmt': ' ' : ErrMsg);
+       EndIf;
+      /end-free
+
+     PClosePDFstmf     E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Initialize Table Ebcdic -> Ascii
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PInzTblAscii      B
+     DInzTblAscii      PI           256A
+
+      // Convert a Graphic Character String API
+     DCDRCVRT          PR                  extpgm('CDRCVRT')
+     D CCSID1                        10I 0 CONST
+     D ST1                           10I 0 CONST
+     D S1                           256    CONST
+     D L1                            10I 0 CONST
+     D CCSID2                        10I 0 CONST
+     D ST2                           10I 0 CONST
+     D GCCASN                        10I 0 CONST
+     D L2                            10I 0 CONST
+     D S2                           256
+     D L3                            10I 0
+     D L4                            10I 0
+     D FB                            12
+
+     DQUSRJOBI         PR                  extpgm('QUSRJOBI')
+     D jobi0400                    1024    OPTIONS(*VARSIZE)
+     D jobiBytes                      9B 0 CONST
+     D jobiFormat                    10    CONST
+     D jobiJobName                   26    CONST
+     D jobiJobInt                    16    CONST
+     D ApiError                     120    OPTIONS(*VARSIZE)
+     D jobi0400        DS
+     D  CCSID                         9B 0 overlay(jobi0400:373)
+
+      // conversion tables and CDRCVRT rtn flds
+     DTblAscii         s            256    inz(*allx'ff')
+     DTblEbcdic        s            256    inz(*allx'ff')
+     DL3               s             10i 0
+     DL4               s             10i 0
+     DFB               s             12
+
+      // conversion binary - hex
+     dxValue           ds
+     d bValue                         3U 0
+
+      /free
+        // get CCSID
+        QUSRJOBI (jobi0400:%len(jobi0400):'JOBI0400':'*':' ':QUSEC);
+        // create a conversion table
+        for bValue = 0 to 254;
+          %subst(TblEbcdic:bValue+1:1) = xValue;
+        endfor;
+        // create table
+        CDRCVRT (CCSID:0:TblEbcdic:256:819:0:0:256:TblAscii:L3:L4:FB);
+        // return table
+        return TblAscii;
+      /end-free
+
+     PInzTblAscii      E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Get C error data
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     Pgeterrinfo       B
+     Dgeterrinfo       PI           128
+     Dgeterrno         PR              *   EXTPROC('__errno')
+     Dstrerror         PR              *   EXTPROC('strerror')
+     D errno                         10I 0 VALUE
+     Derrnum           S             10I 0 BASED(errnum_p)
+      /free
+       errnum_p = geterrno;
+       Return %TRIM(%EDITC(errnum : '3')) + ' : ' +
+           %STR(strerror(errnum));
+      /end-free
+     Pgeterrinfo       E
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // Send Program Message
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     PSndPgmMsg        B
+     DSndPgmMsg        PI
+     D msgType                       10A   CONST
+     D function                      20A   CONST
+     D msgId                          7A   CONST
+     D msgErr                       128A   CONST
+
+     D QMHSNDPM        PR                  extpgm('QMHSNDPM')
+     D  MessageId                     7    CONST
+     D  MessageFile                  20    CONST
+     D  MessageData                 512    CONST options(*varsize)
+     D  MessageDataL                  9b 0 CONST
+     D  MessageType                  10    CONST
+     D  CallStkEntry                128    CONST options(*varsize)
+     D  CallStkCount                  9b 0 CONST
+     D  MessageKey                    4    CONST
+     D  ApiError                    120    options(*varsize)
+
+     D idMsg           S              7A
+     D errMsg          S            128A
+
+      /free
+
+       if msgId <> ' ';
+         idMsg  = msgId;
+         errMsg = msgErr;
+       else;
+         if msgType = '*ESCAPE';
+           idMsg  = 'CPF9898';
+           errMsg = 'Error ' + %trimr(function) + ' : ' + msgErr;
+         else;
+           errMsg = msgErr;
+         endif;
+       endif;
+
+       QMHSNDPM (idMsg: 'QCPFMSG   QSYS' : errMsg : %len(errMsg) :
+                 msgType : '*CTLBDY' : 1 : ' ' : QUSEC);
+
+      /end-free
+     PSndPgmMsg        E
+

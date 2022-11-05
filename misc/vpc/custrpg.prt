@@ -1,0 +1,155 @@
+      *==============================================================*
+      * Program name: CUSTRPG                                        *
+      * Purpose.....: Customer Selection Window Program              *
+      *                                                              *
+      * Indicators:                                                  *
+      *     40  -  Clear subfile                                     *
+      *     41  -  Display subfile                                   *
+      *     98  -  EOF for read changed records in CSFL subfile      *
+      *     99  -  EOF for CUSTLFNM                                  *
+      *==============================================================*
+      *
+      *==============================================================*
+      * Files Declaration                                            *
+      *==============================================================*
+      *
+     FCUSTLFNMIF  E           K        DISK
+     FCUSTDSPFCF  E                    WORKSTN      KINFDS INFDS
+     F                                        CRRN  KSFILE CSFL
+      *
+      *==============================================================*
+      * Data Structures                                              *
+      *==============================================================*
+      *
+     IINFDS       DS
+     I                                      369 369 KEY
+      *
+      *==============================================================*
+      * Constants Declaration                                        *
+      *==============================================================*
+      *
+      * Function keys
+     I              X'33'                 C         F03
+     I              X'3C'                 C         F12
+     I              X'F1'                 C         ENTER
+      *
+      *==============================================================*
+      * Input parameter I#CUST not used in program                   *
+      * Output parameter O#CUST is selected CUSTNO (Customer number) *
+      *==============================================================*
+      *
+     C           *ENTRY    PLIST
+     C                     PARM O#CUST    I#CUST
+      *
+      * Position record pointer at the beginning of file
+     C           *LOVAL    SETLLCUSTLFNM
+      *
+      * Build window
+     C                     WRITECSFLCMD
+      * Fill subfile
+     C                     EXSR @LOAD
+      *
+      *==============================================================*
+      * Main Loop                                                    *
+      *==============================================================*
+      *
+      * Display selection window and accept user input
+     C           KEY       DOUEQF03
+     C           KEY       OREQ F12
+      *
+     C                     WRITECSFLCMD
+     C                     EXFMTCSFLCTL
+      *
+      * Check user input
+     C           KEY       IFEQ ENTER
+     C           NCNAME    IFEQ *BLANKS
+     C                     EXSR @CHKSL
+     C                     ELSE
+     C                     EXSR @REPOS
+     C                     EXSR @LOAD
+     C                     ENDIF
+     C                     ENDIF
+      *
+     C                     ENDDO
+      *
+      * End of program
+     C                     MOVE *ON       *INLR
+     C                     RETRN
+      *
+      *==============================================================*
+      * Check if user made a selection                               *
+      *==============================================================*
+      *
+     C           @CHKSL    BEGSR
+      *
+     C                     READCCSFL                     98
+      *
+     C           *IN98     DOWEQ*OFF
+     C           SELIO     IFEQ 1
+     C                     Z-ADDCUSTNO    O#CUST
+     C                     MOVE F03       KEY
+     C                     LEAVE
+     C                     ENDIF
+     C                     READCCSFL                     98
+     C                     ENDDO
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Reposition subfile for "Position to" entry                   *
+      *==============================================================*
+      *
+     C           @REPOS    BEGSR
+      *
+      * Position file by partial entry NCNAME in dspf
+     C                     MOVELNCNAME    CNAME
+     C           CNAME     SETLLCUSTLFNM
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Load subfile records                                         *
+      *==============================================================*
+      *
+     C           @LOAD     BEGSR
+      *
+      * Clear subfile
+     C                     MOVE *ON       *IN40
+     C                     WRITECSFLCTL
+     C                     MOVE *OFF      *IN40
+      *
+      * Initialize subfile relative record number
+     C                     Z-ADD0         CRRN    50
+      *
+      ** Load 100 records in subfile
+     C                     DO   100
+     C                     READ CUSTLFNM                 99
+     C           *IN99     IFEQ *ON
+     C                     LEAVE
+     C                     ENDIF
+     C                     ADD  1         CRRN
+     C                     Z-ADD0         SELIO
+     C                     WRITECSFL
+     C                     ENDDO
+      *
+      * Check for existing subfile records to condition SFLDSP
+     C           CRRN      IFGT 0
+     C                     MOVE *ON       *IN41
+     C                     ELSE
+     C                     MOVE *OFF      *IN41
+     C                     END
+      *
+     C                     ENDSR
+      *
+      *==============================================================*
+      * Initial Routine                                              *
+      *==============================================================*
+      *
+     C           *INZSR    BEGSR
+      *
+      * Variable declarations
+     C                     Z-ADD1         RCDNBR
+     C           *LIKE     DEFN CUSTNO    I#CUST
+     C           *LIKE     DEFN CUSTNO    O#CUST
+      *
+     C                     ENDSR

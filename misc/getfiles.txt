@@ -1,0 +1,75 @@
+open 168.9.56.25
+itvictor
+victor05
+cd kibvictor
+lcd c:\temp
+get  vpc.binary      binary.txt
+get  vpc.cal         cal.cmd
+get  vpc.calcbl      calcbl.cmd
+get  vpc.caldsp      caldsp.dsp
+get  vpc.countrec    countrec.clp
+get  vpc.crtdupdqcl  crtdupdq.clp
+get  vpc.crtdupdtaq  crtdupdq.cmd
+get  vpc.cursor      cursor.rpg
+get  vpc.cursor1     cursor1.cbl
+get  vpc.custdspf    custdspf.dsp
+get  vpc.custdsp1    custdsp1.dsp
+get  vpc.custdsp2    custdsp2.dsp
+get  vpc.custlfnm    custlfnm.lf
+get  vpc.custpf      custpf.pf
+get  vpc.custprt4    custprt4.prt
+get  vpc.custrpg     custrpg.prt
+get  vpc.custrpg1    custrpg1.prt
+get  vpc.custrpg2    custrpg2.rpg
+get  vpc.custrpg4    custrpg4.prt
+get  vpc.dateval     dateval.clp
+get  vpc.deljoblog   deljoblg.clp
+get  vpc.delsplf     delsplf.cmd
+get  vpc.delsplfcl   delsplf.clp
+get  vpc.dspcldpgm   dspcldpm.cmd
+get  vpc.dspcldpgmc  dspcldpm.clp
+get  vpc.dspclgpgm   dspclgpm.cmd
+get  vpc.dspclgpgmc  dspclgpm.clp
+get  vpc.dspdtaq     dspdtaq.cmd
+get  vpc.dspdtaqcl   dspdtaq.clp
+get  vpc.dspfld      dspfld.cmd
+get  vpc.dspfldcl    dspfld.clp
+get  vpc.dspkeycl    dspkey.clp
+get  vpc.dspkeyfld   dspkey.cmd
+get  vpc.dtaqcl      dtaqcl.clp
+get  vpc.dtaqcl1     dtaqcl1.clp
+get  vpc.dtaqcl2     dtaqcl2.clp
+get  vpc.edtlda      edtlda.cmd
+get  vpc.edtldacl    edtlda.clp
+get  vpc.edtldadsp   edtlda.dsp
+get  vpc.errhandle   errhandl.clp
+get  vpc.fkeys       fkeys.rpg
+get  vpc.getdayofwk  getdow.clp
+get  vpc.hilite      hilite.cmd
+get  vpc.hilitecbl   hilite.cbl
+get  vpc.hiliteclp   hilite.clp
+get  vpc.kiftpgen    kiftpgen.cbl
+get  vpc.kiftppf     kiftppf.pf
+get  vpc.lda         lda.rpg
+get  vpc.list        list.cmd
+get  vpc.listcl      list.clp
+get  vpc.panel       panel.pnl
+get  vpc.q           q.cmd
+get  vpc.qmhsndpm    qmhsndpm.txt
+get  vpc.q1          q.clp
+get  vpc.runftp      runftp.cmd
+get  vpc.runftpcl    runftp.clp
+get  vpc.snddtaq     snddtaq.cmd
+get  vpc.snddtaqcl   snddtaq.clp
+get  vpc.sql         sql.cmd
+get  vpc.sqlcl       sql.clp
+get  vpc.sqlqmqry    sql.qm
+get  vpc.test3cl     test3.clp
+get  vpc.test3dsp    test3.dsp
+get  vpc.xpgmreflf   xpgmref.lf
+get  vpc.xref        xref.cmd
+get  vpc.xrefcbl     xrefcbl.cbl
+get  vpc.xrefcbl1    xrefcbl1.cbl
+get  vpc.xrefcl      xrefcl.clp
+get  vpc.xrefdsp     xrefdsp.dsp
+quit

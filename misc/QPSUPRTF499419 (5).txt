@@ -1,0 +1,17 @@
+  5722WDS V5R3M0  030905                  SEU SOURCE LISTING                            08/10/15 17:56:50    AS400T1      PAGE    1
+  SOURCE FILE . . . . . . .  CIHPSRC/QDDSSRC
+  MEMBER  . . . . . . . . .  CIHPTRCD
+  SEQNBR*...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0
+    100      A*---------------------------------------------------------------*                                         03/04/16
+    200      A* Channel Transaction Code Mapping File                         *                                         03/06/06
+    400      A*---------------------------------------------------------------*                                         03/04/16
+    500      A                                      UNIQUE                                                              03/06/17
+    501      A          R TRNCDREC                                                                                      03/06/17
+    700      A            CHANNEL        5A                                                                             03/05/13
+    800      A            TRANCODE      10A                                                                             03/06/06
+    900      A            SHRTNAME      10A                                                                             03/06/06
+   1000      A            TRANDESC      40A                                                                             03/06/06
+   1100      A            FILLER1       35A                                                                             03/06/06
+   1200      A          K CHANNEL                                                                                       03/06/06
+   1300      A          K TRANCODE                                                                                      03/06/06
+                                  * * * *  E N D  O F  S O U R C E  * * * *

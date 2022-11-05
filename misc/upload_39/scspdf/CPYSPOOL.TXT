@@ -1,0 +1,6 @@
+     A          R RCPYSPOOL
+     A            FCFC           1A
+     A                                      COLHDG('FCFC')
+     A            LINE         198A
+     A                                      COLHDG('LINE')
+
