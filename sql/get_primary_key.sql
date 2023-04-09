@@ -1,0 +1,6 @@
+SELECT *
+    FROM sysibm.sqlstatistics
+    WHERE TABLE_SCHEM = 'VPCRZKH1'
+          AND TABLE_NAME = 'PROCS'
+          AND ORDINAL_POSITION IS NOT null
+    ORDER BY ORDINAL_POSITION;
