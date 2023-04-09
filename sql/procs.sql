@@ -31,3 +31,15 @@ select table_schema, table_name, column_name, system_column_name, ordinal_positi
    from qsys2.syscolumns2
    where table_schema = 'VPCRZKH1'
    and table_name = 'PROCS';
+
+
+ALTER TABLE vpcrzkh1.procs
+   DROP primary key;
+
+ALTER TABLE vpcrzkh1.procs
+    ADD CONSTRAINT vpcrzkh1.procs_prikey 
+    PRIMARY KEY (
+    specific_schema,
+    specific_name
+    );
+    
