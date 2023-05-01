@@ -1,0 +1,6 @@
+java -jar /home/VPCRZKH/acsbundle.jar /plugin=cldownload /system=localhost /hostfile=VPCRZKH1/MSGPF /clientfile=/home/VPCRZKH/msg
+pf.xlsx                                                                                                                         
+May 01, 2023 8:48:23 AM java.util.prefs.FileSystemPreferences$2 run                                                             
+WARNING: Could not create system preferences directory. System preferences are unusable.                                        
+Transfer request is complete.                                                                                                   
+Transfer statistics: 00:00:02                                                                                                   
