@@ -1,3 +1,19 @@
+
+-- convert value to date
+select date('1988-12-25')
+   from sysibm.sysdummy1;
+   
+select date('12/25/1988')
+   from sysibm.sysdummy1;
+   
+select date('25.12.1988')
+   from sysibm.sysdummy1;
+
+select substr(char(19881225), 1, 4) || '-' || substr(char(19881225), 5, 2) ||
+      '-' || substr(char(19881225), 7, 2)
+   from sysibm.sysdummy1;
+
+-- date arithmetic   
 select days(current date) - days('2021-07-03')
    from sysibm.sysdummy1;
 
@@ -21,11 +37,12 @@ select current date - 1 year from sysibm.sysdummy1;
 select current date - 1 month from sysibm.sysdummy1;
 select current date - 1 day from sysibm.sysdummy1;
 
-
+-- get system date/time
 select curdate() from sysibm.sysdummy1;
 select curtime() from sysibm.sysdummy1;
 select now() from sysibm.sysdummy1;  -- a timestamp based on a reading of the time-of-day clock 
 
+-- various date functions
 select day(current date) from sysibm.sysdummy1;
 select month(current date) from sysibm.sysdummy1;
 select year(current date) from sysibm.sysdummy1;
