@@ -1,4 +1,3 @@
-
 -- convert value to date
 select date('1988-12-25')
    from sysibm.sysdummy1;
@@ -14,8 +13,17 @@ select substr(char(19881225), 1, 4) || '-' || substr(char(19881225), 5, 2) ||
    from sysibm.sysdummy1;
 
 -- date arithmetic   
-select days(current date) - days('2021-07-03')
-   from sysibm.sysdummy1;
+select year(current date - date('2021-07-03'))
+  from sysibm.sysdummy1;
+
+select month(current date - date('2021-07-03'))
+  from sysibm.sysdummy1;
+
+select day(current date - date('2023-08-01'))
+  from sysibm.sysdummy1;
+
+select days(current date) - days(date('2023-08-01'))
+  from sysibm.sysdummy1;
 
 select date(days(current date) + 1)
    from sysibm.sysdummy1;
