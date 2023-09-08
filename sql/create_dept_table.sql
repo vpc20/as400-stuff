@@ -1,7 +1,10 @@
-﻿drop procedure create_dept_table;
+﻿set current schema vpcrzkh1;
+
+drop procedure create_dept_table;
 
 create procedure create_dept_table (in p_dept char(3))
       language sql
+      SET OPTION DBGVIEW=*SOURCE 
 --#SET TERMINATOR #
 begin
    declare stmt char(1000);
