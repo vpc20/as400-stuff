@@ -12,6 +12,15 @@ select substr(char(19881225), 1, 4) || '-' || substr(char(19881225), 5, 2) ||
       '-' || substr(char(19881225), 7, 2)
    from sysibm.sysdummy1;
 
+-- substring also works with numbers
+select substr(19881225, 1, 4) || '-' || substr(19881225, 5, 2) ||
+      '-' || substr(19881225, 7, 2)
+   from sysibm.sysdummy1;     
+
+select left(19881225,4) || '-' || substr(char(19881225), 5, 2) ||
+      '-' || right(19881225)
+         from sysibm.sysdummy1;
+
 -- date arithmetic   
 select year(current date - date('2021-07-03'))
   from sysibm.sysdummy1;
