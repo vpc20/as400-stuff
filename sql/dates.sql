@@ -51,8 +51,11 @@ select current date + 1 month from sysibm.sysdummy1;
 select current date + 1 day from sysibm.sysdummy1;
 
 select current date - 1 year from sysibm.sysdummy1;
-select current date - 1 month from sysibm.sysdummy1;
+select current date - 1 month from sysibm.sysdummy1; -- add 1 month (does not change day of month)
 select current date - 1 day from sysibm.sysdummy1;
+
+select ADD_MONTHS('2000-2-28', 1) from sysibm.sysdummy1; -- add 1 month
+select ADD_MONTHS('2000-2-29', 1) from sysibm.sysdummy1; -- add 1 month but returns last day of month
 
 -- get system date/time
 select curdate() from sysibm.sysdummy1;
