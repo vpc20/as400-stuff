@@ -12,7 +12,7 @@ select substr(char(19881225), 1, 4) || '-' || substr(char(19881225), 5, 2) ||
       '-' || substr(char(19881225), 7, 2)
    from sysibm.sysdummy1;
 
--- substring also works with numbers
+-- substring function also works with numbers
 select substr(19881225, 1, 4) || '-' || substr(19881225, 5, 2) ||
       '-' || substr(19881225, 7, 2)
    from sysibm.sysdummy1;     
@@ -22,29 +22,26 @@ select left(19881225,4) || '-' || substr(char(19881225), 5, 2) ||
          from sysibm.sysdummy1;
 
 -- date arithmetic   
-select year(current date - date('2021-07-03'))
+select days(current date) - days(date('2023-08-01'))  -- days difference
   from sysibm.sysdummy1;
 
-select month(current date - date('2021-07-03'))
-  from sysibm.sysdummy1;
-
-select day(current date - date('2023-08-01'))
-  from sysibm.sysdummy1;
-
-select days(current date) - days(date('2023-08-01'))
-  from sysibm.sysdummy1;
-
-select date(days(current date) + 1)
+select date(days(current date) + 1) -- add 1 day
    from sysibm.sysdummy1;
 
-select date(days(current date) - 1)
+select date(days(current date) - 1) -- subtract 1 day
    from sysibm.sysdummy1;
 
-select add_months(current date, 1) 
+select add_months(current date, 1)  -- add months (day will be last day is input date is last day of month)
    from sysibm.sysdummy1;
 
 select months_between(current date, '2021-06-01')
    from sysibm.sysdummy1;
+
+select year(current date - date('1943-05-23')) -- diff in years
+from sysibm.sysdummy1;
+
+select year(current date - date('2023-12-01')) -- diff in years
+from sysibm.sysdummy1;
 
 select current date + 1 year from sysibm.sysdummy1;
 select current date + 1 month from sysibm.sysdummy1;
