@@ -79,10 +79,10 @@ select insert('INSERTING', 4, 2, 'IS'),
 select length('abcdef')
    from sysibm.sysdummy1;
 
--- similar to posstr with arguments inverted
 select posstr('abcdef', 'c')
    from sysibm.sysdummy1;
 
+-- similar to posstr with arguments inverted
 select locate('c', 'abcdef')
    from sysibm.sysdummy1;
 
