@@ -37,9 +37,3 @@ INNER JOIN department dep
            ON dep.deptno = emp.workdept
 WHERE deptno = workdept;
 
-
-SELECT empno, lastname, projno
-FROM employee
-INNER JOIN project
-           ON empno = respemp
-WHERE lastname > 'S';
