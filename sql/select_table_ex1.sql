@@ -1,4 +1,4 @@
-﻿SET CURRENT schema vpcrzkh1;
+﻿-- SET CURRENT schema vpcrzkh1;
 
 SELECT *
   FROM employee;
