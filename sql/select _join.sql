@@ -63,6 +63,7 @@ WHERE emp.lastname > 'S'
    WHERE emp.empno = proj.respemp);
 
 
+-------------------------------------------------------------------------------
 CREATE TABLE a
 (
   acol1 VARCHAR(10),
@@ -93,7 +94,7 @@ VALUES ('B2', 'BB2');
 SELECT *
 FROM b;
 
-
+-- cross join (cartesian product)
 SELECT *
 FROM a
 CROSS JOIN b;
@@ -103,6 +104,22 @@ CROSS JOIN b;
 SELECT *
 FROM a,
      b;
+
+
+SELECT emp.empno, emp.lastname, proj.projno
+FROM employee emp
+FULL OUTER JOIN project proj
+                ON empno = respemp
+WHERE lastname > 'S';
+
+
+SELECT emp.empno, emp.lastname, dept.deptname, proj.projno
+FROM employee emp
+INNER JOIN department dept
+           ON emp.workdept = dept.deptno
+LEFT JOIN  project proj
+           ON emp.empno = proj.respemp
+WHERE lastname > 'S';
 
 
 
