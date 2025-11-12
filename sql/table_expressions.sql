@@ -29,3 +29,23 @@ UNION
 SELECT 'D', MAX(avgsal), CAST(MIN(avgsal) AS DECIMAL(10, 2)) AS minavgsal
 FROM dt
 WHERE deptno LIKE 'D%';
+
+
+-- multiple common table expressions
+-- WITH x AS (SELECT order_id, cust_id
+--            FROM orders
+--            ORDER BY ord_date DESC
+--              FETCH FIRST 1000 ROWS ONLY),
+--      y AS (SELECT cust_id, line_id, order_qty
+--            FROM x,
+--                 orderline
+--            WHERE x.order_id = orderline.order_id)
+-- SELECT line_id
+-- FROM (SELECT line_id
+--       FROM y
+--       WHERE y.cust_id IN (SELECT DISTINCT cust_id
+--                           FROM y
+--                           WHERE line.id = 'XXX')
+--       GROUP BY line_id
+--       ORDER BY SUM(order_qty) DESC)
+--   FETCH FIRST 5 ROWS ONLY
