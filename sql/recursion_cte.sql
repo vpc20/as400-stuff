@@ -67,7 +67,7 @@ WITH destinations (departure, arrival, connections, flights, trains, cost) AS
 SELECT departure, arrival, connections, flights, trains, cost
 FROM destinations;
 
-
+-- DEPTH FIRST and BREADTH FIRST options for recursive common table expressions
 WITH destinations (origin, departure, arrival, connections, cost) AS
        (SELECT f.departure, f.departure, f.arrival, 0, price
         FROM flights f
@@ -98,3 +98,41 @@ SET ordcol
 SELECT *
 FROM destinations
 ORDER BY ordcol;
+
+
+-- Cyclic data using recursive common table expressions
+INSERT INTO flights
+VALUES ('Cairo', 'Paris', 'Euro Air', '1134', 440);
+
+WITH destinations (departure, arrival, connections, cost, itinerary) AS
+       (SELECT f.departure,
+               f.arrival,
+               1,
+               price,
+               CAST(TRIM(f.departure) || '->' || TRIM(f.arrival) AS VARCHAR(2000))
+        FROM flights f
+        WHERE f.departure = 'New York'
+        UNION ALL
+        SELECT r.departure,
+               b.arrival,
+               r.connections + 1,
+               r.cost + b.price,
+               CAST(TRIM(r.itinerary) || '->' || TRIM(b.arrival) AS VARCHAR(2000))
+        FROM destinations r,
+             flights b
+        WHERE r.arrival = b.departure)
+  CYCLE arrival
+SET cyclic_data TO '1' DEFAULT '0'
+SELECT departure, arrival, itinerary, cyclic_data
+FROM destinations;
+
+SELECT *
+FROM flights
+WHERE departure = 'Cairo'
+  AND arrival = 'Paris';
+
+-- delete test data for cyclic recursion
+DELETE
+FROM flights
+WHERE departure = 'Cairo'
+  AND arrival = 'Paris';

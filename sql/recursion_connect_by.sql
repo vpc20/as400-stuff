@@ -161,6 +161,17 @@ FROM flights
 START WITH departure = 'New York'
 CONNECT BY NOCYCLE PRIOR arrival = departure;
 
+-- same as previous sql statement but the itenerary includes the origin
+SELECT CONNECT_BY_ROOT departure                      AS origin,
+       departure,
+       arrival,
+       TRIM(CONNECT_BY_ROOT departure)
+         || SYS_CONNECT_BY_PATH(TRIM(arrival), ' : ') AS itinerary, -- <-- FIX APPLIED HERE
+       connect_by_iscycle                             AS cyclic
+FROM flights
+START WITH departure = 'New York'
+CONNECT BY NOCYCLE PRIOR arrival = departure;
+
 -- show only the cyclic data
 SELECT CONNECT_BY_ROOT departure AS              origin,
        arrival,
