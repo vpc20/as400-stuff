@@ -19,3 +19,8 @@ INSERT INTO orders_with_seq (orderno, custno)
   
 select * from orders_with_seq;
 
+SELECT *
+  FROM qsys2.syssequences
+  WHERE sequence_schema = 'VPCRZKH1';
+
+
