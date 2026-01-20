@@ -1,0 +1,97 @@
+A*================================================================
+      A* DISPLAY FILE: WRKMBRSFLD
+      A* DESCRIPTION: Work with Members - Subfile Display
+      A* SIMILAR TO: WRKMBRPDM
+      A*================================================================
+      A                                      DSPSIZ(24 80 *DS3)
+      A                                      INDARA
+      A                                      CA03(03 'Exit')
+      A                                      CA05(05 'Refresh')
+      A                                      CA12(12 'Cancel')
+      A                                      PRINT
+      A                                      ERRSFL
+      A*================================================================
+      A* SUBFILE CONTROL RECORD FORMAT
+      A*================================================================
+      A          R SFLCTL                    SFLCTL(SFL01)
+      A                                      SFLSIZ(0013)
+      A                                      SFLPAG(0012)
+      A                                      OVERLAY
+      A  31                                  SFLDSP
+      A  32                                  SFLDSPCTL
+      A  33                                  SFLCLR
+      A  34                                  SFLEND(*MORE)
+      A*
+      A* HEADER INFORMATION
+      A*
+      A                                  1  2'Work with Members'
+      A                                      DSPATR(HI)
+      A                                  1 63'System:'
+      A            SYSTEM        10A  O  1 71
+      A                                  2  2'File . . . . . :'
+      A            LIBFILE       21A  O  2 20
+      A                                  2 63'Date:'
+      A            CURDATE        8A  O  2 71
+      A                                  3  2'Library  . . . :'
+      A            LIBNAM        10A  O  3 20
+      A                                  3 63'Time:'
+      A            CURTIME        8A  O  3 71
+      A*
+      A                                  5  2'Type options, press Enter.'
+      A                                  6  2'2=Edit  3=Copy  4=Delete  -
+      A                                      5=Display  8=Display Desc'
+      A*
+      A* COLUMN HEADERS
+      A*
+      A                                  8  2'Opt'
+      A                                  8  7'Member'
+      A                                  8 18'Type'
+      A                                  8 28'Text'
+      A                                  8 66'Changed'
+      A*
+      A* FUNCTION KEY INDICATORS
+      A*
+      A                                 23  2'F3=Exit'
+      A                                      COLOR(BLU)
+      A                                 23 13'F5=Refresh'
+      A                                      COLOR(BLU)
+      A                                 23 27'F12=Cancel'
+      A                                      COLOR(BLU)
+      A*================================================================
+      A* SUBFILE RECORD FORMAT
+      A*================================================================
+      A          R SFL01                     SFL
+      A*                                      SFLNXTCHG
+      A            OPT            2A  B  9  2VALUES(' ' '2' '3' '4' '5' -
+      A                                      '8')
+      A  40                                  DSPATR(RI)
+      A            MEMBER        10A  O  9  7COLOR(GRN)
+      A            MBRTYP        10A  O  9 18
+      A            MBRTEXT       36A  O  9 28
+      A            CHGDAT         8A  O  9 66
+      A*================================================================
+      A* FOOTER/MESSAGE RECORD FORMAT
+      A*================================================================
+      A          R MSGCTL                    OVERLAY
+      A                                      ASSUME
+      A*
+      A* ERROR MESSAGE SUBFILE CONTROL
+      A*
+      A                                      SFLMSGRCD(24)
+      A                                      SFLDSP
+      A                                      SFLDSPCTL
+      A                                      SFLPAG(1)
+      A                                      SFLSIZ(2)
+      A  50                                  SFLCLR
+      A            SFPGMQ        10A  H
+      A            DUMMY          1A  H
+      A*================================================================
+      A* MESSAGE SUBFILE RECORD
+      A*================================================================
+      A          R MSGSFL                    SFL
+      A                                      SFLMSGRCD(24)
+      A            MSGKEY         4A  H
+      A            PGMNAM        10A  H
+      A*================================================================
+      A* END OF DISPLAY FILE
+      A*================================================================

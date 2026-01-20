@@ -1,0 +1,417 @@
+IDENTIFICATION DIVISION.
+       PROGRAM-ID. WRKMBRSFCL.
+      *================================================================
+      * PROGRAM: WRKMBRSFCL
+      * DESCRIPTION: WORK WITH MEMBERS USING SUBFILE
+      * SIMILAR TO: WRKMBRPDM
+      *================================================================
+       
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+       
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+      * DISPLAY FILE
+           SELECT WRKMBRSFLD
+               ASSIGN TO WORKSTATION-WRKMBRSFLD
+               ORGANIZATION IS TRANSACTION
+               ACCESS MODE IS DYNAMIC
+               CONTROL-AREA IS FUNCTION-KEY-AREA
+               FILE STATUS IS WS-FILE-STATUS.
+      
+      * PHYSICAL FILE - EXTERNALLY DESCRIBED
+           SELECT MEMBERSPF
+               ASSIGN TO DATABASE-MEMBERSPF
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               FILE STATUS IS WS-MBR-STATUS.
+       
+       DATA DIVISION.
+       FILE SECTION.
+       
+       FD  WRKMBRSFLD.
+       01  SFLCTL-REC.
+           05  SFLCTL-DATA         PIC X(1920).
+       01  SFL01-REC.
+           05  SFL01-DATA          PIC X(1920).
+       01  MSGCTL-REC.
+           05  MSGCTL-DATA         PIC X(1920).
+       01  MSGSFL-REC.
+           05  MSGSFL-DATA         PIC X(1920).
+       
+      * INDICATOR FEEDBACK AREA (SEPARATE FROM CONTROL AREA)
+       01  INDICATOR-FEEDBACK-AREA PIC X(99).
+       
+       FD  MEMBERSPF.
+       01  MEMBERSR.
+           COPY DDS-ALL-FORMATS OF MEMBERSPF.
+       
+       WORKING-STORAGE SECTION.
+       
+      * FUNCTION KEY CONTROL AREA
+       01  FUNCTION-KEY-AREA.
+           05  AID-BYTE            PIC XX.
+               88  F3-EXIT                VALUE '03'.
+               88  F5-REFRESH             VALUE '05'.
+               88  F12-CANCEL             VALUE '12'.
+               88  PAGE-DOWN              VALUE '25'.
+               88  PAGE-UP                VALUE '26'.
+               88  ENTER-KEY              VALUE X'F1'.
+           05  FILLER              PIC X(97).
+       
+      * INDICATOR AREA FOR SUBFILE CONTROL
+       01  INDICATOR-AREA.
+           05  IND-31              PIC 1 INDICATOR 31.
+               88  SUBFILE-DISPLAY        VALUE B'1'.
+           05  IND-32              PIC 1 INDICATOR 32.
+               88  SUBFILE-DISPLAY-CTL    VALUE B'1'.
+           05  IND-33              PIC 1 INDICATOR 33.
+               88  SUBFILE-CLEAR          VALUE B'1'.
+           05  IND-34              PIC 1 INDICATOR 34.
+               88  SUBFILE-END            VALUE B'1'.
+           05  IND-40              PIC 1 INDICATOR 40.
+               88  OPTION-ERROR           VALUE B'1'.
+           05  IND-50              PIC 1 INDICATOR 50.
+               88  MESSAGE-CLEAR          VALUE B'1'.
+           05  FILLER              PIC X(93).
+       
+      * FILE STATUS
+       01  WS-FILE-STATUS          PIC XX.
+       01  WS-MBR-STATUS           PIC XX.
+       
+      * CONTROL FIELDS
+       01  WS-CONTROL-FIELDS.
+           05  WS-END-OF-FILE      PIC X VALUE 'N'.
+               88  EOF                    VALUE 'Y'.
+           05  WS-RRN              PIC 9(4) COMP VALUE 0.
+           05  WS-VALID-OPTION     PIC X VALUE 'N'.
+               88  VALID-OPT              VALUE 'Y'.
+           05  WS-PROCESSING       PIC X VALUE 'Y'.
+               88  CONTINUE-PROC          VALUE 'Y'.
+           05  WS-ERROR-FLAG       PIC X VALUE 'N'.
+               88  ERROR-FOUND            VALUE 'Y'.
+           05  WS-TOP-RRN          PIC 9(4) COMP VALUE 1.
+           05  WS-BOTTOM-RRN       PIC 9(4) COMP VALUE 0.
+           05  WS-PAGE-SIZE        PIC 9(4) COMP VALUE 12.
+           05  WS-RECORD-COUNT     PIC 9(4) COMP VALUE 0.
+           05  WS-CURRENT-REC      PIC 9(4) COMP VALUE 0.
+           05  WS-POSITION-KEY.
+               10  WS-POS-LIB      PIC X(10).
+               10  WS-POS-FILE     PIC X(10).
+               10  WS-POS-MEMBER   PIC X(10).
+       
+      * SCREEN FIELDS - CONTROL RECORD
+       01  WS-CTL-FIELDS.
+           05  WS-SYSTEM           PIC X(10) VALUE 'AS400'.
+           05  WS-LIBFILE          PIC X(21) VALUE SPACES.
+           05  WS-LIBNAM           PIC X(10) VALUE SPACES.
+           05  WS-CURDATE          PIC X(8).
+           05  WS-CURTIME          PIC X(8).
+           05  WS-SFPGMQ           PIC X(10) VALUE 'WRKMBRSFCL'.
+           05  WS-DUMMY            PIC X VALUE SPACE.
+           05  WS-LIB-FILTER       PIC X(10) VALUE SPACES.
+           05  WS-FILE-FILTER      PIC X(10) VALUE SPACES.
+       
+      * SCREEN FIELDS - SUBFILE RECORD
+       01  WS-SFL-FIELDS.
+           05  WS-OPT              PIC XX.
+           05  WS-MEMBER           PIC X(10).
+           05  WS-MBRTYP           PIC X(10).
+           05  WS-MBRTEXT          PIC X(36).
+           05  WS-CHGDAT           PIC X(8).
+       
+      * MESSAGE FIELDS
+       01  WS-MSG-FIELDS.
+           05  WS-MSGKEY           PIC X(4) VALUE SPACES.
+           05  WS-PGMNAM           PIC X(10) VALUE 'WRKMBRSFCL'.
+       
+      * TEMPORARY WORK FIELDS
+       01  WS-WORK-FIELDS.
+           05  WS-COUNT            PIC 9(4) VALUE 0.
+           05  WS-SAVERRN          PIC 9(4) COMP VALUE 0.
+       
+       PROCEDURE DIVISION.
+       
+       000-MAIN-PROCEDURE.
+           PERFORM 100-INITIALIZE
+           PERFORM 200-PROCESS-PROGRAM UNTIL NOT CONTINUE-PROC
+           PERFORM 900-TERMINATE
+           STOP RUN.
+       
+       100-INITIALIZE.
+      * OPEN FILES
+           OPEN I-O WRKMBRSFLD
+           OPEN INPUT MEMBERSPF
+           
+      * INITIALIZE INDICATOR AREA
+           MOVE LOW-VALUES TO INDICATOR-AREA
+           
+      * GET CURRENT DATE AND TIME
+           ACCEPT WS-CURDATE FROM DATE
+           ACCEPT WS-CURTIME FROM TIME
+           
+      * SET INITIAL VALUES
+           MOVE 'TESTLIB/MEMBERSPF' TO WS-LIBFILE
+           MOVE 'TESTLIB' TO WS-LIBNAM
+           MOVE 'TESTLIB' TO WS-LIB-FILTER
+           MOVE 'MEMBERSPF' TO WS-FILE-FILTER
+           
+      * INITIAL SUBFILE LOAD - FIRST PAGE
+           MOVE 1 TO WS-TOP-RRN
+           MOVE 'N' TO WS-END-OF-FILE
+           PERFORM 300-LOAD-SUBFILE-PAGE.
+       
+       200-PROCESS-PROGRAM.
+      * DISPLAY SUBFILE
+           PERFORM 400-DISPLAY-SUBFILE
+           
+      * CHECK FOR EXIT CONDITIONS
+           IF F3-EXIT OR F12-CANCEL
+               SET CONTINUE-PROC TO FALSE
+               GO TO 200-EXIT
+           END-IF
+           
+      * CHECK FOR REFRESH
+           IF F5-REFRESH
+               MOVE 1 TO WS-TOP-RRN
+               PERFORM 300-LOAD-SUBFILE-PAGE
+               GO TO 200-EXIT
+           END-IF
+           
+      * CHECK FOR PAGE DOWN
+           IF PAGE-DOWN
+               PERFORM 350-PAGE-DOWN
+               GO TO 200-EXIT
+           END-IF
+           
+      * CHECK FOR PAGE UP
+           IF PAGE-UP
+               PERFORM 360-PAGE-UP
+               GO TO 200-EXIT
+           END-IF
+           
+      * PROCESS USER SELECTIONS
+           PERFORM 500-PROCESS-OPTIONS.
+       
+       200-EXIT.
+           EXIT.
+       
+       300-LOAD-SUBFILE-PAGE.
+      * CLEAR SUBFILE
+           SET SUBFILE-CLEAR TO TRUE
+           ACCEPT INDICATOR-FEEDBACK-AREA FROM INDICATOR-AREA
+           WRITE SFLCTL-REC FROM INDICATOR-FEEDBACK-AREA
+           SET SUBFILE-CLEAR TO FALSE
+           
+      * INITIALIZE RRN
+           MOVE 0 TO WS-RRN
+           MOVE 'N' TO WS-END-OF-FILE
+           
+      * POSITION FILE TO START OF PAGE USING START
+           PERFORM 305-POSITION-FILE
+           
+      * LOAD RECORDS FOR CURRENT PAGE
+           PERFORM 310-LOAD-PAGE-RECORDS
+           
+      * SET DISPLAY INDICATORS
+           IF WS-RRN > 0
+               SET SUBFILE-DISPLAY TO TRUE
+               SET SUBFILE-DISPLAY-CTL TO TRUE
+           ELSE
+               SET SUBFILE-DISPLAY TO FALSE
+               SET SUBFILE-DISPLAY-CTL TO TRUE
+           END-IF
+           
+      * SET END INDICATOR IF AT END OF FILE
+           IF EOF
+               SET SUBFILE-END TO TRUE
+           ELSE
+               SET SUBFILE-END TO FALSE
+           END-IF.
+       
+       305-POSITION-FILE.
+      * USE START TO POSITION FILE POINTER
+      * BUILD POSITIONING KEY - START FROM BEGINNING OF LIBRARY/FILE
+           MOVE WS-LIB-FILTER TO WS-POS-LIB
+           MOVE WS-FILE-FILTER TO WS-POS-FILE
+           MOVE LOW-VALUES TO WS-POS-MEMBER
+           
+      * START AT FIRST RECORD FOR THIS LIBRARY/FILE
+           MOVE WS-POSITION-KEY TO MBLIB
+           START MEMBERSPF KEY NOT LESS THAN MBLIB
+               INVALID KEY
+                   SET EOF TO TRUE
+           END-START
+           
+      * NOW SKIP (WS-TOP-RRN - 1) RECORDS TO GET TO PAGE START
+           IF NOT EOF
+               MOVE 1 TO WS-CURRENT-REC
+               PERFORM UNTIL WS-CURRENT-REC >= WS-TOP-RRN OR EOF
+                   READ MEMBERSPF NEXT
+                       AT END
+                           SET EOF TO TRUE
+                       NOT AT END
+                           ADD 1 TO WS-CURRENT-REC
+                   END-READ
+               END-PERFORM
+           END-IF.
+       
+       310-LOAD-PAGE-RECORDS.
+      * LOAD UP TO PAGE-SIZE RECORDS
+           MOVE 0 TO WS-COUNT
+           
+           PERFORM UNTIL WS-COUNT >= WS-PAGE-SIZE OR EOF
+               READ MEMBERSP
+                   AT END
+                       SET EOF TO TRUE
+                   NOT AT END
+                       ADD 1 TO WS-RRN
+                       ADD 1 TO WS-COUNT
+                       MOVE SPACES TO WS-OPT
+                       MOVE MBMEMBER TO WS-MEMBER
+                       MOVE MBTYPE TO WS-MBRTYP
+                       MOVE MBTEXT(1:36) TO WS-MBRTEXT
+                       MOVE MBCHGDAT TO WS-CHGDAT
+                       PERFORM 320-WRITE-SUBFILE
+               END-READ
+           END-PERFORM.
+       
+       310-LOAD-SAMPLE-DATA.
+       
+       320-WRITE-SUBFILE.
+           WRITE SFL01-REC.
+       
+       350-PAGE-DOWN.
+      * CALCULATE NEXT PAGE TOP
+           COMPUTE WS-TOP-RRN = WS-TOP-RRN + WS-PAGE-SIZE
+           
+      * RELOAD SUBFILE WITH NEW PAGE
+           PERFORM 300-LOAD-SUBFILE-PAGE
+           
+      * IF NO RECORDS LOADED, GO BACK TO PREVIOUS PAGE
+           IF WS-RRN = 0
+               COMPUTE WS-TOP-RRN = WS-TOP-RRN - WS-PAGE-SIZE
+               IF WS-TOP-RRN < 1
+                   MOVE 1 TO WS-TOP-RRN
+               END-IF
+               PERFORM 300-LOAD-SUBFILE-PAGE
+           END-IF.
+       
+       360-PAGE-UP.
+      * CALCULATE PREVIOUS PAGE TOP
+           COMPUTE WS-TOP-RRN = WS-TOP-RRN - WS-PAGE-SIZE
+           
+      * CHECK IF BEFORE START OF FILE
+           IF WS-TOP-RRN < 1
+               MOVE 1 TO WS-TOP-RRN
+           END-IF
+           
+      * RELOAD SUBFILE WITH NEW PAGE
+           PERFORM 300-LOAD-SUBFILE-PAGE.
+       
+       400-DISPLAY-SUBFILE.
+      * WRITE CONTROL RECORD WITH INDICATOR AREA
+           ACCEPT INDICATOR-FEEDBACK-AREA FROM INDICATOR-AREA
+           WRITE SFLCTL-REC FROM INDICATOR-FEEDBACK-AREA
+           
+      * READ MODIFIED SUBFILE - AID BYTE RETURNED IN CONTROL AREA
+           READ WRKMBRSFLD INTO INDICATOR-FEEDBACK-AREA.
+       
+       500-PROCESS-OPTIONS.
+      * INITIALIZE
+           MOVE 0 TO WS-SAVERRN
+           SET ERROR-FOUND TO FALSE
+           
+      * READ ALL SUBFILE RECORDS
+           PERFORM 510-READ-SUBFILE-RECORDS.
+       
+       510-READ-SUBFILE-RECORDS.
+      * READ NEXT MODIFIED SUBFILE RECORD
+           READ WRKMBRSFLD NEXT RECORD
+               AT END
+                   GO TO 510-EXIT
+           END-READ
+           
+      * PROCESS IF OPTION WAS ENTERED
+           IF WS-OPT NOT = SPACES
+               PERFORM 520-VALIDATE-OPTION
+               IF VALID-OPT
+                   PERFORM 530-EXECUTE-OPTION
+               ELSE
+                   SET OPTION-ERROR TO TRUE
+                   SET ERROR-FOUND TO TRUE
+                   MOVE WS-RRN TO WS-SAVERRN
+               END-IF
+           END-IF
+           
+      * CLEAR OPTION FIELD
+           MOVE SPACES TO WS-OPT
+           REWRITE SFL01-REC
+           
+           GO TO 510-READ-SUBFILE-RECORDS.
+       
+       510-EXIT.
+           EXIT.
+       
+       520-VALIDATE-OPTION.
+           SET VALID-OPT TO FALSE
+           EVALUATE WS-OPT
+               WHEN '2'
+               WHEN '3'
+               WHEN '4'
+               WHEN '5'
+               WHEN '8'
+                   SET VALID-OPT TO TRUE
+               WHEN OTHER
+                   CONTINUE
+           END-EVALUATE.
+       
+       530-EXECUTE-OPTION.
+           EVALUATE WS-OPT
+               WHEN '2'
+                   PERFORM 540-EDIT-MEMBER
+               WHEN '3'
+                   PERFORM 550-COPY-MEMBER
+               WHEN '4'
+                   PERFORM 560-DELETE-MEMBER
+               WHEN '5'
+                   PERFORM 570-DISPLAY-MEMBER
+               WHEN '8'
+                   PERFORM 580-DISPLAY-DESC
+           END-EVALUATE.
+       
+       540-EDIT-MEMBER.
+      * CALL EDITOR (EXAMPLE)
+      *    CALL 'EDITORPGM' USING WS-MEMBER.
+           CONTINUE.
+       
+       550-COPY-MEMBER.
+      * CALL COPY PROGRAM (EXAMPLE)
+      *    CALL 'COPYPGM' USING WS-MEMBER.
+           CONTINUE.
+       
+       560-DELETE-MEMBER.
+      * CALL DELETE PROGRAM (EXAMPLE)
+      *    CALL 'DELETEPGM' USING WS-MEMBER.
+           CONTINUE.
+       
+       570-DISPLAY-MEMBER.
+      * CALL DISPLAY PROGRAM (EXAMPLE)
+      *    CALL 'DSPPGM' USING WS-MEMBER.
+           CONTINUE.
+       
+       580-DISPLAY-DESC.
+      * CALL DESCRIPTION PROGRAM (EXAMPLE)
+      *    CALL 'DSCPGM' USING WS-MEMBER.
+           CONTINUE.
+       
+       900-TERMINATE.
+      * CLOSE FILES
+           CLOSE WRKMBRSFLD
+           CLOSE MEMBERSPF.
+       
+      *================================================================
+      * END OF PROGRAM
+      *================================================================

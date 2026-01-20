@@ -1,0 +1,41 @@
+A*================================================================
+      A* PHYSICAL FILE: MEMBERSPF
+      A* DESCRIPTION: Member Information Physical File
+      A* USED BY: WRKMBRSFCL (Work with Members Subfile Program)
+      A*================================================================
+      A          R MEMBERSR                  TEXT('Member Record')
+      A*
+      A* KEY FIELDS
+      A*
+      A            MBLIB         10A         COLHDG('Library')
+      A                                      TEXT('Library Name')
+      A            MBFILE        10A         COLHDG('File')
+      A                                      TEXT('File Name')
+      A            MBMEMBER      10A         COLHDG('Member')
+      A                                      TEXT('Member Name')
+      A*
+      A* DATA FIELDS
+      A*
+      A            MBTYPE        10A         COLHDG('Type')
+      A                                      TEXT('Member Type')
+      A            MBTEXT        50A         COLHDG('Text' 'Description')
+      A                                      TEXT('Member Text Desc')
+      A            MBCHGDAT       8A         COLHDG('Changed' 'Date')
+      A                                      TEXT('Last Change Date')
+      A            MBCHGTIM       6A         COLHDG('Changed' 'Time')
+      A                                      TEXT('Last Change Time')
+      A            MBCRTDAT       8A         COLHDG('Created' 'Date')
+      A                                      TEXT('Create Date')
+      A            MBCRTTIM       6A         COLHDG('Created' 'Time')
+      A                                      TEXT('Create Time')
+      A            MBLINES        9S 0       COLHDG('Source' 'Lines')
+      A                                      TEXT('Source Record Count')
+      A*
+      A* KEY SPECIFICATION
+      A*
+      A          K MBLIB
+      A          K MBFILE
+      A          K MBMEMBER
+      A*================================================================
+      A* END OF PHYSICAL FILE DEFINITION
+      A*================================================================
