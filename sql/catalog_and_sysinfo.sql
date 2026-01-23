@@ -46,6 +46,14 @@ SELECT *
   FROM TABLE (
       qsys2.active_job_info()
     ) AS x;
+  
+  
+-- Use the RELATED_OBJECTS Table Function (SYSTOOLS schema): 
+-- This is excellent for database files, showing views, or other files that depend on your input file, 
+-- recursively finding indirect dependencies.
+-- This does not show Program References, Non-Database Objects and SQL Routines with Unqualified Names.
+SELECT * FROM TABLE(SYSTOOLS.RELATED_OBJECTS('VPCRZKH1', 'MSGLPF'));
+
 
 
 
