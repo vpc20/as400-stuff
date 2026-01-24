@@ -5,6 +5,17 @@ SELECT *
       qsys2.object_statistics('VPCRZKH1', '*ALL')
     );
 
+SELECT *
+  FROM TABLE (
+      qsys2.object_statistics('VPCRZKH1', '*PGM *SRVPGM')
+    );
+
+
+SELECT *
+  FROM TABLE (
+      qsys2.object_statistics('VPCRZKH1', '*PGM', 'WRK*')
+    );
+
 
 -- member info
 SELECT *
