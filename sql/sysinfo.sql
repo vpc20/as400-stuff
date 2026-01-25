@@ -168,5 +168,61 @@ SELECT *
     );
 
 
+-----------------------------------------------------------------------------------------------------------------------
+-- OUTPUT_QUEUE_ENTRIES table function
+-- The OUTPUT_QUEUE_ENTRIES table function returns one row for each spooled file in an output queue.
+-----------------------------------------------------------------------------------------------------------------------
+SELECT *
+  FROM TABLE (
+      qsys2.output_queue_entries(outq_lib => '*LIBL', outq_name => 'VPCRZKH')
+    );
+
+
+-- OUTPUT_QUEUE_ENTRIES view
+-- The OUTPUT_QUEUE_ENTRIES view returns one row for each spooled file in every output queue. This
+-- view uses the QSYS2.OUTPUT_QUEUE_ENTRIES table function with DETAILED_INFO => 'YES'.
+SELECT *
+  FROM qsys2.output_queue_entries
+  WHERE output_queue_name = 'VPCRZKH'
+        AND output_queue_library_name = 'QGPL';
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-- SYSTEM_STATUS_INFO view
+-- The SYSTEM_STATUS_INFO view returns a single row containing details about the current partition. This
+-- view uses the QSYS2.SYSTEM_STATUS table function with DETAILED_INFO => 'ALL'.
+-----------------------------------------------------------------------------------------------------------------------
+SELECT active_jobs_in_system, interactive_jobs_in_system, batch_running, main_storage_size, system_asp_storage,
+       total_auxiliary_storage, system_asp_used
+  FROM qsys2.system_status_info;
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-- SPOOLED_FILE_INFO table function
+-- The SPOOLED_FILE_INFO table function returns a list of spooled files on the system.
+-- This information is similar to what is returned by the Work with Spooled Files (WRKSPLF) CL command
+-- and the Open List of Spooled Files (QGYOLSPL) API.
+-----------------------------------------------------------------------------------------------------------------------
+SELECT *
+  FROM TABLE (
+      qsys2.spooled_file_info(user_name => 'VPCRZKH')
+    );
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-- SPOOLED_FILE_DATA table function
+-- The SPOOLED_FILE_DATA table function returns the content of a spooled file.
+-----------------------------------------------------------------------------------------------------------------------
+SELECT *
+  FROM TABLE (
+      systools.spooled_file_data(job_name => '728628/VPCRZKH/QPADEV0010', spooled_file_name => 'QPRTSPLF')
+    )
+  ORDER BY ordinal_position;
+  
+  
+  
+------  
+SELECT * FROM QSYS2.ASP_INFO;        
+
 
 
