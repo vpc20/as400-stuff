@@ -1,0 +1,83 @@
+     A*%%TS  SD  20260120  034129  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*================================================================
+     A* DISPLAY FILE: WRKMBRSFLD
+     A* DESCRIPTION: Work with Members - Subfile Display
+     A* SIMILAR TO: WRKMBRPDM
+     A*================================================================
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA12(12 'Cancel')
+     A                                      PRINT
+     A                                      ERRSFL
+     A*================================================================
+     A* SUBFILE RECORD FORMAT
+     A*================================================================
+     A          R SFL01                     SFL
+     A*%%TS  SD  20260120  033915  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*                                      SFLNXTCHG
+     A            OPT            2A  B  9  2VALUES(' ' '2' '3' '4' '5' '8')
+     A                                      CHKMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A* 40                                  DSPATR(RI)
+     A            MEMBER        10A  O  9  7COLOR(GRN)
+     A            MBRTYP        10A  O  9 19
+     A            MBRTEXT       36A  O  9 31
+     A            CHGDAT         8A  O  9 69
+     A*================================================================
+     A* SUBFILE CONTROL RECORD FORMAT
+     A*================================================================
+     A          R SFLCTL                    SFLCTL(SFL01)
+     A*%%TS  SD  20260120  034129  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      SFLSIZ(0013)
+     A                                      SFLPAG(0012)
+     A                                      OVERLAY
+     A  31                                  SFLDSP
+     A  32                                  SFLDSPCTL
+     A  33                                  SFLCLR
+     A  34                                  SFLEND(*MORE)
+     A*
+     A* HEADER INFORMATION
+     A*
+     A                                  1  2'Work with Members'
+     A                                      DSPATR(HI)
+     A                                  1 63'System:'
+     A            SYSTEM        10A  O  1 71
+     A                                  2  2'File . . . . . :'
+     A            LIBFILE       21A  O  2 20
+     A                                  2 63'Date:'
+     A            CURDATE        8A  O  2 71
+     A                                  3  2'Library  . . . :'
+     A            LIBNAM        10A  O  3 20
+     A                                  3 63'Time:'
+     A            CURTIME        8A  O  3 71
+     A*
+     A                                  5  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  3'2=Edit  3=Copy  4=Delete  5=Displa-
+     A                                      y  8=Display Desc'
+     A                                      COLOR(BLU)
+     A*
+     A* COLUMN HEADERS
+     A*
+     A                                  8  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  8  7'Member'
+     A                                      COLOR(WHT)
+     A                                  8 19'Type'
+     A                                      COLOR(WHT)
+     A                                  8 31'Text'
+     A                                      COLOR(WHT)
+     A                                  8 69'Changed'
+     A                                      COLOR(WHT)
+     A*================================================================
+     A* FUNCTION KEYS DESCRIPTION
+     A*================================================================
+     A          R FKEYS1
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 13'F5=Refresh'
+     A                                      COLOR(BLU)
+     A                                 23 27'F12=Cancel'
+     A                                      COLOR(BLU)
