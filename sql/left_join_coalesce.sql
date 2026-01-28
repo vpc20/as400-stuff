@@ -1,3 +1,5 @@
+﻿SET CURRENT schema vpcrzkh1;
+
 SELECT *
 FROM employee;
 
@@ -28,8 +30,6 @@ VALUES ('200340', 'X21');
 --            workdept
 --          END
 -- FROM employee;
-
-
 -- error encountered -  'Comparison operator IN not valid'
 -- SELECT empno,
 --        CASE
@@ -39,6 +39,14 @@ VALUES ('200340', 'X21');
 --          END AS final_workdept
 -- FROM employee;
 
+
+SELECT empno,
+       CASE
+         WHEN (SELECT empdept.workdept FROM empdept WHERE empdept.empno = employee.empno) IS not null 
+         THEN (SELECT empdept.workdept FROM empdept WHERE empdept.empno = employee.empno)
+         ELSE employee.workdept
+       END
+  FROM employee;
 
 -- left join with coalesce function
 SELECT e.empno,
