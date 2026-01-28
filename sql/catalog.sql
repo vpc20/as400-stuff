@@ -18,14 +18,27 @@ where table_schema = 'VPCRZKH1';
 SELECT *
 FROM qsys2.syscolumns
 WHERE table_schema = 'VPCRZKH1'
-  AND table_name = 'EMPLOYEE';
-
+  AND table_name = 'CUSMSTL3';
 
 -- key fields
 SELECT *
   FROM qsys.qadbkatr
-  WHERE dbkfil = 'MSGPF'
+  WHERE dbkfil = 'CUSMSTL3'
         AND dbklib = 'VPCRZKH1';
+
+
+-- key fields
+SELECT dbk.dbklib, dbk.dbkfil, dbk.dbkfmt, dbk.dbkfld, dbk.dbkpos, dbk.dbkord, col.data_type,
+       col.length, col.numeric_scale, col.long_comment, col.column_heading
+  FROM qsys.qadbkatr dbk
+       INNER JOIN qsys2.syscolumns col
+         ON dbk.dbkfil = col.table_name
+           AND dbk.dbkfld = col.column_name
+  WHERE dbk.dbklib = 'VPCRZKH1'
+        AND dbk.dbkfil = 'CUSMSTL3'
+        AND col.table_schema = 'VPCRZKH1'
+        AND col.table_name = 'CUSMSTL3';
+
 
 -----------------------------------------------------------------------------------------------------------------------
 -- SYSMEMBERSTAT view

@@ -4,18 +4,28 @@
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
   FROM TABLE (
-      qsys2.object_statistics(object_schema => 'VPCRZKH1', objtypelist => '*ALL')
+      qsys2.object_statistics(
+        object_schema => 'VPCRZKH1',
+        objtypelist => '*ALL'
+      )
     );
 
 SELECT *
   FROM TABLE (
-      qsys2.object_statistics(object_schema =>'VPCRZKH1', objtypelist => '*PGM *SRVPGM')
+      qsys2.object_statistics(
+        object_schema => 'VPCRZKH1',
+        objtypelist => '*FILE'
+      )
     );
 
 
 SELECT *
   FROM TABLE (
-      qsys2.object_statistics(object_schema => 'VPCRZKH1', objtypelist => '*PGM', object_name => 'WRK*')
+      qsys2.object_statistics(
+        object_schema => 'VPCRZKH1',
+        objtypelist => '*PGM',
+        object_name => 'WRK*'
+      )
     );
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -43,89 +53,106 @@ SELECT *
 -- Subsystem Jobs (WRKSBSJOB), and Work with Submitted Jobs (WRKSBMJOB) CL commands and the List
 -- Job (QUSLJOB) API.
 -----------------------------------------------------------------------------------------------------------------------
-
 -- WRKSBMJOB SBMFROM(*USER)
 SELECT *
   FROM TABLE (
-      qsys2.job_info(job_submitter_filter => '*USER', job_user_filter => '*ALL')
+      qsys2.job_info(
+        job_submitter_filter => '*USER',
+        job_user_filter => '*ALL'
+      )
     );
 
 -- WRKSBSJOB SBS(QBATCH) USER(*ALL)
 SELECT *
   FROM TABLE (
-      qsys2.job_info(job_subsystem_filter => 'QBATCH', job_user_filter => '*ALL')
+      qsys2.job_info(
+        job_subsystem_filter => 'QBATCH',
+        job_user_filter => '*ALL'
+      )
     );
- 
+
 -- WRKUSRJOB
 SELECT *
   FROM TABLE (
-      qsys2.job_info(job_user_filter => 'VPCRZKH', job_status_filter => '*ALL')
+      qsys2.job_info(
+        job_user_filter => 'VPCRZKH',
+        job_status_filter => '*ALL'
+      )
     ) x;
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*ALL', 
-        job_type_filter => '*ALL', 
-        job_user_filter => 'VPCRZKH', 
-        job_name_filter => 'QPADEV002T')
+        job_status_filter => '*ALL',
+        job_type_filter => '*ALL',
+        job_user_filter => 'VPCRZKH',
+        job_name_filter => 'QPADEV002T'
+      )
     );
 
 
 SELECT *
   FROM TABLE (
-      qsys2.job_info(job_status_filter => '*ALL', 
-      job_type_filter => '*ALL', 
-      job_user_filter => 'QUSER')
+      qsys2.job_info(
+        job_status_filter => '*ALL',
+        job_type_filter => '*ALL',
+        job_user_filter => 'QUSER'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*ALL', 
-        job_type_filter => '*ALL', 
-        job_user_filter => '*ALL', 
-        job_name_filter => 'QZDASOINIT')
+        job_status_filter => '*ALL',
+        job_type_filter => '*ALL',
+        job_user_filter => '*ALL',
+        job_name_filter => 'QZDASOINIT'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*ALL', 
-        job_type_filter => '*INTERACT', 
-        job_user_filter => '*ALL') 
+        job_status_filter => '*ALL',
+        job_type_filter => '*INTERACT',
+        job_user_filter => '*ALL'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*ALL', 
-        job_type_filter => '*BATCH', 
-        job_user_filter => '*ALL') 
+        job_status_filter => '*ALL',
+        job_type_filter => '*BATCH',
+        job_user_filter => '*ALL'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*ACTIVE', 
-        job_type_filter => '*BATCH', 
-        job_user_filter => '*ALL') 
+        job_status_filter => '*ACTIVE',
+        job_type_filter => '*BATCH',
+        job_user_filter => '*ALL'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*JOBQ', 
-        job_type_filter => '*BATCH', 
-        job_user_filter => '*ALL') 
+        job_status_filter => '*JOBQ',
+        job_type_filter => '*BATCH',
+        job_user_filter => '*ALL'
+      )
     );
 
 SELECT *
   FROM TABLE (
       qsys2.job_info(
-        job_status_filter => '*OUTQ', 
-        job_type_filter => '*BATCH', 
-        job_user_filter => '*ALL') 
+        job_status_filter => '*OUTQ',
+        job_type_filter => '*BATCH',
+        job_user_filter => '*ALL'
+      )
     );
 
 
@@ -153,7 +180,10 @@ SELECT *
 SELECT *
   FROM TABLE (
       qsys2.active_job_info(
-        subsystem_list_filter => 'QUSRWRK', job_name_filter => 'QZDASOINIT', current_user_list_filter => 'QUSER')
+        subsystem_list_filter => 'QUSRWRK',
+        job_name_filter => 'QZDASOINIT',
+        current_user_list_filter => 'QUSER'
+      )
     );
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +194,10 @@ SELECT *
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
   FROM TABLE (
-      systools.related_objects('VPCRZKH1', 'MSGLPF')
+      systools.related_objects(
+        library_name => 'VPCRZKH1',
+        file_name => 'MSGLPF'
+      )
     );
 
 
@@ -174,7 +207,10 @@ SELECT *
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
   FROM TABLE (
-      qsys2.output_queue_entries(outq_lib => '*LIBL', outq_name => 'VPCRZKH')
+      qsys2.output_queue_entries(
+        outq_lib => '*LIBL',
+        outq_name => 'VPCRZKH'
+      )
     );
 
 
@@ -215,7 +251,10 @@ SELECT *
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
   FROM TABLE (
-      systools.spooled_file_data(job_name => '728628/VPCRZKH/QPADEV0010', spooled_file_name => 'QPRTSPLF')
+      systools.spooled_file_data(
+        job_name => '728628/VPCRZKH/QPADEV0010',
+        spooled_file_name => 'QPRTSPLF'
+      )
     )
   ORDER BY ordinal_position;
   
