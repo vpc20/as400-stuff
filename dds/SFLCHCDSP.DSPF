@@ -1,0 +1,12 @@
+     A                                      INDARA
+     A          R SFLRCD                    SFL
+     A            CTLFLD         1Y 0H      SFLCHCCTL
+     A            NAME          30A  O  2  2
+     A          R SFLCTL                    SFLCTL(SFLRCD)
+     A                                      SFLSNGCHC(*AUTOSLT)
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLPAG(10)
+     A                                      SFLSIZ(11)
+     A                                      CF03(03)
+     A            DUMMY1         1A  H

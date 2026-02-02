@@ -1,0 +1,12 @@
+CREATE TABLE table1
+(
+  col  INT NOT NULL,
+  col2 INT NOT NULL,
+  col3 VARCHAR(100) GENERATED ALWAYS AS current user
+);
+
+CREATE VIEW new_view AS
+SELECT *
+FROM table1
+WHERE col2 > 10
+ORDER BY col;
