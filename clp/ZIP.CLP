@@ -1,30 +1,24 @@
-             PGM        PARM(&ZIPFILE &FILELIST &DIR)
+             PGM        PARM(&ZIPFILE &FILELIST)
 
-             DCL        VAR(&DIR)        TYPE(*CHAR) LEN(128)
-             DCL        VAR(&ZIPFILE)    TYPE(*CHAR) LEN(32)
-             DCL        VAR(&FILELIST)   TYPE(*CHAR) LEN(3202)
+             DCL        VAR(&ZIPFILE)    TYPE(*CHAR) LEN(80)
+             DCL        VAR(&FILELIST)   TYPE(*CHAR) LEN(4002)
 
-             DCL        VAR(&FILESTR)    TYPE(*CHAR) LEN(4000) VALUE(' ')
-             DCL        VAR(&QSHCMD)     TYPE(*CHAR) LEN(4000)
-             DCL        VAR(&LSTCOUNTX)  TYPE(*CHAR) LEN(2)
-             DCL        VAR(&LASTI)      TYPE(*INT)
-             DCL        VAR(&STRPOS)     TYPE(*DEC)  LEN(3)
+             DCL        VAR(&FILESTR)    TYPE(*CHAR) LEN(4050) VALUE(' ')
+             DCL        VAR(&QSHCMD)     TYPE(*CHAR) LEN(4140)
+             DCL        VAR(&LSTCOUNT)   TYPE(*INT)
              DCL        VAR(&I)          TYPE(*INT)
+             DCL        VAR(&STRPOS)     TYPE(*INT)
 
              INCLUDE    SRCMBR(ERRVAR)
 
-       /***  change directory  ***/
-             IF         COND(&DIR *NE '*CURDIR') THEN(CHDIR DIR(&DIR))
-
        /***  get number of filenames in list  ***/
-             CHGVAR     VAR(&LSTCOUNTX) VALUE(%SST(&FILELIST 1 2))
-             CHGVAR     VAR(&LASTI) +
-                        VALUE((%BIN(&LSTCOUNTX) - 1) * 32 + 3)
+             CHGVAR     VAR(&LSTCOUNT) VALUE(%BINARY(&FILELIST 1 2))
 
        /***  build the string containing all the file names  ***/
-             DOFOR      VAR(&I) FROM(3) TO(&LASTI) BY(32)
+             DOFOR      VAR(&I) FROM(1) TO(&LSTCOUNT)
+             CHGVAR     VAR(&STRPOS) VALUE((&I - 1) * 80 + 3)
              CHGVAR     VAR(&FILESTR) +
-                        VALUE(&FILESTR *BCAT %SST(&FILELIST &I 32))
+                        VALUE(&FILESTR *BCAT %SST(&FILELIST &STRPOS 80))
              ENDDO
 
        /***  zip the files  ***/
