@@ -18,8 +18,9 @@
              MONMSG     MSGID(CPF0000)
 
              ADDLIBLE   LIB(QSHELL) POSITION(*LAST)
-             MONMSG     MSGID(CPF2103)
-
+             MONMSG     MSGID(CPC2196 CPF2103)
+             RCVMSG     MSGTYPE(*COMP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF)
 
              CHGVAR     VAR(&FILE) VALUE(%SST(&QUALFILE 1 10))
              CHGVAR     VAR(&LIB)  VALUE(%SST(&QUALFILE 11 10))
@@ -33,10 +34,6 @@
                           *BCAT '/clientfile=' *CAT &TOXLS)
              QSH        CMD(&SHCMD)
 
-             RCVMSG     MSGTYPE(*COMP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
-                          MSGF(&MSGF)
-             IF         COND(&MSGID *NE 'CPC2196') THEN(SNDPGMMSG +
-                          MSGID(&MSGID) MSGF(&MSGF) MSGDTA(&MSGDTA))
              INCLUDE    SRCMBR(ERRRTN)
 
              ENDPGM
