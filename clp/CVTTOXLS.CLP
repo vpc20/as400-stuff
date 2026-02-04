@@ -14,8 +14,16 @@
              DCL        VAR(&LIB)        TYPE(*CHAR) LEN(10)
              DCL        VAR(&SHCMD)      TYPE(*CHAR) LEN(200)
 
+             INCLUDE    SRCMBR(ERRVAR)
+             MONMSG     MSGID(CPF0000)
+
+             ADDLIBLE   LIB(QSHELL) POSITION(*LAST)
+             MONMSG     MSGID(CPF2103)
+
+
              CHGVAR     VAR(&FILE) VALUE(%SST(&QUALFILE 1 10))
              CHGVAR     VAR(&LIB)  VALUE(%SST(&QUALFILE 11 10))
+             CHKOBJ     OBJ(&LIB/&FILE) OBJTYPE(*FILE)
 
              /* Convert file to spreadsheet */
              CHGVAR     VAR(&SHCMD) VALUE('java -jar +
@@ -24,5 +32,11 @@
                           /hostfile=' *TCAT &LIB *TCAT '/' *TCAT &FILE +
                           *BCAT '/clientfile=' *CAT &TOXLS)
              QSH        CMD(&SHCMD)
+
+             RCVMSG     MSGTYPE(*COMP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF)
+             IF         COND(&MSGID *NE 'CPC2196') THEN(SNDPGMMSG +
+                          MSGID(&MSGID) MSGF(&MSGF) MSGDTA(&MSGDTA))
+             INCLUDE    SRCMBR(ERRRTN)
 
              ENDPGM
