@@ -11,21 +11,26 @@
 
              PARM       KWD(TYPE) TYPE(*CHAR) LEN(10) RSTD(*YES) +
                           DFT(*ALL) VALUES(*ALL *BASATR *ATR +
-                          *ACCPTH *SELECT *JOIN *SEQ *RCDFMT *MBR +
-                          *SPOOL *MBRLIST *CST *TRG) MIN(0) MAX(10) +
-                          PROMPT('Information type')
+                          *ACCPTH *MBRLIST *SELECT *SEQ *RCDFMT +
+                          *MBR *SPOOL *JOIN *TRG *CST *NODGRP) +
+                          MIN(0) MAX(10) PROMPT('Information type')
 
              PARM       KWD(OUTPUT) TYPE(*CHAR) LEN(8) RSTD(*YES) +
                           DFT(*) VALUES(* *PRINT *OUTFILE) +
                           PROMPT('Output')
 
              PARM       KWD(FILEATR) TYPE(*CHAR) LEN(10) RSTD(*YES) +
-                          DFT(*ALL) VALUES(*ALL *DSPF *PRTF *PF +
-                          *LF) MIN(0) MAX(10) PROMPT('File attributes')
+                          DFT(*ALL) VALUES(*ALL *DSPF *PRTF *DKTF +
+                          *TAPF *CMNF *BSCF *MXDF *PF *LF *SAVF +
+                          *DDMF *ICFF) MIN(0) MAX(10) PROMPT('File +
+                          attributes')
 
              PARM       KWD(OUTFILE) TYPE(QUAL2) MAX(1) +
                           PMTCTL(OUTFILE) PROMPT('File to receive +
                           output')
+             DEP        CTL(&OUTPUT *EQ '*OUTFILE') PARM((OUTFILE)) +
+                          MSGID(CPD9861)
+
  QUAL2:      QUAL       TYPE(*NAME) LEN(10) MIN(1)
              QUAL       TYPE(*NAME) LEN(10) DFT(*LIBL) +
                           SPCVAL((*LIBL) (*CURLIB)) PROMPT('Library')
