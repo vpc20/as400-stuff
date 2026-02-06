@@ -257,8 +257,19 @@ SELECT *
       )
     )
   ORDER BY ordinal_position;
-  
-  
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-- MESSAGE_FILE_DATA view
+-- The MESSAGE_FILE_DATA view returns one row for each message in a message file.
+-- The information is similar to what is returned by the Display Message Description (DSPMSGD) CL
+-- command and the Retrieve Message (QMHRTVM) API.
+-----------------------------------------------------------------------------------------------------------------------
+SELECT *
+  FROM qsys2.message_file_data
+  WHERE message_file_library = 'QSYS'
+        AND message_file = 'QCPFMSG'
+        AND (LOWER(message_text) LIKE '%required%');
   
 ------  
 SELECT * FROM QSYS2.ASP_INFO;        

@@ -1,0 +1,22 @@
+     A*----------------------------------------------------------------
+     A* File Name . . . . : SBMJOBD
+     A* Description . . . : Batch Job Submission Screen
+     A*----------------------------------------------------------------
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03 'Exit')
+     A                                      CA12(12 'Cancel')
+     A                                      PRINT
+     A*
+     A          R SBMREC
+     A                                  1 32'Submit Batch Job'
+     A                                      DSPATR(HI)
+     A*
+     A                                  8 20'Job Name . . . . :'
+     A            JOBNAME       10A  B  8 40
+     A*
+     A                                 10 20'Date (MMDDYYYY)  :'
+     A            JOBDATE        8Y 0B 10 40EDTWRD('  /  /    ')
+     A*
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+
