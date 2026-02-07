@@ -3,20 +3,30 @@
        dcl-c MAX_ELEMS 100;
        dcl-c default_city_name 'London';
 
+       // The zone portion of the low-order byte indicates the sign (positive or negative) of the 
+       // decimal number. The standard signs are used: hexadecimal F for positive numbers and 
+       // hexadecimal D for negative numbers. In zoned-decimal format, each digit in a decimal 
+       // number includes a zone portion; however, only the low-order zone portion serves as the sign. 
        dcl-s salaryz zoned(7 : 2);
        dcl-s agez zoned(3);
 
+       //  The maximum number of digits is 63 (32 bytes).
        dcl-s salaryp packed(5 : 2);
        dcl-s agep packed(3);
 
        dcl-s cust_name char(100);
 
-       dcl-s num_elems1 int(3);
-       dcl-s num_elems2 int(5);
-       dcl-s num_elems3 int(10);
-       dcl-s num_elems4 int(20);
+       dcl-s num_elems1 int(3);  // -128 to 127
+       dcl-s num_elems2 int(5);  // -32768 to 32767
+       dcl-s num_elems3 int(10);  // -2147483648 to 2147483647
+       dcl-s num_elems4 int(20);  // -9223372036854775808 to 9223372036854775807
 
+
+       //    4-byte float (8 digits)
+       // -3.4028235E+38 to -1.1754944E-38, 0.0E+0, +1.1754944E-38 to +3.4028235E+38
        dcl-s variance1 float(4);
+       //  8-byte float (16 digits)
+       //  -1.797693134862315E+308 to -2.225073858507201E-308, 0.0E+0, +2.225073858507201E-308 to +1.797693134862315E+308       
        dcl-s variance2 float(8);
 
        dcl-s found ind;
