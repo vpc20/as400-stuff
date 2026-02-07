@@ -1,0 +1,12 @@
+[
+  {
+    "extensions": [
+      "CLP",
+      "CLLE"
+    ],
+    "name": "Create Bound CL Program",
+    "command": "CRTBNDCL PGM(&CURLIB/&NAME) SRCSTMF('&RELATIVEPATH') OPTION(*EVENTF) DBGVIEW(*SOURCE)",
+    "deployFirst": true,
+    "environment": "ile"
+  }
+]

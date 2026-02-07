@@ -14,7 +14,18 @@
        valZonedNeg  zoned(5:2);   // 5 bytes
      end-ds;
 
-    // Open the file
+     dcl-pr qcmdexc extpgm;
+        theCmd char(3000) const;
+        cmdLen packed(15 : 5) const;
+        // 3rd parameter is optional
+        // dbcs char(3) const options(*nopass);
+     end-pr;
+
+     dcl-s cmd varchar(100);
+
+     cmd = 'CLRPFM FILE(VPCRZKH1/FLATFILE)';
+     qcmdexc (cmd : %len(cmd));
+
      open flatfile;
 
     // Write 3 sample records
@@ -46,4 +57,3 @@
 
      *inlr = *on;
      return;
-
