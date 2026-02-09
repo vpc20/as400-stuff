@@ -1,5 +1,6 @@
 ﻿SET current schema vpcrzkh1;
 
+-- tables
 SELECT *
 FROM qsys2.systables
 WHERE table_schema = 'VPCRZKH1';
@@ -50,6 +51,13 @@ SELECT *
   WHERE table_schema = 'VPCRZKH1'
         AND table_name = 'QCLSRC';
 
+
+SELECT table_schema, table_name, system_table_member, source_type, text_description, number_rows
+  FROM qsys2.sysmemberstat
+  WHERE table_schema = 'VPCRZKH1'
+        AND table_name = 'QCLSRC'
+        AND LOWER(text_description) LIKE '%outf%';
+
 -----------------------------------------------------------------------------------------------------------------------
 -- SYSPARTITIONSTAT
 -- The SYSPARTITIONSTAT view contains one row for every table partition or table member. If the table is
@@ -62,9 +70,11 @@ SELECT table_schema, table_name, table_partition AS member_name, number_rows, nu
         AND table_name = 'QCLSRC';
 
 
+-----------------------------------------------------------------------------------------------------------------------
 -- SYSROUTINES
 -- The SYSROUTINES table contains one row for each procedure created by the CREATE PROCEDURE
 -- statement and each function created by the CREATE FUNCTION statement.
+-----------------------------------------------------------------------------------------------------------------------
 SELECT *
 FROM qsys2.sysroutines
 WHERE routine_schema = 'VPCRZKH1';
@@ -80,8 +90,10 @@ SELECT *
   WHERE specific_schema = 'QSYS2'
         AND specific_name LIKE '%OBJECT%';
 
+-----------------------------------------------------------------------------------------------------------------------
 -- SYSFUNCS
 -- The SYSFUNCS view contains one row for each function created by the CREATE FUNCTION statement.
+-----------------------------------------------------------------------------------------------------------------------
 SELECT *
   FROM qsys2.sysfuncs
   WHERE specific_schema = 'QSYS2'

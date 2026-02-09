@@ -10,6 +10,15 @@ SELECT *
       )
     );
 
+
+SELECT objname, objtype, objtext, objlongname
+  FROM TABLE (
+      qsys2.object_statistics(object_schema => 'VPCRZKH1', 
+                              objtypelist   => '*ALL')
+    )
+  WHERE LOWER(objtext) LIKE '%spool%';
+
+
 SELECT *
   FROM TABLE (
       qsys2.object_statistics(
