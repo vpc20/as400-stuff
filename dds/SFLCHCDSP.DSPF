@@ -1,12 +1,33 @@
+     A*%%TS  SD  20260209  064453  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
      A                                      INDARA
      A          R SFLRCD                    SFL
+     A*%%TS  SD  20260209  064453  VPCRZKH     REL-V7R5M0  5770-WDS
      A            CTLFLD         1Y 0H      SFLCHCCTL
-     A            NAME          30A  O  2  2
+     A            NAME          30A  O  4  9
      A          R SFLCTL                    SFLCTL(SFLRCD)
-     A                                      SFLSNGCHC(*AUTOSLT)
+     A*%%TS  SD  20260209  064453  VPCRZKH     REL-V7R5M0  5770-WDS
+     A  *DS3                                SFLLIN(0003)
+     A                                      SFLSIZ(0010)
+     A                                      SFLPAG(0010)
      A                                      SFLDSP
      A                                      SFLDSPCTL
-     A                                      SFLPAG(10)
-     A                                      SFLSIZ(11)
+     A                                      SFLSNGCHC
+     A                                      OVERLAY
      A                                      CF03(03)
      A            DUMMY1         1A  H
+     A                                  1 71USER
+     A                                  2 71DATE
+     A                                      EDTCDE(Y)
+     A                                  1  2SYSNAME
+     A                                  2  2'MAINMENU'
+     A                                  2 36'Main Menu'
+     A                                      COLOR(WHT)
+     A                                  1 32'Application System'
+     A                                      COLOR(WHT)
+     A          R FKEY1
+     A*%%TS  SD  20260209  064453  VPCRZKH     REL-V7R5M0  5770-WDS
+     A            DUMMY1         1A  H
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)

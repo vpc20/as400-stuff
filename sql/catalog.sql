@@ -57,6 +57,12 @@ SELECT table_schema, table_name, system_table_member, source_type, text_descript
   WHERE table_schema = 'VPCRZKH1'
         AND table_name = 'QCLSRC'
         AND LOWER(text_description) LIKE '%outf%';
+        
+-- browse member
+SELECT srcdata
+  FROM TABLE (
+      sqltools.readsrc('VPCRZKH1', 'QCLSRC', 'CRTSPLFOUT')
+    );
 
 -----------------------------------------------------------------------------------------------------------------------
 -- SYSPARTITIONSTAT
