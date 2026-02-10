@@ -1,18 +1,24 @@
-             PGM        PARM(&PGM)
+             PGM        PARM(&PGMNAME)
 
-             DCL        VAR(&PGM)        TYPE(*CHAR) LEN(20)
              DCL        VAR(&PGMNAME)    TYPE(*CHAR) LEN(10)
-             DCL        VAR(&LIB)        TYPE(*CHAR) LEN(10)
 
              INCLUDE    SRCMBR(ERRVAR)
+             MONMSG     MSGID(CPF0000)
 
-             CHGVAR     VAR(&PGMNAME) VALUE(%SST(&PGM 1 10))
-             CHGVAR     VAR(&LIB)     VALUE(%SST(&PGM 11 10))
-
-             DSPPGMREF  PGM(&LIB/&PGMNAME) OUTPUT(*OUTFILE) +
+             /* create qadsppgm in qtemp                 */
+             /* not authorized to create dup of qadsppgm */
+             IF         COND(&PGMNAME = ' ') THEN(DO)
+             DSPPGMREF  PGM(QCMDEXC1) OUTPUT(*OUTFILE) +
                           OUTFILE(QTEMP/QADSPPGM)
+             CLRPFM     FILE(QTEMP/QADSPPGM)
+             ENDDO
+             ELSE       CMD(DO)
+             DSPPGMREF  PGM(&PGMNAME) OUTPUT(*OUTFILE) +
+                          OUTFILE(QTEMP/QADSPPGM)
+             ENDDO
+
              OVRDBF     FILE(QADSPPGM) TOFILE(QTEMP/QADSPPGM)
-             CALL       PGM(WRKPGMREFC) PARM(&PGM)
+             CALL       PGM(WRKPGMREFC) PARM(&PGMNAME)
 
              INCLUDE    SRCMBR(ERRRTN)
 

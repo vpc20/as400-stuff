@@ -11,11 +11,12 @@
 
        dcl-ds keyMenupf  likerec(menupf.menupf:*key);
 
-       dcl-c maxSflSize  36;
-       dcl-s recnum      zoned(4:0);
-       dcl-s currParent  char(10);
-       dcl-s  menuStack  char(10) dim (108);
-       dcl-s  stackIdx   int(5);
+       dcl-c maxSflSize    108;
+       dcl-s recnum        zoned(4:0);
+       dcl-s currParent    char(10);
+       dcl-s  menuStack    char(10)   dim (108);
+       dcl-s  stackIdx     int(5);
+       dcl-s  rcdnbrStack  zoned(4:0) dim (108);
 
        dcl-ds indic qualified ;
          exitKey    ind pos(3);
@@ -23,8 +24,8 @@
          sflMore    ind pos(70);
          sflDsp     ind pos(80);
          sflClr     ind pos(81);
-         pageDown   ind pos(90);
-         pageUp     ind pos(91);
+         //pageDown   ind pos(90);
+         //pageUp     ind pos(91);
        end-ds ;
 
        dcl-pr qcmdexc extpgm;
@@ -41,9 +42,10 @@
           open menudspf;
           indic.exitKey = *off;
 
-          currParent           = 'MAIN';
-          stackIdx             = 1;
-          menuStack(stackIdx)  = currParent;
+          currParent            = 'MAIN';
+          stackIdx              = 1;
+          menuStack(stackIdx)   = currParent;
+          rcdnbrStack(stackIdx) = 1;
 
           keyMenupf.menucode = currParent;
           keyMenupf.menuseq    = 0;
@@ -58,6 +60,7 @@
                 when indic.prevKey;
                    if stackIdx > 1;
                       menuStack(stackIdx)  = *blanks;
+                      rcdnbrStack(stackIdx) = 1;
                       stackIdx = stackIdx - 1;
                       keyMenupf.menucode = menuStack(stackIdx);
                       keyMenupf.menuseq    = 0;
@@ -65,14 +68,13 @@
                       LoadSubfile();
                    endif;
 
+                //when indic.pageDown;
+                //   if indic.sflMore;
+                //      LoadSubfile();
+                //   endif;
 
-                when indic.pageDown;
-                   if indic.sflMore;
-                      LoadSubfile();
-                   endif;
-
-                when indic.pageUp;
-                   SubfilePageUp();
+                //when indic.pageUp;
+                //   SubfilePageUp();
 
                 other;
                    ProcessSubfile();
@@ -98,7 +100,7 @@
           // fill subfile
           indic.sflDsp = *off;
           recnum = 0;
-          sflctlDs.rcdnbr = 1;
+          sflctlDs.rcdnbr = rcdnbrStack(stackIdx);
 
           reade %kds(keyMenupf:1) menupf.menupf menupfDs;
           dow not %eof(menupf) and recnum <> maxSflSize;
@@ -127,30 +129,30 @@
 
        //-----------------------------------------------------------------------
 
-       dcl-proc SubfilePageUp;
-
-          chain 1 menudspf.sflrec sflrecDs;
-          if %found;
-             keyMenupf.menucode = sflrecDs.menucode;
-             keyMenupf.menuseq    = sflrecDs.menuseq;
-             chain %kds(keyMenupf) menupf.menupf menupfDs;
-          else;
-             return;
-          endif;
-
-          for recnum = 1 to maxSflSize + 1;
-             readpe %kds(keyMenupf:1) menupf.menupf menupfDs;
-             if %eof(menupf);
-                keyMenupf.menucode = sflrecDs.menucode;
-                keyMenupf.menuseq    = 0;
-                setll %kds(keyMenupf) menupf;
-                leave;
-             endif;
-          endfor;
-
-          LoadSubfile();
-
-       end-proc;
+       //dcl-proc SubfilePageUp;
+       //
+       //   chain 1 menudspf.sflrec sflrecDs;
+       //   if %found;
+       //      keyMenupf.menucode = sflrecDs.menucode;
+       //      keyMenupf.menuseq    = sflrecDs.menuseq;
+       //      chain %kds(keyMenupf) menupf.menupf menupfDs;
+       //   else;
+       //      return;
+       //   endif;
+       //
+       //   for recnum = 1 to maxSflSize + 1;
+       //      readpe %kds(keyMenupf:1) menupf.menupf menupfDs;
+       //      if %eof(menupf);
+       //         keyMenupf.menucode = sflrecDs.menucode;
+       //         keyMenupf.menuseq    = 0;
+       //         setll %kds(keyMenupf) menupf;
+       //         leave;
+       //      endif;
+       //   endfor;
+       //
+       //   LoadSubfile();
+       //
+       //end-proc;
 
        //-----------------------------------------------------------------------
 
@@ -160,8 +162,10 @@
 
           if sflrecDs.ctlfld = 1;
              if sflrecDs.menuopttyp = '*MENU';
+                rcdnbrStack(stackIdx) = sflctlDs.csrrrn;
                 stackIdx = stackIdx + 1;
                 menuStack(stackIdx)  = sflrecDs.menuopt;
+                rcdnbrStack(stackIdx) = 1;
 
                 keyMenupf.menucode = sflrecDs.menuopt;
                 keyMenupf.menuseq    = 0;
