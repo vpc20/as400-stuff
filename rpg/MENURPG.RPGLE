@@ -6,7 +6,7 @@
 
        dcl-ds menupfDs  likerec(menupf.menupf: *all);
        dcl-ds sflrecDs  likerec(menudspf.sflrec: *all);
-       dcl-ds sfctlDs   likerec(menudspf.sflctl: *all);
+       dcl-ds sflctlDs  likerec(menudspf.sflctl: *all);
        dcl-ds fkeyrecDs likerec(menudspf.fkeyrec: *all);
 
        dcl-ds keyMenupf  likerec(menupf.menupf:*key);
@@ -27,6 +27,12 @@
          pageUp     ind pos(91);
        end-ds ;
 
+       dcl-pr qcmdexc extpgm;
+         theCmd char(3000) const;
+         cmdLen packed(15 : 5) const;
+         // 3rd parameter is optional
+         // dbcs char(3) const options(*nopass);
+       end-pr;
 
        //-----------------------------------------------------------------------
 
@@ -39,21 +45,21 @@
           stackIdx             = 1;
           menuStack(stackIdx)  = currParent;
 
-          keyMenupf.parentmenu = currParent;
+          keyMenupf.menucode = currParent;
           keyMenupf.menuseq    = 0;
           setll %kds(keyMenupf) menupf;
           LoadSubfile();
 
           dow not indic.exitKey;
              write menudspf.fkeyrec fkeyrecDs;
-             exfmt menudspf.sflctl  sfctlDs;
+             exfmt menudspf.sflctl  sflctlDs;
 
              select;
                 when indic.prevKey;
                    if stackIdx > 1;
                       menuStack(stackIdx)  = *blanks;
                       stackIdx = stackIdx - 1;
-                      keyMenupf.parentmenu = menuStack(stackIdx);
+                      keyMenupf.menucode = menuStack(stackIdx);
                       keyMenupf.menuseq    = 0;
                       setll %kds(keyMenupf) menupf;
                       LoadSubfile();
@@ -86,12 +92,13 @@
        // write menudspf.fkeyrec fkeyrecDs;
           // clear subfile
           indic.sflClr = *on;
-          write menudspf.sflctl sfctlDs;
+          write menudspf.sflctl sflctlDs;
           indic.sflClr = *off;
 
           // fill subfile
           indic.sflDsp = *off;
           recnum = 0;
+          sflctlDs.rcdnbr = 1;
 
           reade %kds(keyMenupf:1) menupf.menupf menupfDs;
           dow not %eof(menupf) and recnum <> maxSflSize;
@@ -124,7 +131,7 @@
 
           chain 1 menudspf.sflrec sflrecDs;
           if %found;
-             keyMenupf.parentmenu = sflrecDs.parentmenu;
+             keyMenupf.menucode = sflrecDs.menucode;
              keyMenupf.menuseq    = sflrecDs.menuseq;
              chain %kds(keyMenupf) menupf.menupf menupfDs;
           else;
@@ -134,7 +141,7 @@
           for recnum = 1 to maxSflSize + 1;
              readpe %kds(keyMenupf:1) menupf.menupf menupfDs;
              if %eof(menupf);
-                keyMenupf.parentmenu = sflrecDs.parentmenu;
+                keyMenupf.menucode = sflrecDs.menucode;
                 keyMenupf.menuseq    = 0;
                 setll %kds(keyMenupf) menupf;
                 leave;
@@ -152,17 +159,21 @@
           readc menudspf.sflrec sflrecDs;
 
           if sflrecDs.ctlfld = 1;
-             stackIdx = stackIdx + 1;
-             menuStack(stackIdx)  = sflrecDs.menuopt;
+             if sflrecDs.menuopttyp = '*MENU';
+                stackIdx = stackIdx + 1;
+                menuStack(stackIdx)  = sflrecDs.menuopt;
 
-             keyMenupf.parentmenu = sflrecDs.menuopt;
-             keyMenupf.menuseq    = 0;
-             setll %kds(keyMenupf) menupf;
-             LoadSubfile();
-
-             // reset control field to zero
-             // sflrecDs.ctlfld = 0;
-             // update menudspf.sflrec sflrecDs;
+                keyMenupf.menucode = sflrecDs.menuopt;
+                keyMenupf.menuseq    = 0;
+                setll %kds(keyMenupf) menupf;
+                LoadSubfile();
+             else;
+                qcmdexc (sflrecDs.cmdtext : %len(sflrecDs.cmdtext));
+                // reset control field to zero
+                sflrecDs.ctlfld = 0;
+                update menudspf.sflrec sflrecDs;
+                sflctlDs.rcdnbr = sflctlDs.csrrrn;
+             endif;
           endif;
 
 
