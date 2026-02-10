@@ -1,6 +1,6 @@
 ﻿set current schema vpcrzkh1;
 
--- DROP TABLE vpcrzkh1.appmenu;
+DROP TABLE vpcrzkh1.appmenu;
 
 CREATE TABLE vpcrzkh1.appmenu (
       parentmenu CHAR(10) NOT NULL,
