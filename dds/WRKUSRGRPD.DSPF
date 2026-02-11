@@ -1,0 +1,83 @@
+     A*%%TS  SD  20260211  112935  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      PRINT
+     A*
+     A* --- SCREEN 1: SUBFILE RECORD ---
+     A* Data starts at Line 9
+     A          R SFLREC1                   SFL
+     A            OPT            2A  B  9  2CHECK(ER)
+     A                                      COLOR(WHT)
+     A            USRPRF        10A  O  9  7
+     A            GRPPRF        10A  O  9 19
+     A*
+     A* --- SCREEN 1: SUBFILE CONTROL ---
+     A          R SFLCTL1                   SFLCTL(SFLREC1)
+     A*%%TS  SD  20260211  041638  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      CF03(03)
+     A                                      CF06(06)
+     A                                      PAGEUP(91)
+     A                                      PAGEDOWN(90)
+     A                                      OVERLAY
+     A  80                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  81                                  SFLCLR
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A* Header Section
+     A                                  1  2SYSNAME
+     A                                  1 31'Work with User Groups'
+     A                                      COLOR(WHT)
+     A                                  1 71USER
+     A                                  2  2'WRKUSRGRP'
+     A                                  2 71DATE
+     A                                      EDTCDE(Y)
+     A*
+     A                                  4 57'Position to'
+     A            POSTO         10A  B  4 69
+     A*
+     A                                  5  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  4'2=Edit   4=Delete   5=Display'
+     A                                      COLOR(BLU)
+     A* Column Headings (Line 8)
+     A                                  8  2'Opt'
+     A                                      COLOR(BLU)
+     A                                  8  7'User'
+     A                                      COLOR(BLU)
+     A                                  8 19'User Group'
+     A                                      COLOR(BLU)
+     A*
+     A* --- SCREEN 1 FOOTER ---
+     A          R FKEYS1
+     A*%%TS  SD  20260211  112935  VPCRZKH     REL-V7R5M0  5770-WDS
+     A            DUMMY          1A  H
+     A  70                             22 72'More...'
+     A                                      COLOR(WHT)
+     A N70                             22 72'Bottom'
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 13'F6=Add'
+     A                                      COLOR(BLU)
+     A*
+     A* --- SCREEN 2: DETAIL RECORD ---
+     A          R RECDTL1
+     A*%%TS  SD  20260211  042613  VPCRZKH     REL-V7R5M0  5770-WDS
+     A  03                                  CF03
+     A                                  1  2SYSNAME
+     A                                  1 31'Work with User Groups'
+     A                                      COLOR(WHT)
+     A                                  1 71USER
+     A                                  2  2'WRKUSRGRP'
+     A                                  2 71DATE
+     A                                      EDTCDE(Y)
+     A* Data
+     A                                  5  2'User:'
+     A            USRPRF        10A  O  5 15
+     A                                  6  2'User Group:'
+     A            GRPPRF        10A  B  6 15
+     A* Detail record includes its own footer
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
