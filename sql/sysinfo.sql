@@ -3,39 +3,31 @@
 -- The OBJECT_STATISTICS table function returns information about objects in a library.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      qsys2.object_statistics(
-        object_schema => 'VPCRZKH1',
-        objtypelist => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.object_statistics(
+  object_schema => 'VPCRZKH1',
+  objtypelist => '*ALL'
+  ));
 
 
 SELECT objname, objtype, objtext, objlongname
-  FROM TABLE (
-      qsys2.object_statistics(object_schema => 'VPCRZKH1', 
-                              objtypelist   => '*ALL')
-    )
-  WHERE LOWER(objtext) LIKE '%spool%';
+FROM TABLE ( qsys2.object_statistics(object_schema => 'VPCRZKH1',
+  objtypelist => '*ALL'))
+WHERE LOWER(objtext) LIKE '%spool%';
 
 
 SELECT *
-  FROM TABLE (
-      qsys2.object_statistics(
-        object_schema => 'VPCRZKH1',
-        objtypelist => '*FILE'
-      )
-    );
+FROM TABLE ( qsys2.object_statistics(
+  object_schema => 'VPCRZKH1',
+  objtypelist => '*FILE'
+  ));
 
 
 SELECT *
-  FROM TABLE (
-      qsys2.object_statistics(
-        object_schema => 'VPCRZKH1',
-        objtypelist => '*PGM',
-        object_name => 'WRK*'
-      )
-    );
+FROM TABLE ( qsys2.object_statistics(
+  object_schema => 'VPCRZKH1',
+  objtypelist => '*PGM',
+  object_name => 'WRK*'
+  ));
 
 -----------------------------------------------------------------------------------------------------------------------
 -- GET_JOB_INFO table function
@@ -46,14 +38,10 @@ SELECT *
 -- QIBM_DB_SQLADM or QIBM_DB_SYSMON function usage identifier.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      qsys2.get_job_info(v_job_name => '*')
-    );
+FROM TABLE ( qsys2.get_job_info(v_job_name => '*'));
 
 SELECT *
-  FROM TABLE (
-      qsys2.get_job_info(v_job_name => '708028/QUSER/QZDASOINIT')
-    );
+FROM TABLE ( qsys2.get_job_info(v_job_name => '708028/QUSER/QZDASOINIT'));
 
 -----------------------------------------------------------------------------------------------------------------------
 -- JOB_INFO table function
@@ -64,105 +52,85 @@ SELECT *
 -----------------------------------------------------------------------------------------------------------------------
 -- WRKSBMJOB SBMFROM(*USER)
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_submitter_filter => '*USER',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_submitter_filter => '*USER',
+  job_user_filter => '*ALL'
+  ));
 
 -- WRKSBSJOB SBS(QBATCH) USER(*ALL)
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_subsystem_filter => 'QBATCH',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_subsystem_filter => 'QBATCH',
+  job_user_filter => '*ALL'
+  ));
 
 -- WRKUSRJOB
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_user_filter => 'VPCRZKH',
-        job_status_filter => '*ALL'
-      )
-    ) x;
+FROM TABLE(
+  qsys2.job_info(
+    job_user_filter => 'VPCRZKH',
+    job_status_filter => '*ALL'
+  )
+     ) x;
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ALL',
-        job_type_filter => '*ALL',
-        job_user_filter => 'VPCRZKH',
-        job_name_filter => 'QPADEV002T'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ALL',
+  job_type_filter => '*ALL',
+  job_user_filter => 'VPCRZKH',
+  job_name_filter => 'QPADEV002T'
+  ));
 
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ALL',
-        job_type_filter => '*ALL',
-        job_user_filter => 'QUSER'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ALL',
+  job_type_filter => '*ALL',
+  job_user_filter => 'QUSER'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ALL',
-        job_type_filter => '*ALL',
-        job_user_filter => '*ALL',
-        job_name_filter => 'QZDASOINIT'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ALL',
+  job_type_filter => '*ALL',
+  job_user_filter => '*ALL',
+  job_name_filter => 'QZDASOINIT'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ALL',
-        job_type_filter => '*INTERACT',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ALL',
+  job_type_filter => '*INTERACT',
+  job_user_filter => '*ALL'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ALL',
-        job_type_filter => '*BATCH',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ALL',
+  job_type_filter => '*BATCH',
+  job_user_filter => '*ALL'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*ACTIVE',
-        job_type_filter => '*BATCH',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*ACTIVE',
+  job_type_filter => '*BATCH',
+  job_user_filter => '*ALL'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*JOBQ',
-        job_type_filter => '*BATCH',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*JOBQ',
+  job_type_filter => '*BATCH',
+  job_user_filter => '*ALL'
+  ));
 
 SELECT *
-  FROM TABLE (
-      qsys2.job_info(
-        job_status_filter => '*OUTQ',
-        job_type_filter => '*BATCH',
-        job_user_filter => '*ALL'
-      )
-    );
+FROM TABLE ( qsys2.job_info(
+  job_status_filter => '*OUTQ',
+  job_type_filter => '*BATCH',
+  job_user_filter => '*ALL'
+  ));
 
 
 
@@ -170,9 +138,7 @@ SELECT *
 -- default job_type_filter is *all
 -- default job_user_filter is current user
 SELECT *
-  FROM TABLE (
-      qsys2.job_info()
-    );
+FROM TABLE ( qsys2.job_info());
 
 -----------------------------------------------------------------------------------------------------------------------
 -- ACTIVE_JOB_INFO table function
@@ -181,19 +147,15 @@ SELECT *
 -- command and the List Job (QUSLJOB) API. 
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      qsys2.active_job_info()
-    );
+FROM TABLE ( qsys2.active_job_info());
 
 
 SELECT *
-  FROM TABLE (
-      qsys2.active_job_info(
-        subsystem_list_filter => 'QUSRWRK',
-        job_name_filter => 'QZDASOINIT',
-        current_user_list_filter => 'QUSER'
-      )
-    );
+FROM TABLE ( qsys2.active_job_info(
+  subsystem_list_filter => 'QUSRWRK',
+  job_name_filter => 'QZDASOINIT',
+  current_user_list_filter => 'QUSER'
+  ));
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Use the RELATED_OBJECTS Table Function (SYSTOOLS schema):
@@ -202,12 +164,10 @@ SELECT *
 -- This does not show Program References, Non-Database Objects and SQL Routines with Unqualified Names.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      systools.related_objects(
-        library_name => 'VPCRZKH1',
-        file_name => 'MSGLPF'
-      )
-    );
+FROM TABLE ( systools.related_objects(
+  library_name => 'VPCRZKH1',
+  file_name => 'MSGLPF'
+  ));
 
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -215,21 +175,19 @@ SELECT *
 -- The OUTPUT_QUEUE_ENTRIES table function returns one row for each spooled file in an output queue.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      qsys2.output_queue_entries(
-        outq_lib => '*LIBL',
-        outq_name => 'VPCRZKH'
-      )
-    );
+FROM TABLE ( qsys2.output_queue_entries(
+  outq_lib => '*LIBL',
+  outq_name => 'VPCRZKH'
+  ));
 
 
 -- OUTPUT_QUEUE_ENTRIES view
 -- The OUTPUT_QUEUE_ENTRIES view returns one row for each spooled file in every output queue. This
 -- view uses the QSYS2.OUTPUT_QUEUE_ENTRIES table function with DETAILED_INFO => 'YES'.
 SELECT *
-  FROM qsys2.output_queue_entries
-  WHERE output_queue_name = 'VPCRZKH'
-        AND output_queue_library_name = 'QGPL';
+FROM qsys2.output_queue_entries
+WHERE output_queue_name = 'VPCRZKH'
+  AND output_queue_library_name = 'QGPL';
 
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -237,9 +195,14 @@ SELECT *
 -- The SYSTEM_STATUS_INFO view returns a single row containing details about the current partition. This
 -- view uses the QSYS2.SYSTEM_STATUS table function with DETAILED_INFO => 'ALL'.
 -----------------------------------------------------------------------------------------------------------------------
-SELECT active_jobs_in_system, interactive_jobs_in_system, batch_running, main_storage_size, system_asp_storage,
-       total_auxiliary_storage, system_asp_used
-  FROM qsys2.system_status_info;
+SELECT active_jobs_in_system,
+       interactive_jobs_in_system,
+       batch_running,
+       main_storage_size,
+       system_asp_storage,
+       total_auxiliary_storage,
+       system_asp_used
+FROM qsys2.system_status_info;
 
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -249,9 +212,7 @@ SELECT active_jobs_in_system, interactive_jobs_in_system, batch_running, main_st
 -- and the Open List of Spooled Files (QGYOLSPL) API.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      qsys2.spooled_file_info(user_name => 'VPCRZKH')
-    );
+FROM TABLE ( qsys2.spooled_file_info(user_name => 'VPCRZKH'));
 
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -259,13 +220,11 @@ SELECT *
 -- The SPOOLED_FILE_DATA table function returns the content of a spooled file.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM TABLE (
-      systools.spooled_file_data(
-        job_name => '728628/VPCRZKH/QPADEV0010',
-        spooled_file_name => 'QPRTSPLF'
-      )
-    )
-  ORDER BY ordinal_position;
+FROM TABLE ( systools.spooled_file_data(
+  job_name => '728628/VPCRZKH/QPADEV0010',
+  spooled_file_name => 'QPRTSPLF'
+  ))
+ORDER BY ordinal_position;
 
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -275,13 +234,8 @@ SELECT *
 -- command and the Retrieve Message (QMHRTVM) API.
 -----------------------------------------------------------------------------------------------------------------------
 SELECT *
-  FROM qsys2.message_file_data
-  WHERE message_file_library = 'QSYS'
-        AND message_file = 'QCPFMSG'
-        AND (LOWER(message_text) LIKE '%required%');
-  
-------  
-SELECT * FROM QSYS2.ASP_INFO;        
-
-
+FROM qsys2.message_file_data
+WHERE message_file_library = 'QSYS'
+  AND message_file = 'QCPFMSG'
+  AND (LOWER(message_text) LIKE '%required%');
 

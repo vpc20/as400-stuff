@@ -9,6 +9,16 @@ SELECT *
 FROM qsys2.systables
 WHERE table_owner = 'VPCRZKH';
 
+SELECT  system_table_name, system_table_schema, table_name, table_schema
+  FROM qsys2.systables
+  WHERE system_table_name = 'FLIGH00001'
+        AND system_table_schema = 'VPCRZKH1';                    
+
+SELECT table_name, table_schema, system_table_name, system_table_schema
+  FROM qsys2.systables
+  WHERE table_name = 'FLIGHTS'
+        AND system_table_schema = 'VPCRZKH1';              
+
 
 -- output similar to dspfd command
 select * from qsys2.sysfiles
@@ -84,6 +94,17 @@ SELECT table_schema, table_name, table_partition AS member_name, number_rows, nu
 SELECT *
 FROM qsys2.sysroutines
 WHERE routine_schema = 'VPCRZKH1';
+
+SELECT routine_schema, routine_name, specific_schema, specific_name
+  FROM qsys2.sysroutines
+  WHERE routine_schema = 'QSYS2'
+        AND routine_name = 'CLEAR_DATA_QUEUE';
+
+SELECT specific_schema, specific_name, routine_schema, routine_name
+FROM qsys2.sysroutines
+WHERE specific_schema = 'QSYS2'
+and specific_name = 'QSQCLRDTAQ';
+
 
 -- 
 SELECT *
