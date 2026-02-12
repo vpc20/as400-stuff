@@ -1,4 +1,4 @@
-     A*%%TS  SD  20260212  050105  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260212  132422  VPCRZKH     REL-V7R5M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      PRINT
@@ -29,7 +29,7 @@
      A                                      SFLPAG(0013)
      A            RCDNBR         4S 0H      SFLRCDNBR(CURSOR)
      A            CSRRRN         5S 0H
-     A* Header Section
+     A******* Header Section
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
      A                                      COLOR(WHT)
@@ -45,7 +45,7 @@
      A                                      COLOR(BLU)
      A                                  6  4'2=Edit   4=Delete   5=Display'
      A                                      COLOR(BLU)
-     A* Column Headings (Line 8)
+     A******* Column Headings
      A                                  8  2'Opt'
      A                                      COLOR(BLU)
      A                                  8  7'User'
@@ -66,7 +66,7 @@
      A                                      COLOR(BLU)
      A*
      A          R RECDTL1
-     A*%%TS  SD  20260211  042613  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260212  132422  VPCRZKH     REL-V7R5M0  5770-WDS
      A                                      CF12(12)
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
@@ -77,7 +77,13 @@
      A                                      EDTCDE(Y)
      A                                  5  2'User:'
      A            USRPRF        10A  B  5 15
+     A  25                                  ERRMSGID(KBD0007 QSYS/QCPFMSG)
+     A  50                                  DSPATR(PR)
+     A N50                                  DSPATR(UL)
      A                                  6  2'User Group:'
      A            GRPPRF        10A  B  6 15
+     A  26                                  ERRMSGID(KBD0007 QSYS/QCPFMSG)
+     A  51                                  DSPATR(PR)
+     A N51                                  DSPATR(UL)
      A                                 23  2'F12=Cancel'
      A                                      COLOR(BLU)

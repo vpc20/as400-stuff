@@ -17,21 +17,33 @@
        dcl-ds keyUsr      likerec(usrgrp.usrgrp : *key);
 
        // Constants and Variables
-       dcl-c maxSflSize   13; // Matches SFLPAG
+       dcl-c maxSflSize   13;
+       dcl-c kAdd         'ADD';
+       dcl-c kChg         'CHG';
+       dcl-c kDel         'DEL';
+       dcl-c kDsp         'DSP';
+
        dcl-s rrn          zoned(4:0);
        dcl-s usrprf1      char(10);
        dcl-s reloadSfl    ind;
 
        // Indicator Data Structure
        dcl-ds indic qualified;
-         exitKey    ind pos(3);
-         addKey     ind pos(6);
-         cancelKey  ind pos(12);
-         sflMore    ind pos(70);
-         sflDsp     ind pos(80);
-         sflClr     ind pos(81);
-         pageDown   ind pos(90);
-         pageUp     ind pos(91);
+         exitKey         ind pos(3);
+         addKey          ind pos(6);
+         cancelKey       ind pos(12);
+
+         mandatoryUsr    ind pos(25);
+         mandatoryGrp    ind pos(26);
+
+         protectKeys     ind pos(50);
+         protectNonKeys  ind pos(51);
+
+         sflMore         ind pos(70);
+         sflDsp          ind pos(80);
+         sflClr          ind pos(81);
+         pageDown        ind pos(90);
+         pageUp          ind pos(91);
        end-ds;
 
        //-----------------------------------------------------------------------
@@ -65,7 +77,7 @@
 
              when indic.addKey;  // F6
                reloadSfl = *off;
-               HandleDetail('ADD': *blanks);
+               HandleDetail(kAdd : *blanks);
                if reloadSfl;
                   LoadSubfile();
                endif;
@@ -165,16 +177,16 @@
          readc wrkusrgrpd.sflrec1 sflrec1Ds;
          dow not %eof(wrkusrgrpd);
            select;
-             when sflrec1Ds.opt = '2'; // Edit
-               HandleDetail('CHG': sflrec1Ds.usrprf);
-             when sflrec1Ds.opt = '4'; // Delete
-               HandleDetail('DLT': sflrec1Ds.usrprf);
-             when sflrec1Ds.opt = '5'; // Display
-               HandleDetail('DSP': sflrec1Ds.usrprf);
+             when %trim(sflrec1Ds.opt) = '2';   // Edit
+               HandleDetail(kChg : sflrec1Ds.usrprf);
+             when %trim(sflrec1Ds.opt) = '4';   // Delete
+               HandleDetail(kDel : sflrec1Ds.usrprf);
+             when %trim(sflrec1Ds.opt) = '5';   // Display
+               HandleDetail(kDsp : sflrec1Ds.usrprf);
            endsl;
 
            // Reset option and update subfile record
-           if sflrec1Ds.opt = '4';  // Delete
+           if %trim(sflrec1Ds.opt) = '4' and reloadSfl;   // Delete
               sflctl1Ds.rcdnbr = 1;
            else;
               sflctl1Ds.rcdnbr = sflctl1Ds.csrrrn;
@@ -190,21 +202,34 @@
        dcl-proc HandleDetail;
 
          dcl-pi *n;
-           mode char(3) const; // 'ADD', 'CHG', 'DLT', 'DSP'
+           mode char(3) const; // 'ADD', 'CHG', 'DEL', 'DSP'
            pUsr char(10) const;
          end-pi;
 
          dcl-ds dtlDs likerec(wrkusrgrpd.recdtl1 : *all);
          dcl-s confirmed ind inz(*off);
 
-         // 1. Prepare Data
-         if mode = 'ADD';
-           clear dtlDs;
+         // prepare data
+         if mode = kAdd;
+            clear dtlDs;
          else;
-           keyUsr.usrprf = pUsr;
-           chain %kds(keyUsr) usrgrp usrgrpDs;
-           eval-corr dtlDs = usrgrpDs;
+             keyUsr.usrprf = pUsr;
+             chain %kds(keyUsr) usrgrp usrgrpDs;
+             eval-corr dtlDs = usrgrpDs;
          endif;
+
+         // protect fields depending on mode
+         select;
+           when mode = kAdd;
+             indic.protectKeys    = *off;
+             indic.protectNonKeys = *off;
+           when mode = kChg;
+             indic.protectKeys    = *on;
+             indic.protectNonKeys = *off;
+           when mode = kDel or mode = kDsp;
+             indic.protectKeys    = *on;
+             indic.protectNonKeys = *on;
+         endsl;
 
          // 2. Display Loop
          dow not indic.cancelKey;
@@ -220,7 +245,7 @@
            // This acts as the "Press Enter to Confirm" step.
 
            select;
-             when mode = 'ADD';
+             when mode = kAdd;
                usrgrpDs.usrprf = dtlDs.usrprf; // Ensure key is set
                usrgrpDs.grpprf = dtlDs.grpprf;
                write usrgrp.usrgrp usrgrpDs;
@@ -230,7 +255,7 @@
                reloadSfl = *on;
                leave;
 
-             when mode = 'CHG';
+             when mode = kChg;
                // Re-chain for update lock
                chain %kds(keyUsr) usrgrp usrgrpDs;
                if %found;
@@ -242,7 +267,7 @@
                  leave;
                endif;
 
-             when mode = 'DLT';
+             when mode = kDel;
                // Confirmation for Delete
                chain %kds(keyUsr) usrgrp usrgrpDs;
                if %found;
@@ -253,7 +278,7 @@
                  leave;
                endif;
 
-             when mode = 'DSP';
+             when mode = kDsp;
                  leave;
 
            endsl;
