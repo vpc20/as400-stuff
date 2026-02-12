@@ -1,12 +1,10 @@
-     A*%%TS  SD  20260211  233329  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260212  050105  VPCRZKH     REL-V7R5M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      PRINT
      A                                      INDARA
      A                                      ERRSFL
      A*
-     A* --- SCREEN 1: SUBFILE RECORD ---
-     A* Data starts at Line 9
      A          R SFLREC1                   SFL
      A*%%TS  SD  20260211  231916  VPCRZKH     REL-V7R5M0  5770-WDS
      A            OPT            2A  B  9  2COLOR(WHT)
@@ -16,19 +14,21 @@
      A            USRPRF        10A  O  9  7
      A            GRPPRF        10A  O  9 19
      A*
-     A* --- SCREEN 1: SUBFILE CONTROL ---
      A          R SFLCTL1                   SFLCTL(SFLREC1)
-     A*%%TS  SD  20260211  041638  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260212  050105  VPCRZKH     REL-V7R5M0  5770-WDS
      A                                      CA03(03)
      A                                      CF06(06)
      A                                      PAGEUP(91)
      A                                      PAGEDOWN(90)
      A                                      OVERLAY
+     A                                      SFLCSRRRN(&CSRRRN)
      A  80                                  SFLDSP
      A                                      SFLDSPCTL
      A  81                                  SFLCLR
      A                                      SFLSIZ(0014)
      A                                      SFLPAG(0013)
+     A            RCDNBR         4S 0H      SFLRCDNBR(CURSOR)
+     A            CSRRRN         5S 0H
      A* Header Section
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
@@ -53,7 +53,6 @@
      A                                  8 19'User Group'
      A                                      COLOR(BLU)
      A*
-     A* --- SCREEN 1 FOOTER ---
      A          R FKEYS1
      A*%%TS  SD  20260211  112935  VPCRZKH     REL-V7R5M0  5770-WDS
      A            DUMMY          1A  H
@@ -66,10 +65,8 @@
      A                                 23 13'F6=Add'
      A                                      COLOR(BLU)
      A*
-     A* --- SCREEN 2: DETAIL RECORD ---
      A          R RECDTL1
      A*%%TS  SD  20260211  042613  VPCRZKH     REL-V7R5M0  5770-WDS
-     A                                      CA03(03)
      A                                      CF12(12)
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
@@ -78,13 +75,9 @@
      A                                  2  2'WRKUSRGRP'
      A                                  2 71DATE
      A                                      EDTCDE(Y)
-     A* Data
      A                                  5  2'User:'
      A            USRPRF        10A  B  5 15
      A                                  6  2'User Group:'
      A            GRPPRF        10A  B  6 15
-     A* Detail record includes its own footer
-     A                                 23  2'F3=Exit'
-     A                                      COLOR(BLU)
-     A                                 23 12'F12=Cancel'
+     A                                 23  2'F12=Cancel'
      A                                      COLOR(BLU)

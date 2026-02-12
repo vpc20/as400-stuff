@@ -19,7 +19,8 @@
        // Constants and Variables
        dcl-c maxSflSize   13; // Matches SFLPAG
        dcl-s rrn          zoned(4:0);
-      //  dcl-s lastKey      char(10);
+       dcl-s usrprf1      char(10);
+       dcl-s reloadSfl    ind;
 
        // Indicator Data Structure
        dcl-ds indic qualified;
@@ -42,7 +43,9 @@
          // Initial Load
          indic.exitKey = *off;
          clear sflctl1Ds.posto;
+
          setll *loval usrgrp;
+         sflctl1Ds.rcdnbr = 1;
          LoadSubfile();
 
          dow not indic.exitKey;
@@ -61,8 +64,11 @@
                sflctl1Ds.posto = *blanks;
 
              when indic.addKey;  // F6
+               reloadSfl = *off;
                HandleDetail('ADD': *blanks);
-               LoadSubfile(); // Refresh after add
+               if reloadSfl;
+                  LoadSubfile();
+               endif;
 
              when indic.pageDown;
                if indic.sflMore;
@@ -73,7 +79,12 @@
                SubfilePageUp();
 
              other;
+               reloadSfl = *off;
                ProcessSubfile();
+               if reloadSfl;
+                  LoadSubfile();
+               endif;
+
            endsl;
          enddo;
 
@@ -99,6 +110,9 @@
            sflrec1Ds.opt = *blanks;
            eval-corr sflrec1Ds = usrgrpDs;
            write wrkusrgrpd.sflrec1 sflrec1Ds;
+           if rrn = 1;
+              usrprf1 = sflrec1Ds.usrprf;
+           endif;
            read usrgrp usrgrpDs;
          enddo;
 
@@ -160,16 +174,21 @@
            endsl;
 
            // Reset option and update subfile record
+           if sflrec1Ds.opt = '4';  // Delete
+              sflctl1Ds.rcdnbr = 1;
+           else;
+              sflctl1Ds.rcdnbr = sflctl1Ds.csrrrn;
+           endif;
            sflrec1Ds.opt = *blanks;
            update wrkusrgrpd.sflrec1 sflrec1Ds;
            readc wrkusrgrpd.sflrec1 sflrec1Ds;
          enddo;
 
-         LoadSubfile(); // Reload to show changes
-
        end-proc;
 
+       //-----------------------------------------------------------------------
        dcl-proc HandleDetail;
+
          dcl-pi *n;
            mode char(3) const; // 'ADD', 'CHG', 'DLT', 'DSP'
            pUsr char(10) const;
@@ -181,9 +200,6 @@
          // 1. Prepare Data
          if mode = 'ADD';
            clear dtlDs;
-           // In ADD mode, USRPRF is output in your DDS,
-           // but normally it should be input.
-           // We'll assume the user fills GRPPRF.
          else;
            keyUsr.usrprf = pUsr;
            chain %kds(keyUsr) usrgrp usrgrpDs;
@@ -191,11 +207,11 @@
          endif;
 
          // 2. Display Loop
-         dow not indic.exitKey and not indic.cancelKey;
+         dow not indic.cancelKey;
 
            exfmt wrkusrgrpd.recdtl1 dtlDs;
 
-           if indic.exitKey or indic.cancelKey;
+           if indic.cancelKey;
              leave;
            endif;
 
@@ -210,6 +226,8 @@
                write usrgrp.usrgrp usrgrpDs;
                keyUsr.usrprf = usrgrpDs.usrprf;
                setll %kds(keyUsr) usrgrp;
+               sflctl1Ds.rcdnbr = 1;
+               reloadSfl = *on;
                leave;
 
              when mode = 'CHG';
@@ -218,29 +236,30 @@
                if %found;
                  usrgrpDs.grpprf = dtlDs.grpprf;
                  update usrgrp.usrgrp usrgrpDs;
-                 chain 1 wrkusrgrpd.sflrec1 sflrec1Ds;
-                 keyUsr.usrprf = sflrec1Ds.usrprf;
+                 keyUsr.usrprf = usrprf1;
                  setll %kds(keyUsr) usrgrp;
+                 reloadSfl = *on;
+                 leave;
                endif;
-               leave;
 
              when mode = 'DLT';
                // Confirmation for Delete
                chain %kds(keyUsr) usrgrp usrgrpDs;
                if %found;
                  delete usrgrp.usrgrp;
-                 chain 1 wrkusrgrpd.sflrec1 sflrec1Ds;
-                 keyUsr.usrprf = sflrec1Ds.usrprf;
+                 keyUsr.usrprf = usrprf1;
                  setll %kds(keyUsr) usrgrp;
+                 reloadSfl = *on;
+                 leave;
                endif;
-               leave;
 
              when mode = 'DSP';
-               leave;
+                 leave;
+
            endsl;
          enddo;
 
          // Reset indicators for next time
-         indic.exitKey = *off;
          indic.cancelKey = *off;
+
        end-proc;
