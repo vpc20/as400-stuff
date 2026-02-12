@@ -1,21 +1,25 @@
-     A*%%TS  SD  20260211  112935  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260211  233329  VPCRZKH     REL-V7R5M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
-     A                                      INDARA
      A                                      PRINT
+     A                                      INDARA
+     A                                      ERRSFL
      A*
      A* --- SCREEN 1: SUBFILE RECORD ---
      A* Data starts at Line 9
      A          R SFLREC1                   SFL
-     A            OPT            2A  B  9  2CHECK(ER)
-     A                                      COLOR(WHT)
+     A*%%TS  SD  20260211  231916  VPCRZKH     REL-V7R5M0  5770-WDS
+     A            OPT            2A  B  9  2COLOR(WHT)
+     A                                      VALUES('  ' '2 ' ' 2' '4 ' ' 4' '5 -
+     A                                      ' ' 5')
+     A                                      CHKMSGID(CPD6A7C QSYS/QCPFMSG)
      A            USRPRF        10A  O  9  7
      A            GRPPRF        10A  O  9 19
      A*
      A* --- SCREEN 1: SUBFILE CONTROL ---
      A          R SFLCTL1                   SFLCTL(SFLREC1)
      A*%%TS  SD  20260211  041638  VPCRZKH     REL-V7R5M0  5770-WDS
-     A                                      CF03(03)
+     A                                      CA03(03)
      A                                      CF06(06)
      A                                      PAGEUP(91)
      A                                      PAGEDOWN(90)
@@ -65,7 +69,8 @@
      A* --- SCREEN 2: DETAIL RECORD ---
      A          R RECDTL1
      A*%%TS  SD  20260211  042613  VPCRZKH     REL-V7R5M0  5770-WDS
-     A  03                                  CF03
+     A                                      CA03(03)
+     A                                      CF12(12)
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
      A                                      COLOR(WHT)
@@ -75,9 +80,11 @@
      A                                      EDTCDE(Y)
      A* Data
      A                                  5  2'User:'
-     A            USRPRF        10A  O  5 15
+     A            USRPRF        10A  B  5 15
      A                                  6  2'User Group:'
      A            GRPPRF        10A  B  6 15
      A* Detail record includes its own footer
      A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F12=Cancel'
      A                                      COLOR(BLU)
