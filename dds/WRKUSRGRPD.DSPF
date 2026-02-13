@@ -1,4 +1,4 @@
-     A*%%TS  SD  20260212  132422  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260213  095021  VPCRZKH     REL-V7R5M0  5770-WDS
      A*%%EC
      A                                      DSPSIZ(24 80 *DS3)
      A                                      PRINT
@@ -66,8 +66,10 @@
      A                                      COLOR(BLU)
      A*
      A          R RECDTL1
-     A*%%TS  SD  20260212  132422  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%TS  SD  20260213  095021  VPCRZKH     REL-V7R5M0  5770-WDS
      A                                      CF12(12)
+     A            USRDESC       30A  P
+     A            GRPDESC       30A  P
      A                                  1  2SYSNAME
      A                                  1 31'Work with User Groups'
      A                                      COLOR(WHT)
@@ -77,13 +79,15 @@
      A                                      EDTCDE(Y)
      A                                  5  2'User:'
      A            USRPRF        10A  B  5 15
-     A  25                                  ERRMSGID(KBD0007 QSYS/QCPFMSG)
      A  50                                  DSPATR(PR)
      A N50                                  DSPATR(UL)
+     A  25                                  ERRMSGID(ERR0001 VPCRZKH1/APPMSGF &-
+     A                                      USRDESC)
      A                                  6  2'User Group:'
      A            GRPPRF        10A  B  6 15
-     A  26                                  ERRMSGID(KBD0007 QSYS/QCPFMSG)
      A  51                                  DSPATR(PR)
      A N51                                  DSPATR(UL)
+     A  26                                  ERRMSGID(ERR0001 VPCRZKH1/APPMSGF &-
+     A                                      GRPDESC)
      A                                 23  2'F12=Cancel'
      A                                      COLOR(BLU)
