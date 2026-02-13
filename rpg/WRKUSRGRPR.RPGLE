@@ -49,6 +49,12 @@ dcl-ds indic qualified;
   pageUp          ind pos(91);
 end-ds;
 
+dcl-pr ConfirmRecord extpgm('CONFBOXR');
+  Action    char(3) const;
+  Confirmed ind;
+end-pr;
+
+
        //-----------------------------------------------------------------------
 dcl-proc Main;
 
@@ -209,7 +215,7 @@ dcl-proc HandleDetail;
     pUsr char(10) const;
   end-pi;
 
-  dcl-s confirmed ind inz(*off);
+  dcl-s confirmed   ind;
 
          // prepare data
   if mode = kAdd;
@@ -247,9 +253,12 @@ dcl-proc HandleDetail;
       iter;
     endif;
 
-           // 3. Confirmation Logic
-           // We "Display" the data, then wait for another Enter to confirm
-           // This acts as the "Press Enter to Confirm" step.
+    // Call the program
+    ConfirmRecord(mode : Confirmed);
+
+    if not Confirmed;
+      iter;
+    endif;
 
     select;
       when mode = kAdd;

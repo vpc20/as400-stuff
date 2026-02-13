@@ -1,0 +1,15 @@
+     A*%%TS  SD  20260213  215645  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A          R WDWREC1
+     A*%%TS  SD  20260213  215645  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      CF12(12)
+     A                                      WINDOW(9 20 5 37)
+     A                                      WDWBORDER((*DSPATR RI) (*CHAR '    -
+     A                                          '))
+     A                                  4  5'<Enter>=Confirm   F12=Cancel'
+     A            MSGTXT        26A  O  2  6
+     A          R DUMMY
+     A                                      ASSUME
+     A                                  1  2' '
