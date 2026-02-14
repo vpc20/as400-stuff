@@ -1,0 +1,32 @@
+     A*%%TS  SD  20260214  101920  VPCRZKH     REL-V7R5M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A          R RECDTL1
+     A*%%TS  SD  20260214  065041  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      CF03(03)
+     A                                      OVERLAY
+     A                                  1  2SYSNAME
+     A                                  1 31'Error Subfile Demo'
+     A                                      COLOR(WHT)
+     A                                  1 71USER
+     A                                  2  2'WRKUSRGRP'
+     A                                  2 71DATE
+     A                                      EDTCDE(Y)
+     A                                  5  2'Dummy Field:'
+     A            DUMMYFLD1     10A  B  5 15
+     A          R MSGSFL                    SFL
+     A*%%TS  SD  20260214  044656  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      SFLMSGRCD(24)
+     A            MSGKEY                    SFLMSGKEY
+     A            PGMQ                      SFLPGMQ(276)
+     A          R MSGCTL                    SFLCTL(MSGSFL)
+     A*%%TS  SD  20260214  101920  VPCRZKH     REL-V7R5M0  5770-WDS
+     A                                      OVERLAY
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A  90                                  SFLEND
+     A                                      SFLSIZ(0010)
+     A                                      SFLPAG(0001)
+     A            PGMQ                      SFLPGMQ(276)

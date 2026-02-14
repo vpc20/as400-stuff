@@ -1,0 +1,94 @@
+**free
+ctl-opt dftactgrp(*no) actgrp(*caller) main(GetStack);
+
+//------------------------------------------------------------------
+// API Prototypes and Structures
+//------------------------------------------------------------------
+dcl-pr QWVRCSTK extpgm('QWVRCSTK');
+  receiver      char(32767) options(*varsize);
+  receiverLen   int(10)     const;
+  format        char(8)     const;
+  jobInfo       like(JobIdInfo);
+  jobFormat     char(8)     const;
+  errorCode     char(256)   options(*varsize);
+end-pr;
+
+dcl-ds JobIdInfo qualified;
+  jobName       char(10) inz('*');
+  userName      char(10) inz(*blanks);
+  jobNumber     char(6)  inz(*blanks);
+  internalJobId char(16) inz(*allx'00');
+  reserved      char(2)  inz(*allx'00');
+  threadInd     int(10)  inz(1); // 1 = Current thread
+  threadId      char(8)  inz(*allx'00');
+end-ds;
+
+// Header Structure (CSTK0100)
+dcl-ds CSTK0100_Hdr qualified based(ptrHdr);
+  bytesRet      int(10);
+  bytesAvail    int(10);
+  numEntries    int(10);
+  offsetEntries int(10);
+  entriesRet    int(10);
+end-ds;
+
+// Entry Structure (CSTK0100)
+dcl-ds CSTK0100_Ent qualified based(ptrEnt);
+  entryLen      int(10);
+  // ... there are other fields here, but entryLen is key for navigation
+  statement     char(10) pos(45);
+  pgmName       char(10) pos(55);
+  pgmLib        char(10) pos(65);
+  procName      char(256) pos(205); // Variable length usually
+end-ds;
+
+dcl-ds ErrorCode qualified;
+  bytesProv     int(10) inz(%size(ErrorCode));
+  bytesAvail    int(10) inz(0);
+  msgID         char(7);
+  reserved      char(1);
+  msgData       char(128);
+end-ds;
+
+//------------------------------------------------------------------
+// Main Procedure
+//------------------------------------------------------------------
+dcl-proc GetStack;
+  dcl-s receiver    char(32767);
+  dcl-s ptrHdr      pointer;
+  dcl-s ptrEnt      pointer;
+  dcl-s i           int(10);
+  dcl-s msg         varchar(100);
+
+  ptrHdr = %addr(receiver);
+
+  // Call the API
+  QWVRCSTK(receiver : %size(receiver) : 'CSTK0100' : 
+           JobIdInfo : 'JIDF0100' : ErrorCode);
+
+  if ErrorCode.bytesAvail > 0;
+    dsply ('Error: ' + ErrorCode.msgID);
+    return;
+  endif;
+
+  // Point to the first entry using the offset from the header
+  ptrEnt = ptrHdr + CSTK0100_Hdr.offsetEntries;
+
+  // Display Total Stack Count
+  msg = 'Stack Depth: ' + %char(CSTK0100_Hdr.entriesRet);
+  dsply msg;
+
+  // Loop through stack entries
+  for i = 1 to CSTK0100_Hdr.entriesRet;
+    
+    msg = %char(i) + ': ' + %trim(CSTK0100_Ent.pgmName);
+    dsply msg;
+
+    // Move pointer to next entry using the length of the current entry
+    if i < CSTK0100_Hdr.entriesRet;
+      ptrEnt = ptrEnt + CSTK0100_Ent.entryLen;
+    endif;
+  endfor;
+
+end-proc;
+
