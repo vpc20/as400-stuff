@@ -25,17 +25,17 @@ dcl-proc Main;
    indic.sflend =  *on;
    sendError('MSG0001' : ' ');
 
-   //msgctlds.pgmq = '*';
+   msgctlds.pgmq = '*';
 
    //msgctlds.pgmq = pgmPsds.pgmName;   // 'ERRDEMO   '
    // msgctlds.pgmq = 'ERRDEMO   ';
    // msgctlds.pgmq = '*EXT';
    //msgctlds.pgmq = 'Main      ';
 
-     msgctlds.pgmq = *blanks;
-     procName = %proc();
-     EVAL %SUBST(msgctlds.pgmq :   1 : %len(procName)) = procName;
-     EVAL %SUBST(msgctlds.pgmq : 267 : %len(pgmPsds.pgmName)) = pgmPsds.pgmName;
+   //msgctlds.pgmq = *blanks;
+   //procName = %proc();
+   //EVAL %SUBST(msgctlds.pgmq :   1 : %len(procName)) = procName;
+   //EVAL %SUBST(msgctlds.pgmq : 267 : %len(pgmPsds.pgmName)) = pgmPsds.pgmName;
 
    //msgctlds.pgmq = *blanks;
    //EVAL %SUBST(msgctlds.pgmq :   1 : 9) = 'SENDERROR';

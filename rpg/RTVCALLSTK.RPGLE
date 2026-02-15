@@ -60,7 +60,6 @@ dcl-ds errCode qualified;
   msgData        char(256);
 end-ds;
 
-
 dcl-s mainProc   varchar(256);
 
 // --- Prototype for QWVRCSTK -------------------------------------------------
@@ -79,7 +78,7 @@ end-pr;
 dcl-proc GetStackDepth;
 
   dcl-pi *n int(10);
-    mainProc varchar(256) const;
+    startProc varchar(256) const;
   end-pi;
 
   dcl-s rcvBuffer  char(32767) inz(*allx'00');
@@ -120,8 +119,8 @@ dcl-proc GetStackDepth;
       procName = '';
     endif;
 
-    // Stop counting when we reach MYMAIN
-    if %upper(%trimr(procName)) = 'MYMAIN';
+    // Stop counting when we reach startProc
+    if %upper(%trimr(procName)) = startProc;
       leave;
     endif;
 
@@ -139,7 +138,8 @@ end-proc;
 // --- Main & Test Procedures -------------------------------------------------
 
 dcl-proc MyMain;
-  mainProc = %proc();
+  mainProc = %proc;
+
   dsply ('Depth: ' + %char(GetStackDepth(mainProc)) + '  Proc: ' + %proc());
   testSub();
 end-proc;
