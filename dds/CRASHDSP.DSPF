@@ -1,0 +1,5 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R CRASHREC
+     A                                  1 30'EMULATOR CRASH TEST'
+     A            FLD1          10A  O  5 10
+     A                                 10 10'PRESS ENTER TO CRASH...'
