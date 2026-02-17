@@ -1,0 +1,12 @@
+     A*  Display File - HELLODSPF
+     A          R MAINRCD
+     A                                      CA03(03 'F3 Exit')
+     A                                  1 30'Hello World Display'
+     A                                  3  2'Enter your name:'
+     A            NAME          20A  B  3 21
+     A                                  5  2'Press Enter to continue'
+     A                                  7  2'Press F3 to Exit'
+     A          R MSGRCD
+     A                                  5  2'Hello,'
+     A            GREETING      30A  O  5  9
+     A                                  7  2'Press Enter to return'
