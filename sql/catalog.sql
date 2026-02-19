@@ -68,7 +68,7 @@ SELECT table_schema, table_name, system_table_member, source_type, text_descript
         AND table_name = 'QCLSRC'
         AND LOWER(text_description) LIKE '%outf%';
         
--- browse member
+-- browse member in source physical file
 SELECT srcdata
   FROM TABLE (
       sqltools.readsrc('VPCRZKH1', 'QCLSRC', 'CRTSPLFOUT')

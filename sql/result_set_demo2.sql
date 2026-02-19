@@ -1,5 +1,8 @@
-﻿--#SET TERMINATOR #
-create procedure result_set_demo ()
+﻿set current schema vpcrzkh1;
+
+drop procedure result_set_demo2();
+
+create procedure result_set_demo2()
       language sql
       dynamic result sets 2
 begin
@@ -16,5 +19,5 @@ begin
    return;
 end;
 
-call vpcrzkh1.result_set_demo();
+call vpcrzkh1.result_set_demo2();
 

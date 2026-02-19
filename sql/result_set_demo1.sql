@@ -1,4 +1,8 @@
-﻿create procedure resset ()
+﻿set current schema vpcrzkh1;
+
+drop procedure result_set_demo1();
+
+create procedure result_set_demo1()
       language sql
       dynamic result sets 1  -- a result table associated with a cursor opened in the stored procedure
 begin
@@ -9,5 +13,5 @@ begin
    return;
 end;
 
-call vpcrzkh1.resset;
+call vpcrzkh1.result_set_demo1();
 
