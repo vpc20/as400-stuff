@@ -6,7 +6,7 @@ CREATE PROCEDURE vpcrzkh1.drop_temp_alias
    LANGUAGE SQL
    specific droptempal
    MODIFIES SQL DATA
-   set option dbgview = *source
+--    set option dbgview = *source
 BEGIN
    DECLARE sql_text VARCHAR(1000);
    DECLARE filename VARCHAR(128);

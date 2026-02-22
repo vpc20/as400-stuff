@@ -154,7 +154,7 @@ SELECT *
 FROM TABLE ( qsys2.active_job_info(
   subsystem_list_filter => 'QUSRWRK',
   job_name_filter => 'QZDASOINIT',
-  current_user_list_filter => 'QUSER'
+  current_user_list_filter => 'VPCRZKH'
   ));
 
 -----------------------------------------------------------------------------------------------------------------------
