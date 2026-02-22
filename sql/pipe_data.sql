@@ -1,4 +1,5 @@
---#SET TERMINATOR #
+﻿set current schema vpcrzkh1;
+
 create function transform()
    returns table (
       employee_name char(20),
