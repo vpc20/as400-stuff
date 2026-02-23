@@ -1,13 +1,15 @@
-﻿drop procedure update_salary_1;
+﻿DROP PROCEDURE update_salary_1;
 
-create procedure update_salary_1 (in employee_number char(10), 
-                                  in rate            decimal(6, 2))
-   language sql
-   modifies sql data 
+CREATE PROCEDURE update_salary_1(
+   IN employee_number CHAR(10),
+   IN rate DECIMAL(6, 2))
+   LANGUAGE SQL
+   MODIFIES SQL DATA
 --   
-   update employee
-      set salary = salary * rate
-      where empno = employee_number;
-      
-select * from employee; 
-call vpcrzkh1.update_salary_1('000010', 0.5); 
+UPDATE employee
+SET salary = salary * rate
+   WHERE empno = employee_number;
+
+SELECT *
+   FROM employee;
+CALL vpcrzkh1.update_salary_1('000010', 0.5);
