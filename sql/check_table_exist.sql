@@ -9,6 +9,7 @@ CREATE PROCEDURE table_exists(
 )
    LANGUAGE SQL
    SPECIFIC chktblexst
+   set option dbgview = *source
 BEGIN
    -- Check if the table exists in the specified schema
    SELECT COUNT(*)

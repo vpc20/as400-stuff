@@ -206,7 +206,6 @@
       ******************************************************************
 
        PROCEDURE DIVISION.
-       MAIN-LINE.
            OPEN OUTPUT LISTING.
       *
       * Set Error Code structure to use exceptions
