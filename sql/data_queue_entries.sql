@@ -56,6 +56,10 @@ select * from table
 
 SELECT *
   FROM TABLE (
-      qsys2.data_queue_entries('ORDERDQ', 'VPCRZKH1')
+      qsys2.data_queue_entries('SAMPLEDQ', 'VPCRZKH1')
     );
-
+    
+    
+call qsys2.send_data_queue(message_data       => 'Data from Run SQL Scripts app',
+                           data_queue         => 'SAMPLEDQ', 
+                           data_queue_library => 'VPCRZKH1');

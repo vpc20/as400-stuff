@@ -156,6 +156,11 @@ FROM TABLE ( qsys2.active_job_info(
   job_name_filter => 'QZDASOINIT',
   current_user_list_filter => 'VPCRZKH'
   ));
+  
+SELECT *
+FROM TABLE ( qsys2.active_job_info(
+  current_user_list_filter => 'VPCRZKH'
+  ));
 
 -----------------------------------------------------------------------------------------------------------------------
 -- Use the RELATED_OBJECTS Table Function (SYSTOOLS schema):
