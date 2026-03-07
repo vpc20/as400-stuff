@@ -17,13 +17,43 @@
            05 PACKED3                 PIC 9(9)V99 COMP.
            05 PACKED4                 PIC 9(9)V99 COMPUTATIONAL-3.
            05 PACKED5                 PIC 9(9)V99 COMP-3.
-           05 BINARY1                 PIC 9(4) BINARY.
-           05 BINARY2                 PIC 9(4) COMPUTATIONAL-4.
-           05 BINARY3                 PIC 9(4) COMP-4.
-           05 NATIVE-BINARY1          PIC 9(4) COMPUTATIONAL-5.
-           05 NATIVE-BINARY2          PIC 9(4) COMP-5.
+
+      **** A 2-byte signed integer with a range of -9999 to +9999
+           05 BINARY1                 PIC S9(4) BINARY.
+           05 BINARY2                 PIC S9(4) COMPUTATIONAL-4.
+           05 BINARY3                 PIC S9(4) COMP-4.
+
+      **** A 4-byte signed integer
+      **** with a range of -999999999 to +999999999
+           05 BINARY4                 PIC S9(9) BINARY.
+           05 BINARY5                 PIC S9(9) COMPUTATIONAL-4.
+           05 BINARY6                 PIC S9(9) COMP-4.
+
+      **** A 8-byte signed integer
+      **** with a range of -999999999999999999 to +999999999999999999
+           05 BINARY7                 PIC S9(18) BINARY.
+           05 BINARY8                 PIC S9(18) COMPUTATIONAL-4.
+           05 BINARY9                 PIC S9(18) COMP-4.
+
+      **** A 2-byte signed integer with a range of -32768 to +32767
+           05 NATIVE-BINARY1          PIC S9(4) COMPUTATIONAL-5.
+           05 NATIVE-BINARY2          PIC S9(4) COMP-5.
+
+      **** A 4-byte signed integer
+      **** with a range of -2147483648 to +2147483647
+           05 NATIVE-BINARY3          PIC S9(9) COMPUTATIONAL-5.
+           05 NATIVE-BINARY4          PIC S9(9) COMP-5.
+
+      **** A 8-byte signed integer
+      **** with a range of -9223372036854775808 to +9223372036854775807
+           05 NATIVE-BINARY5          PIC S9(18) COMPUTATIONAL-5.
+           05 NATIVE-BINARY6          PIC S9(18) COMP-5.
+
+      **** A 4-byte floating-point (float)
            05 FLOAT4A                 USAGE COMPUTATIONAL-1.
            05 FLOAT4B                 USAGE COMP-1.
+
+      **** An 8-byte floating-point (double)
            05 FLOAT8A                 USAGE COMPUTATIONAL-2.
            05 FLOAT8B                 USAGE COMP-2.
 
@@ -58,7 +88,7 @@
            05 TIME1                   FORMAT TIME.
            05 TIMESTAMP1              FORMAT TIMESTAMP.
            05 ROWID1                  SQL TYPE IS ROWID.
-           05 RSL1                    SQL TYPE IS  RESULT_SET_LOCATOR.
+           05  RSL1                   SQL TYPE IS RESULT-SET-LOCATOR.
 
        PROCEDURE DIVISION.
 
