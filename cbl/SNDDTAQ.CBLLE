@@ -43,38 +43,11 @@
            05  WS-MSG-BINARY_POS  PIC S9(5)      COMP-4.
            05  WS-MSG-BINARY_NEG  PIC S9(5)      COMP-4.
 
-      *----------------------------------------------------------------
-      * Work fields
-      *----------------------------------------------------------------
-       01  WS-ERROR-FLAG         PIC X      VALUE 'N'.
-           88  WS-ERROR                     VALUE 'Y'.
-           88  WS-NO-ERROR                  VALUE 'N'.
-
-       01  WS-DATE               PIC X(10).
-       01  WS-TIME               PIC X(8).
-
-      *----------------------------------------------------------------
-      * Error handling structure (standard IBM i API error code)
-      *----------------------------------------------------------------
-       01  WS-ERROR-CODE.
-           05  WS-ERR-BYTES-PROV PIC S9(9)  COMP VALUE +272.
-           05  WS-ERR-BYTES-AVAIL PIC S9(9) COMP VALUE +0.
-           05  WS-ERR-MSGID      PIC X(7).
-           05  FILLER            PIC X(1).
-           05  WS-ERR-MSGDTA     PIC X(256).
-
       *================================================================
        PROCEDURE DIVISION.
 
        0000-MAIN.
-           PERFORM 1000-INITIALIZE
-           PERFORM 3000-SEND-DTAQ
-           STOP RUN.
-
-      *----------------------------------------------------------------
-       1000-INITIALIZE.
            INITIALIZE  WS-DTAQ-MESSAGE.
-           MOVE 'N'    TO WS-ERROR-FLAG.
 
       *> Populate the message to be sent to the data queue
            MOVE 'HELLO'            TO WS-MSG-TEXT.
@@ -89,9 +62,6 @@
            MOVE WS-DTAQ-MESSAGE    TO WS-DATA-AREA
            MOVE LENGTH OF WS-DTAQ-MESSAGE
                                    TO WS-DATA-LENGTH.
-
-      *----------------------------------------------------------------
-       3000-SEND-DTAQ.
            *> Call QSNDDTAQ API
            *>   Param 1: Data queue name    (10A)
            *>   Param 2: Library name       (10A)
@@ -100,28 +70,17 @@
            *>   Param 5: Key length         (3P 0) - optional
            *>   Param 6: Key data           (variable) - optional
 
-           CALL 'QSNDDTAQ' USING
-               WS-DTAQ-NAME
-               WS-DTAQ-LIB
-               WS-DATA-LENGTH
-               WS-DATA-AREA
-           END-CALL
+           CALL 'QSNDDTAQ' USING WS-DTAQ-NAME
+                                 WS-DTAQ-LIB
+                                 WS-DATA-LENGTH
+                                 WS-DATA-AREA
+               ON EXCEPTION
+                  DISPLAY '*** ERROR SENDING TO DATA QUEUE ***'
+               NOT ON EXCEPTION
+                  DISPLAY '*** DATA QUEUE SEND SUCCESSFUL ***'
+           END-CALL.
 
-           *> Check for errors
-           IF WS-ERR-BYTES-AVAIL > 0
-               MOVE 'Y' TO WS-ERROR-FLAG
-               DISPLAY '*** ERROR SENDING TO DATA QUEUE ***'
-               DISPLAY 'MSG ID  : ' WS-ERR-MSGID
-               DISPLAY 'MSG DATA: ' WS-ERR-MSGDTA(1:50)
-           ELSE
-               DISPLAY '*** DATA QUEUE SEND SUCCESSFUL ***'
-      *        DISPLAY 'QUEUE   : ' WS-DTAQ-NAME
-      *        DISPLAY 'LIBRARY : ' WS-DTAQ-LIB
-      *        DISPLAY 'LENGTH  : ' WS-DATA-LENGTH
-      *        DISPLAY 'CUSTNBR : ' WS-MSG-CUSTNBR
-      *        DISPLAY 'AMOUNT  : ' WS-MSG-AMOUNT
-      *        DISPLAY 'TYPE    : ' WS-MSG-TYPE
-           END-IF.
+           STOP RUN.
       *================================================================
       * END OF PROGRAM
       *================================================================
