@@ -1,0 +1,156 @@
+      *================================================================
+      * Program  : SNDdtaq
+      * Purpose  : Send data to an IBM i Data Queue (DTAQ)
+      * API Used : QSNDDTAQ (Send Data Queue)
+      *================================================================
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SNDdtaq.
+       AUTHOR. IBM-I-COBOL-EXAMPLE.
+
+      *================================================================
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+      *================================================================
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+      *----------------------------------------------------------------
+      * QSNDDTAQ API Parameters
+      *----------------------------------------------------------------
+       01  WS-DTAQ-NAME          PIC X(10)  VALUE 'SAMPLEDQ  '.
+       01  WS-DTAQ-LIB           PIC X(10)  VALUE 'VPCRZKH1  '.
+       01  WS-DATA-LENGTH        PIC S9(5)  COMP-3 VALUE +0.
+       01  WS-DATA-AREA          PIC X(512).
+
+      *----------------------------------------------------------------
+      * Optional: Key for Keyed Data Queue
+      *----------------------------------------------------------------
+       01  WS-KEY-LENGTH         PIC S9(3)  COMP-3 VALUE +0.
+       01  WS-KEY-DATA           PIC X(10)  VALUE SPACES.
+
+      *----------------------------------------------------------------
+      * Message / Payload Structure sent to DTAQ
+      *----------------------------------------------------------------
+       01  WS-DTAQ-MESSAGE.
+           05  WS-MSG-TEXT        PIC X(10).
+           05  WS-MSG-ZONED_POS   PIC S9(5)V99.
+           05  WS-MSG-ZONED_NEG   PIC S9(5)V99.
+           05  WS-MSG-PACKED_POS  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-PACKED_NEG  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-BINARY_POS  PIC S9(5)      COMP-4.
+           05  WS-MSG-BINARY_NEG  PIC S9(5)      COMP-4.
+
+      *----------------------------------------------------------------
+      * Work fields
+      *----------------------------------------------------------------
+       01  WS-ERROR-FLAG         PIC X      VALUE 'N'.
+           88  WS-ERROR                     VALUE 'Y'.
+           88  WS-NO-ERROR                  VALUE 'N'.
+
+       01  WS-DATE               PIC X(10).
+       01  WS-TIME               PIC X(8).
+
+      *----------------------------------------------------------------
+      * Error handling structure (standard IBM i API error code)
+      *----------------------------------------------------------------
+       01  WS-ERROR-CODE.
+           05  WS-ERR-BYTES-PROV PIC S9(9)  COMP VALUE +272.
+           05  WS-ERR-BYTES-AVAIL PIC S9(9) COMP VALUE +0.
+           05  WS-ERR-MSGID      PIC X(7).
+           05  FILLER            PIC X(1).
+           05  WS-ERR-MSGDTA     PIC X(256).
+
+      *================================================================
+       PROCEDURE DIVISION.
+
+       0000-MAIN.
+           PERFORM 1000-INITIALIZE
+           PERFORM 3000-SEND-DTAQ
+           STOP RUN.
+
+      *----------------------------------------------------------------
+       1000-INITIALIZE.
+           INITIALIZE  WS-DTAQ-MESSAGE.
+           MOVE 'N'    TO WS-ERROR-FLAG.
+
+      *> Populate the message to be sent to the data queue
+           MOVE 'HELLO'            TO WS-MSG-TEXT.
+           MOVE  123.45            TO WS-MSG-ZONED_POS.
+           MOVE -234.56            TO WS-MSG-ZONED_NEG.
+           MOVE  345.67            TO WS-MSG-PACKED_POS.
+           MOVE -456.78            TO WS-MSG-PACKED_NEG.
+           MOVE  5                 TO WS-MSG-BINARY_POS.
+           MOVE -8                 TO WS-MSG-BINARY_NEG.
+
+      *> Move message to data area and calculate its length
+           MOVE WS-DTAQ-MESSAGE    TO WS-DATA-AREA
+           MOVE LENGTH OF WS-DTAQ-MESSAGE
+                                   TO WS-DATA-LENGTH.
+
+      *----------------------------------------------------------------
+       3000-SEND-DTAQ.
+           *> Call QSNDDTAQ API
+           *>   Param 1: Data queue name    (10A)
+           *>   Param 2: Library name       (10A)
+           *>   Param 3: Data length        (5P 0)
+           *>   Param 4: Data               (variable)
+           *>   Param 5: Key length         (3P 0) - optional
+           *>   Param 6: Key data           (variable) - optional
+
+           CALL 'QSNDDTAQ' USING
+               WS-DTAQ-NAME
+               WS-DTAQ-LIB
+               WS-DATA-LENGTH
+               WS-DATA-AREA
+           END-CALL
+
+           *> Check for errors
+           IF WS-ERR-BYTES-AVAIL > 0
+               MOVE 'Y' TO WS-ERROR-FLAG
+               DISPLAY '*** ERROR SENDING TO DATA QUEUE ***'
+               DISPLAY 'MSG ID  : ' WS-ERR-MSGID
+               DISPLAY 'MSG DATA: ' WS-ERR-MSGDTA(1:50)
+           ELSE
+               DISPLAY '*** DATA QUEUE SEND SUCCESSFUL ***'
+      *        DISPLAY 'QUEUE   : ' WS-DTAQ-NAME
+      *        DISPLAY 'LIBRARY : ' WS-DTAQ-LIB
+      *        DISPLAY 'LENGTH  : ' WS-DATA-LENGTH
+      *        DISPLAY 'CUSTNBR : ' WS-MSG-CUSTNBR
+      *        DISPLAY 'AMOUNT  : ' WS-MSG-AMOUNT
+      *        DISPLAY 'TYPE    : ' WS-MSG-TYPE
+           END-IF.
+      *================================================================
+      * END OF PROGRAM
+      *================================================================
+      *```
+      *
+      *---
+      *
+      ***How it works:**
+      *
+      ***QSNDDTAQ API Parameters:**
+      *
+      *| # | Parameter | Type | Description |
+      *|---|-----------|------|-------------|
+      *| 1 | Data queue name | CHAR(10) | Name of the DTAQ object |
+      *| 2 | Library name | CHAR(10) | Library containing the DTAQ |
+      *| 3 | Data length | PACKED(5,0) | Length of data being sent |
+      *| 4 | Data | CHAR(*) | The actual data payload |
+      *| 5 | Key length *(optional)* | PACKED(3,0) | Only for keyed DTAQs |
+      *| 6 | Key data *(optional)* | CHAR(*) | Key value for keyed DTAQs |
+      *
+      ***To create the Data Queue before running:**
+      *```
+      *CRTDTAQ DTAQ(MYLIB/MYDTAQ) MAXLEN(512) TEXT('My Test Queue')
+      *```
+      *
+      ***To compile the COBOL program:**
+      *```
+      *CRTCBLPGM PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)
+      *```
+      *or for ILE COBOL:
+      *```
+      *CRTBNDCBL PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)

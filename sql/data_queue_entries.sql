@@ -63,3 +63,9 @@ SELECT *
 call qsys2.send_data_queue(message_data       => 'Data from Run SQL Scripts app',
                            data_queue         => 'SAMPLEDQ', 
                            data_queue_library => 'VPCRZKH1');
+                           
+                           
+SELECT *
+FROM   QSYS2.DATA_QUEUE_INFO
+WHERE  data_queue_library = 'VPCRZKH1'
+AND    data_queue_name    = 'SAMPLEDQ';                       
