@@ -52,20 +52,43 @@ select * from table
                                key_order      => 'LE'));      
                                
                                
- CALL QSYS2.CLEAR_DATA_QUEUE('ORDERDQ', 'VPCRZKH1');
 
+CALL QSYS2.CLEAR_DATA_QUEUE('ORDERDQ', 'VPCRZKH1');
+
+
+CALL QSYS2.CLEAR_DATA_QUEUE('SAMPLEDQ', 'VPCRZKH1');
+
+-- query all data in the data queue
 SELECT *
   FROM TABLE (
       qsys2.data_queue_entries('SAMPLEDQ', 'VPCRZKH1')
     );
-    
-    
+
+-- query data queue message - sent from java program
+SELECT
+  CAST(SUBSTR(MESSAGE_DATA, 1, 10) AS CHAR(10) CCSID 37) AS MSG_TEXT,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 11, 7) AS BINARY(7)) AS NUMERIC(7, 2)) AS ZONED_POS,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 18, 7) AS BINARY(7)) AS NUMERIC(7, 2)) AS ZONED_NEG,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 25, 4) AS BINARY(4)) AS DECIMAL(7, 2)) AS PACKED_POS,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 29, 4) AS BINARY(4)) AS DECIMAL(7, 2)) AS PACKED_NEG,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 33, 4) AS BINARY(4)) AS INTEGER) AS BINARY_POS,
+  INTERPRET(CAST(SUBSTR(MESSAGE_DATA, 37, 4) AS BINARY(4)) AS INTEGER) AS BINARY_NEG
+FROM TABLE(
+  QSYS2.DATA_QUEUE_ENTRIES('SAMPLEDQ', 'VPCRZKH1')
+) AS DQ;
+  
+  
+
+-- send data queue    
 call qsys2.send_data_queue(message_data       => 'Data from Run SQL Scripts app',
                            data_queue         => 'SAMPLEDQ', 
                            data_queue_library => 'VPCRZKH1');
                            
-                           
+
+-- query info about the data queue                           
 SELECT *
 FROM   QSYS2.DATA_QUEUE_INFO
 WHERE  data_queue_library = 'VPCRZKH1'
-AND    data_queue_name    = 'SAMPLEDQ';                       
+AND    data_queue_name    = 'SAMPLEDQ';     
+
+select * from vpcrzkh1.flatfile;                  
