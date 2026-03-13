@@ -7,11 +7,13 @@ dcl-ds flatrec1 likerec(flatfile.flatrec: *all);
 
 // Data structure for the 20-byte field
 dcl-ds RecordDS qualified;
-  ItemCode CHAR(4);
-  valPackedPos packed(5:2);  // 3 bytes
-  valPackedNeg packed(5:2);  // 3 bytes
-  valZonedPos  zoned(5:2);   // 5 bytes
-  valZonedNeg  zoned(5:2);   // 5 bytes
+  msgText  CHAR(10);
+  valZonedPos  zoned(7:2);   // 7 bytes
+  valZonedNeg  zoned(7:2);   // 7 bytes
+  valPackedPos packed(7:2);  // 4 bytes
+  valPackedNeg packed(7:2);  // 4 bytes
+  valBinaryPos int(10);      // 4 bytes
+  valBinaryNeg int(10);      // 4 bytes
 end-ds;
 
 dcl-pr qcmdexc extpgm;
@@ -28,27 +30,13 @@ qcmdexc (cmd : %len(cmd));
 
 open flatfile;
 
-RecordDS.ItemCode = 'A001';
-RecordDS.valPackedPos =  121.50;
-RecordDS.valPackedNeg = -122.50;
-RecordDS.valZonedPos  =  123.50;
-RecordDS.valZonedNeg  = -124.50;
-flatrec1 = RecordDS;
-write flatfile.flatrec flatrec1;
-
-RecordDS.ItemCode = 'B002';
-RecordDS.valPackedPos =  51.50;
-RecordDS.valPackedNeg = -52.50;
-RecordDS.valZonedPos  =  53.50;
-RecordDS.valZonedNeg  = -54.50;
-flatrec1 = RecordDS;
-write flatfile.flatrec flatrec1;
-
-RecordDS.ItemCode = 'C003';
-RecordDS.valPackedPos =  1.99;
-RecordDS.valPackedNeg = -2.99;
-RecordDS.valZonedPos  =  3.99;
-RecordDS.valZonedNeg  = -4.99;
+RecordDS.msgText      = 'Hello';
+RecordDS.valZonedPos  =  123.45;
+RecordDS.valZonedNeg  = -234.56;
+RecordDS.valPackedPos =  345.67;
+RecordDS.valPackedNeg = -456.78;
+RecordDS.valBinaryPos =  5;
+RecordDS.valBinaryNeg = -8;
 flatrec1 = RecordDS;
 write flatfile.flatrec flatrec1;
 

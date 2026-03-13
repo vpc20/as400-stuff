@@ -1,10 +1,10 @@
       *================================================================
-      * Program  : SNDdtaq
+      * Program  : SNDDTAQ
       * Purpose  : Send data to an IBM i Data Queue (DTAQ)
       * API Used : QSNDDTAQ (Send Data Queue)
       *================================================================
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. SNDdtaq.
+       PROGRAM-ID. SNDDTAQ.
        AUTHOR. IBM-I-COBOL-EXAMPLE.
 
       *================================================================
@@ -13,10 +13,24 @@
        SOURCE-COMPUTER. IBM-AS400.
        OBJECT-COMPUTER. IBM-AS400.
 
+      *================================================================*
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT FLATFILE         ASSIGN TO DATABASE-FLATFILE
+                  ORGANIZATION     IS SEQUENTIAL
+                  ACCESS           IS SEQUENTIAL.
+
       *================================================================
        DATA DIVISION.
-       WORKING-STORAGE SECTION.
 
+       FILE SECTION.
+       FD  FLATFILE
+           LABEL RECORDS ARE STANDARD.
+       01  FLATFILE-REC.
+           COPY DDS-ALL-FORMATS OF FLATFILE.
+
+       WORKING-STORAGE SECTION.
       *----------------------------------------------------------------
       * QSNDDTAQ API Parameters
       *----------------------------------------------------------------
@@ -47,19 +61,22 @@
        PROCEDURE DIVISION.
 
        0000-MAIN.
-           INITIALIZE  WS-DTAQ-MESSAGE.
+           OPEN OUTPUT FLATFILE.
 
-      *> Populate the message to be sent to the data queue
-           MOVE 'HELLO'            TO WS-MSG-TEXT.
-           MOVE  123.45            TO WS-MSG-ZONED_POS.
-           MOVE -234.56            TO WS-MSG-ZONED_NEG.
-           MOVE  345.67            TO WS-MSG-PACKED_POS.
-           MOVE -456.78            TO WS-MSG-PACKED_NEG.
-           MOVE  5                 TO WS-MSG-BINARY_POS.
-           MOVE -8                 TO WS-MSG-BINARY_NEG.
+           INITIALIZE  WS-DTAQ-MESSAGE.
+           MOVE "HELLO"       TO WS-MSG-TEXT.
+           MOVE  123.45       TO WS-MSG-ZONED_POS.
+           MOVE -234.56       TO WS-MSG-ZONED_NEG.
+           MOVE  345.67       TO WS-MSG-PACKED_POS.
+           MOVE -456.78       TO WS-MSG-PACKED_NEG.
+           MOVE  5            TO WS-MSG-BINARY_POS.
+           MOVE -8            TO WS-MSG-BINARY_NEG.
+
+           MOVE WS-DTAQ-MESSAGE TO FLATFILE-REC.
+           WRITE FLATFILE-REC.
 
       *> Move message to data area and calculate its length
-           MOVE WS-DTAQ-MESSAGE    TO WS-DATA-AREA
+           MOVE WS-DTAQ-MESSAGE    TO WS-DATA-AREA.
            MOVE LENGTH OF WS-DTAQ-MESSAGE
                                    TO WS-DATA-LENGTH.
            *> Call QSNDDTAQ API
@@ -80,15 +97,11 @@
                   DISPLAY '*** DATA QUEUE SEND SUCCESSFUL ***'
            END-CALL.
 
+           CLOSE FLATFILE.
            STOP RUN.
       *================================================================
       * END OF PROGRAM
       *================================================================
-      *```
-      *
-      *---
-      *
-      ***How it works:**
       *
       ***QSNDDTAQ API Parameters:**
       *
