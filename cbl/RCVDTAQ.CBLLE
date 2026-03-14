@@ -1,0 +1,155 @@
+      *================================================================
+      * Program  : RCVDTAQ
+      * Purpose  : Send data to an IBM i Data Queue (DTAQ)
+      * API Used : QRCVDTAQ (Send Data Queue)
+      *================================================================
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.  RCVDTAQ.
+       AUTHOR. IBM-I-COBOL-EXAMPLE.
+
+      *================================================================
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-AS400.
+       OBJECT-COMPUTER. IBM-AS400.
+
+      *================================================================*
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT FLATFILE         ASSIGN TO DATABASE-FLATFILE
+                  ORGANIZATION     IS SEQUENTIAL
+                  ACCESS           IS SEQUENTIAL.
+
+      *================================================================
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  FLATFILE
+           LABEL RECORDS ARE STANDARD.
+       01  FLATFILE-REC.
+           COPY DDS-ALL-FORMATS OF FLATFILE.
+
+
+       WORKING-STORAGE SECTION.
+      *----------------------------------------------------------------*
+      * Data Queue API Parameters                                       *
+      *----------------------------------------------------------------*
+       01  WS-DTAQ-NAME          PIC X(10) VALUE 'SAMPLEDQ  '.
+       01  WS-DTAQ-LIB           PIC X(10) VALUE 'VPCRZKH1  '.
+       01  WS-DATA-LEN           PIC S9(5) COMP-3 VALUE +100.
+       01  WS-DATA               PIC X(100).
+       01  WS-WAIT-TIME          PIC S9(5) COMP-3 VALUE +30.
+      *    WAIT-TIME: -1 = wait forever
+      *               0  = no wait (return immediately)
+      *              >0  = wait N seconds
+
+      * 01  WS-KEY-ORDER          PIC X(2)  VALUE '  '.
+      *    KEY-ORDER used only for keyed data queues
+      *    Values: 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE'
+
+      * 01  WS-KEY-LENGTH         PIC S9(3) COMP-3 VALUE +0.
+      * 01  WS-KEY-DATA           PIC X(10).
+      * 01  WS-SENDER-INFO        PIC X(44).
+
+      *----------------------------------------------------------------*
+      * Return / Status Fields                                          *
+      *----------------------------------------------------------------*
+       01  WS-RECEIVED-LEN       PIC S9(5) COMP-3.
+
+      *----------------------------------------------------------------
+      * Message / Payload Structure sent to DTAQ
+      *----------------------------------------------------------------
+       01  WS-DTAQ-MESSAGE.
+           05  WS-MSG-TEXT        PIC X(10).
+           05  WS-MSG-ZONED_POS   PIC S9(5)V99.
+           05  WS-MSG-ZONED_NEG   PIC S9(5)V99.
+           05  WS-MSG-PACKED_POS  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-PACKED_NEG  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-BINARY_POS  PIC S9(5)      COMP-4.
+           05  WS-MSG-BINARY_NEG  PIC S9(5)      COMP-4.
+
+       01  DISPLAY-VAR.
+           05  ZONED_POS   PIC -ZZ,ZZ9.99.
+           05  ZONED_NEG   PIC -ZZ,ZZ9.99.
+           05  PACKED_POS  PIC -ZZ,ZZ9.99.
+           05  PACKED_NEG  PIC -ZZ,ZZ9.99.
+           05  BINARY_POS  PIC -ZZ,ZZ9.
+           05  BINARY_NEG  PIC -ZZ,ZZ9.
+
+      *================================================================
+       PROCEDURE DIVISION.
+
+           OPEN OUTPUT FLATFILE.
+
+           MOVE SPACES  TO WS-DATA
+           MOVE +100    TO WS-DATA-LEN
+
+           CALL 'QRCVDTAQ' USING
+               WS-DTAQ-NAME
+               WS-DTAQ-LIB
+               WS-DATA-LEN
+               WS-DATA
+               WS-WAIT-TIME
+
+           EVALUATE TRUE
+               WHEN WS-DATA-LEN = ZEROS
+                   DISPLAY 'No more entries - timeout/empty queue'
+
+               WHEN WS-DATA-LEN > ZEROS
+                   MOVE WS-DATA-LEN TO WS-RECEIVED-LEN
+                   DISPLAY 'Received ' WS-RECEIVED-LEN ' bytes'
+                   MOVE WS-DATA TO  WS-DTAQ-MESSAGE
+                   MOVE WS-MSG-ZONED_POS  TO ZONED_POS
+                   MOVE WS-MSG-ZONED_NEG  TO ZONED_NEG
+                   MOVE WS-MSG-PACKED_POS TO PACKED_POS
+                   MOVE WS-MSG-PACKED_NEG TO PACKED_NEG
+                   MOVE WS-MSG-BINARY_POS TO BINARY_POS
+                   MOVE WS-MSG-BINARY_NEG TO BINARY_NEG
+
+                   DISPLAY  WS-MSG-TEXT
+                   DISPLAY  ZONED_POS
+                   DISPLAY  ZONED_NEG
+                   DISPLAY  PACKED_POS
+                   DISPLAY  PACKED_NEG
+                   DISPLAY  BINARY_POS
+                   DISPLAY  BINARY_NEG
+
+                   MOVE WS-DTAQ-MESSAGE TO FLATFILE-REC
+                   WRITE FLATFILE-REC
+
+               WHEN OTHER
+                   DISPLAY 'Unexpected data length: ' WS-DATA-LEN
+           END-EVALUATE.
+
+
+
+           CLOSE FLATFILE.
+           STOP RUN.
+      *================================================================
+      * END OF PROGRAM
+      *================================================================
+      *
+      ***QRCVDTAQ API Parameters:**
+      *
+      *| # | Parameter | Type | Description |
+      *|---|-----------|------|-------------|
+      *| 1 | Data queue name | CHAR(10) | Name of the DTAQ object |
+      *| 2 | Library name | CHAR(10) | Library containing the DTAQ |
+      *| 3 | Data length | PACKED(5,0) | Length of data being sent |
+      *| 4 | Data | CHAR(*) | The actual data payload |
+      *| 5 | Key length *(optional)* | PACKED(3,0) | Only for keyed DTAQs |
+      *| 6 | Key data *(optional)* | CHAR(*) | Key value for keyed DTAQs |
+      *
+      ***To create the Data Queue before running:**
+      *```
+      *CRTDTAQ DTAQ(MYLIB/MYDTAQ) MAXLEN(512) TEXT('My Test Queue')
+      *```
+      *
+      ***To compile the COBOL program:**
+      *```
+      *CRTCBLPGM PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)
+      *```
+      *or for ILE COBOL:
+      *```
+      *CRTBNDCBL PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)

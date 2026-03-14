@@ -52,10 +52,20 @@ select * from table
                                key_order      => 'LE'));      
                                
                                
-
 CALL QSYS2.CLEAR_DATA_QUEUE('ORDERDQ', 'VPCRZKH1');
 
 
+--------------------------------------------------------------------------------
+-- testing for vpcrzkh1/sampledq
+--------------------------------------------------------------------------------
+
+-- query info about the data queue                           
+SELECT *
+FROM   QSYS2.DATA_QUEUE_INFO
+WHERE  data_queue_library = 'VPCRZKH1'
+AND    data_queue_name    = 'SAMPLEDQ';     
+
+-- clear data queue
 CALL QSYS2.CLEAR_DATA_QUEUE('SAMPLEDQ', 'VPCRZKH1');
 
 -- query all data in the data queue
@@ -91,18 +101,11 @@ SELECT
   -- QSYS2.DATA_QUEUE_ENTRIES('SAMPLEDQ', 'VPCRZKH1')
 -- );
   
-  
 
 -- send data queue    
 call qsys2.send_data_queue(message_data       => 'Data from Run SQL Scripts app',
                            data_queue         => 'SAMPLEDQ', 
                            data_queue_library => 'VPCRZKH1');
                            
-
--- query info about the data queue                           
-SELECT *
-FROM   QSYS2.DATA_QUEUE_INFO
-WHERE  data_queue_library = 'VPCRZKH1'
-AND    data_queue_name    = 'SAMPLEDQ';     
 
 select * from vpcrzkh1.flatfile;                  
