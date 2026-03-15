@@ -243,4 +243,33 @@ FROM qsys2.message_file_data
 WHERE message_file_library = 'QSYS'
   AND message_file = 'QCPFMSG'
   AND (LOWER(message_text) LIKE '%required%');
+  
+-----------------------------------------------------------------------------------------------------------------------
+-- JOB_QUEUE_INFO view
+-- The JOB_QUEUE_INFO view returns one row for each job queue.
+-- The values returned for the columns in the view are similar to the values returned by the Work with Job
+-- Queue (WRKJOBQ) CL command and the Retrieve Job Queue Information (QSPRJOBQ) API.  
+-----------------------------------------------------------------------------------------------------------------------
 
+-- get all the job queues associated with subsystem QBATCH2
+select job_queue_library,
+       job_queue_name,
+       sequence_number,
+       maximum_active_jobs,
+       job_queue_status,
+       number_of_jobs
+  from qsys2.job_queue_info
+  where subsystem_name = 'QBATCH2'
+  order by sequence_number;
+
+-- get the subsystem used by a job queue
+select job_queue_library,
+       job_queue_name,
+       sequence_number,
+       maximum_active_jobs,
+       job_queue_status,
+       number_of_jobs,
+       subsystem_name
+  from qsys2.job_queue_info
+  where job_queue_name = 'VPCRZKH'
+  order by sequence_number;
