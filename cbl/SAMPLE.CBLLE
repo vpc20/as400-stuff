@@ -1,0 +1,64 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PGMNAME.
+       AUTHOR. PGMR.
+
+      *===============================================================*
+      * Work with Parameter Header                                    *
+      *                                                               *
+      *---------------------------------------------------------------*
+      * Amendment History                                             *
+      *                                                               *
+      * Date      Pgmr  Description                                   *
+      * --------  ---   --------------------------------------------- *
+      *                                                               *
+      *===============================================================*
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-i.
+       OBJECT-COMPUTER. IBM-i.
+
+      *===============================================================*
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT FILENAME         ASSIGN TO DATABASE-FILENAME
+                  ORGANIZATION     IS INDEXED
+                  ACCESS           IS DYNAMIC
+                  RECORD KEY       IS EXTERNALLY-DESCRIBED-KEY.
+
+      *===============================================================*
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       FD  FILENAME
+           LABEL RECORDS ARE STANDARD.
+       01  FILENAME-REC.
+           COPY DDS-ALL-FORMATS OF FILENAME.
+
+      *===============================================================*
+
+       WORKING-STORAGE SECTION.
+
+       01  WS-WORK-AREAS.
+           05 WS-VAR1                  PIC 9(4)  VALUE ZEROES.
+           05 WS-VAR2                  PIC 9(4)  VALUE ZEROES.
+
+      *===============================================================*
+
+       LINKAGE SECTION.
+
+       01  PGM-PARM.
+           05 PARM1                    PIC X(10).
+           05 PARM2                    PIC X(10).
+
+      *===============================================================*
+
+       PROCEDURE DIVISION USING PGM-PARM.
+
+           OPEN INPUT FILENAME.
+
+           CLOSE FILENAME.
+           STOP RUN.
