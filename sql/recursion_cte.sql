@@ -1,3 +1,5 @@
+﻿set current schema vpcrzkh1;
+
 -- recursive common table expressions and recursive views
 WITH destinations (origin, departure, arrival, flight_count) AS
        (SELECT flo.departure, flo.departure, flo.arrival, 1
@@ -10,6 +12,22 @@ WITH destinations (origin, departure, arrival, flight_count) AS
         WHERE dest.arrival = flr.departure)
 SELECT origin, departure, arrival, flight_count
 FROM destinations;
+
+-- same as above but using join
+WITH destinations (origin, departure, arrival, flight_count) AS
+       (SELECT flo.departure, flo.departure, flo.arrival, 1
+        FROM flights flo
+        WHERE flo.departure = 'Chicago'
+
+        UNION ALL
+
+        SELECT dest.origin, flr.departure, flr.arrival, dest.flight_count + 1
+        FROM flights flr
+        INNER JOIN destinations dest
+           ON flr.departure = dest.arrival)
+SELECT origin, departure, arrival, flight_count
+FROM destinations;
+
 
 -- You can write the previous recursive common table expression as a recursive view like this:
 CREATE VIEW destinations (origin, departure, arrival, flight_count) AS
