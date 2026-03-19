@@ -112,17 +112,5 @@
       *| 3 | Data length | PACKED(5,0) | Length of data being sent |
       *| 4 | Data | CHAR(*) | The actual data payload |
       *| 5 | Key length *(optional)* | PACKED(3,0) | Only for keyed DTAQs |
-      *| 6 | Key data *(optional)* | CHAR(*) | Key value for keyed DTAQs |
+      *| 6 | Key data *(optional)* | CHAR(*) | Key value for keyed DTAQs 
       *
-      ***To create the Data Queue before running:**
-      *```
-      *CRTDTAQ DTAQ(MYLIB/MYDTAQ) MAXLEN(512) TEXT('My Test Queue')
-      *```
-      *
-      ***To compile the COBOL program:**
-      *```
-      *CRTCBLPGM PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)
-      *```
-      *or for ILE COBOL:
-      *```
-      *CRTBNDCBL PGM(MYLIB/SNDTAQ) SRCFILE(MYLIB/QCBLSRC) SRCMBR(SNDTAQ)

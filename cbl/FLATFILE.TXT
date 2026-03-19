@@ -1,0 +1,73 @@
+*** record format for flatfile.flatfld
+
+       01  WS-DTAQ-MESSAGE.
+           05  WS-MSG-TEXT        PIC X(10).
+           05  WS-MSG-ZONED_POS   PIC S9(5)V99.
+           05  WS-MSG-ZONED_NEG   PIC S9(5)V99.
+           05  WS-MSG-PACKED_POS  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-PACKED_NEG  PIC S9(5)V99   COMP-3.
+           05  WS-MSG-BINARY_POS  PIC S9(5)      COMP-4.
+           05  WS-MSG-BINARY_NEG  PIC S9(5)      COMP-4.
+
+      *================================================================
+           INITIALIZE  WS-DTAQ-MESSAGE.
+           MOVE "HELLO"       TO WS-MSG-TEXT.
+           MOVE  123.45       TO WS-MSG-ZONED_POS.
+           MOVE -234.56       TO WS-MSG-ZONED_NEG.
+           MOVE  345.67       TO WS-MSG-PACKED_POS.
+           MOVE -456.78       TO WS-MSG-PACKED_NEG.
+           MOVE  5            TO WS-MSG-BINARY_POS.
+           MOVE -8            TO WS-MSG-BINARY_NEG.
+
+           MOVE WS-DTAQ-MESSAGE TO FLATFILE-REC.
+           WRITE FLATFILE-REC.
+
+
+
+***** hex representation using the dsppfm command
+                          Display Physical File Member                                                                              
+ File . . . . . . :   FLATFILE            Library  . . . . :   VPCRZKH1                                                             
+ Member . . . . . :   FLATFILE            Record . . . . . :   1                                                                    
+ Control  . . . . .                       Column . . . . . :   1                                                                    
+ Find . . . . . . .                                                                                                                 
+ *...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+....0                               
+ HELLO     0012345002345O██î"█áÅý███████8                                                                                           
+ CCDDD44444FFFFFFFFFFFFFD035704680000FFFF444444444444444444444444444444444444444444444444444444444444                               
+ 853360000000123450023456046F057D0005FFF8000000000000000000000000000000000000000000000000000000000000                               
+                                                                                                                                    
+                           ****** END OF DATA ******                                                                                
+
+
+
+***** query the flat field
+ SELECT hex(FLATFLD) FROM flatfile
+
+                                                            Display Data                                                             
+                                                                                                  Data width . . . . . . :     200  
+ Position to line  . . . . .                                                                  Shift to column  . . . . . .          
+ ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10....+...11....+...12....+...13.
+ HEX ( FLATFLD )                                                                                                                    
+ C8C5D3D3D64040404040F0F0F1F2F3F4F5F0F0F2F3F4F5D60034567F0045678D00000005FFFFFFF8404040404040404040404040404040404040404040404040404
+ ********  End of data  ********      
+
+
+
+***** query the substrings of the flat field
+ select
+  CAST(SUBSTR(FLATFLD, 1, 10) AS CHAR(10) CCSID 37) AS TEXT,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 11, 7) AS BINARY(7)) AS NUMERIC(7, 2)) AS ZONED_POS,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 18, 7) AS BINARY(7)) AS NUMERIC(7, 2)) AS ZONED_NEG,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 25, 4) AS BINARY(4)) AS DECIMAL(7, 2)) AS PACKED_POS,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 29, 4) AS BINARY(4)) AS DECIMAL(7, 2)) AS PACKED_NEG,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 33, 4) AS BINARY(4)) AS INTEGER) AS BINARY_POS,
+  INTERPRET(CAST(SUBSTR(FLATFLD, 37, 4) AS BINARY(4)) AS INTEGER) AS BINARY_NEG
+  from flatfile;   
+
+                                                                                            
+                                                           Display Data                                                             
+                                                                                                  Data width . . . . . . :      92  
+ Position to line  . . . . .                                                                  Shift to column  . . . . . .          
+ ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9..                                       
+ TEXT        ZONED_POS   ZONED_NEG   PACKED_POS   PACKED_NEG    ASBINARY_POS    ASBINARY_NEG                                        
+ HELLO          123.45      234.56-      345.67       456.78-              5               8-                                       
+ ********  End of data  ********        

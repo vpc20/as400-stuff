@@ -1,0 +1,267 @@
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      1  
+Command  . . . . . . . . . . . . . . . :   CRTBNDCBL                                                                                
+Actual Values:                                                                                                                      
+  Program  . . . . . . . . . . . . . . :   GETPIC                                                                                   
+    Library  . . . . . . . . . . . . . :     VPCRZKH1                                                                               
+  Source file  . . . . . . . . . . . . :   QCBLLESRC                                                                                
+    Library  . . . . . . . . . . . . . :     VPCRZKH1                                                                               
+    CCSID  . . . . . . . . . . . . . . :   273                                                                                      
+  Source member  . . . . . . . . . . . :   GETPIC         26-02-17 12:54:06                                                         
+  Text 'description' . . . . . . . . . :   Get picture clause of sql data types                                                     
+Command Options:                                                                                                                    
+  Program  . . . . . . . . . . . . . . :   GETPIC                                                                                   
+    Library  . . . . . . . . . . . . . :     VPCRZKH1                                                                               
+  Source file  . . . . . . . . . . . . :   QCBLLESRC                                                                                
+    Library  . . . . . . . . . . . . . :     VPCRZKH1                                                                               
+  Source member  . . . . . . . . . . . :   GETPIC                                                                                   
+  Output . . . . . . . . . . . . . . . :   *PRINT                                                                                   
+  Generation severity level  . . . . . :   30                                                                                       
+  Text 'description' . . . . . . . . . :   *SRCMBRTXT                                                                               
+  Compiler options . . . . . . . . . . :   *NONE                                                                                    
+  Conversion options . . . . . . . . . :   *NONE                                                                                    
+  Message limit:                                                                                                                    
+    Number of messages . . . . . . . . :   *NOMAX                                                                                   
+    Message limit severity . . . . . . :   30                                                                                       
+  Debug view option  . . . . . . . . . :                                                                                            
+    Debug view . . . . . . . . . . . . :   *STMT                                                                                    
+    Compress listing view  . . . . . . :   *NOCOMPRESSDBG                                                                           
+  Debug encryption key  . . . . .  . . :   *NONE                                                                                    
+  Optimize level . . . . . . . . . . . :   *NONE                                                                                    
+  FIPS flagging  . . . . . . . . . . . :   *NOFIPS *NOOBSOLETE                                                                      
+  Extended display options . . . . . . :   *NONE                                                                                    
+  Flagging severity  . . . . . . . . . :   0                                                                                        
+  Replace program  . . . . . . . . . . :   *YES                                                                                     
+  Simple program . . . . . . . . . . . :   *YES                                                                                     
+  Authority  . . . . . . . . . . . . . :   *LIBCRTAUT                                                                               
+  Link literal . . . . . . . . . . . . :   *PGM                                                                                     
+  Target release . . . . . . . . . . . :   *CURRENT                                                                                 
+  User profile . . . . . . . . . . . . :   *USER                                                                                    
+  Sort sequence  . . . . . . . . . . . :   *HEX                                                                                     
+    Library  . . . . . . . . . . . . . :                                                                                            
+  Language identifier  . . . . . . . . :   *JOBRUN                                                                                  
+  Enable performance collection:                                                                                                    
+    Collection level . . . . . . . . . :   *PEP                                                                                     
+  Binding directory  . . . . . . . . . :   *NONE                                                                                    
+    Library  . . . . . . . . . . . . . :                                                                                            
+  Storage model  . . . . . . . . . . . :   *SNGLVL                                                                                  
+  Activation group . . . . . . . . . . :   *STGMDL                                                                                  
+  Profiling data . . . . . . . . . . . :   *NOCOL                                                                                   
+  Coded character set ID . . . . . . . :   *JOBRUN                                                                                  
+  National coded character set ID  . . :   13488                                                                                    
+  Arithmetic mode. . . . . . . . . . . :   *NOEXTEND                                                                                
+  Padding character:                                                                                                                
+    Single byte to national  . . . . . :   NX"0020"                                                                                 
+    Double byte to national  . . . . . :   NX"3000"                                                                                 
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      2  
+    National to national . . . . . . . :   NX"3000"                                                                                 
+  Include directory  . . . . . . . . . :   *NONE                                                                                    
+  Generate program information . . . . :   *NO                                                                                      
+  Define names . . . . . . . . . . . . :   *NONE                                                                                    
+  TARGET CODED CHARACTER SET ID  . . . :   *SRC                                                                                     
+  Compiler . . . . . . . . . . . . . . :   IBM ILE COBOL                                                                            
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      3  
+                                     S o u r c e                                                                                    
+  STMT PL SEQNBR -A 1 B..+....2....+....3....+....4....+....5....+....6....+....7..IDENTFCN  S COPYNAME   CHG DATE                  
+           000100 PROCESS VARCHAR FLOAT DATETIME DATE TIME TIMESTAMP PICXGRAPHIC                                                    
+           000200         PICGGRAPHIC PICNGRAPHIC.                                                                                  
+           000300                                                                                                                   
+     1     000400 IDENTIFICATION DIVISION.                                                                                          
+     2     000500 PROGRAM-ID. GETPIC.                                                                                               
+     3     000600 AUTHOR. VPC.                                                                                                      
+           000700                                                                                                                   
+     4     000800 ENVIRONMENT DIVISION.                                                                                             
+     5     000900 CONFIGURATION SECTION.                                                                                            
+     6     001000 SOURCE-COMPUTER.  IBM-AS400.                                                                                      
+     7     001100 OBJECT-COMPUTER.  IBM-AS400.                                                                                      
+           001200                                                                                                                   
+           001300*===============================================================*                                                  
+           001400                                                                                                                   
+           001500*--- create table using interactive sql session                                                                    
+           001600* create table sampledb2f (                                                                                        
+           001700*             intv         int           not null with default,                                                    
+           001800*             smallintv    smallint      not null with default,                                                    
+           001900*             bigintv      bigint        not null with default,                                                    
+           002000*             floatv       float         not null with default,                                                    
+           002100*             decfloatv    decfloat      not null with default,                                                    
+           002200*             numericv     numeric       not null with default,                                                    
+           002300*             charv        char          not null with default,                                                    
+           002400*             varcharv     varchar(20)   not null with default,                                                    
+           002500*             binaryv      binary        not null with default,                                                    
+           002600*             varbinaryv   varbinary(10) not null with default,                                                    
+           002700*             datev        date          not null with default,                                                    
+           002800*             timev        time          not null with default,                                                    
+           002900*             timestampv   timestamp     not null with default,                                                    
+           003000*             realv        real          not null with default,                                                    
+           003100*             doublev      double        not null with default                                                     
+           003200*         )                                                                                                        
+           003300                                                                                                                   
+     8     003400 INPUT-OUTPUT SECTION.                                                                                             
+     9     003500 FILE-CONTROL.                                                                                                     
+           003600                                                                                                                   
+    10     003700     SELECT FILENAME        ASSIGN TO DATABASE-datatypes-ALWNULL.                                                  
+           003800                                                                                                                   
+           003900**   SELECT FILENAME        ASSIGN TO DATABASE-sampledb2f-ALWNULL.                                                 
+           004000                                                                                                                   
+           004100**   SELECT FILENAME        ASSIGN TO DATABASE-USER_INFO-ALWNULL.                                                  
+           004200                                                                                                                   
+           004300**   SELECT FILENAME        ASSIGN TO DATABASE-SYSVALINFO-ALWNULL                                                  
+           004400**          ORGANIZATION    IS INDEXED                                                                             
+           004500**          ACCESS          IS DYNAMIC                                                                             
+           004600**          RECORD KEY      IS EXTERNALLY-DESCRIBED-KEY.                                                           
+           004700                                                                                                                   
+           004800*===============================================================*                                                  
+           004900                                                                                                                   
+    12     005000 DATA DIVISION.                                                                                                    
+           005100                                                                                                                   
+    13     005200 FILE SECTION.                                                                                                     
+    14     005300 FD  FILENAME                                                                                                      
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      4  
+  STMT PL SEQNBR -A 1 B..+....2....+....3....+....4....+....5....+....6....+....7..IDENTFCN  S COPYNAME   CHG DATE                  
+           005400     LABEL RECORDS ARE STANDARD.                                                                                   
+    15     005500 01  RECNAME.                                                                                                      
+           005600     COPY DDS-ALL-FORMATS OF datatypes.                                                                            
+    16    +000001       05  DATATYPES-RECORD PIC X(32730).                                     <-ALL-FMTS                           
+          +000002*    I-O FORMAT:DATATYPES  FROM FILE DATATYPES  OF LIBRARY VPCRZKH1           <-ALL-FMTS                           
+          +000003*                                                                             <-ALL-FMTS                           
+    17    +000004       05  DATATYPES     REDEFINES DATATYPES-RECORD.                          <-ALL-FMTS                           
+    18    +000005           06 INT1                  PIC S9(9)         COMP-4.                 <-ALL-FMTS                           
+    19    +000006           06 SMALLINT1             PIC S9(4)         COMP-4.                 <-ALL-FMTS                           
+    20    +000007           06 BIGINT1               PIC S9(18)        COMP-4.                 <-ALL-FMTS                           
+    21    +000008           06 FLOAT1                                  COMP-2.                 <-ALL-FMTS                           
+          +000009*                  (Floating-point field)                                     <-ALL-FMTS                           
+    22    +000010           06 DECFLOAT1             PIC  X(16).                               <-ALL-FMTS                           
+    23    +000011           06 NUMERIC1              PIC S9(5).                                <-ALL-FMTS                           
+    24    +000012           06 DECIMAL1              PIC S9(5)         COMP-3.                 <-ALL-FMTS                           
+    25    +000013           06 CHAR1                 PIC X(1).                                 <-ALL-FMTS                           
+    26    +000014           06 VARCHAR1.                                                       <-ALL-FMTS                           
+          +000015*                  (Variable length field)                                    <-ALL-FMTS                           
+    27    +000016                49 VARCHAR1-LENGTH  PIC S9(4) COMP-4.                         <-ALL-FMTS                           
+    28    +000017                49 VARCHAR1-DATA    PIC X(128).                               <-ALL-FMTS                           
+    29    +000018           06 LVARCHAR1.                                                      <-ALL-FMTS                           
+          +000019*                  (Variable length field)                                    <-ALL-FMTS                           
+    30    +000020                49 LVARCHAR1-LENGTH PIC S9(4) COMP-4.                         <-ALL-FMTS                           
+    31    +000021                49 LVARCHAR1-DATA   PIC X(31968).                             <-ALL-FMTS                           
+    32    +000022           06 BINARY1               PIC  X(1).                                <-ALL-FMTS                           
+    33    +000023           06 VARBINARY1.                                                     <-ALL-FMTS                           
+          +000024*                  (Variable length field)                                    <-ALL-FMTS                           
+    34    +000025                49 VARBINARY1-LENGTH                                          <-ALL-FMTS                           
+          +000026                                    PIC S9(4) COMP-4.                         <-ALL-FMTS                           
+    35    +000027                49 VARBINARY1-DATA  PIC X(128).                               <-ALL-FMTS                           
+    36    +000028           06 DATE1                 FORMAT DATE "@Y-%m-%d".                   <-ALL-FMTS                           
+          +000029*                  (Date field)                                               <-ALL-FMTS                           
+    37    +000030           06 TIME1                 FORMAT TIME "%H.%M.%S".                   <-ALL-FMTS                           
+          +000031*                  (Time field)                                               <-ALL-FMTS                           
+    38    +000032           06 TIMESTAMP1            FORMAT TIMESTAMP.                         <-ALL-FMTS                           
+          +000033*                  (Timestamp field)                                          <-ALL-FMTS                           
+    39    +000034           06 FILLER                PIC X(2).                                 <-ALL-FMTS                           
+          +000035*                  (Graphic field)                                            <-ALL-FMTS                           
+    40    +000036           06 VARGRAPH1.                                                      <-ALL-FMTS                           
+          +000037*                  (Variable length field)                                    <-ALL-FMTS                           
+    41    +000038                49 VARGRAPH1-LENGTH PIC S9(4) COMP-4.                         <-ALL-FMTS                           
+          +000039*                  (Number of 2 byte Characters)                              <-ALL-FMTS                           
+    42    +000040                49 FILLER           PIC X(256).                               <-ALL-FMTS                           
+          +000041*                  (Graphic field)                                            <-ALL-FMTS                           
+    43    +000042           06 REAL1                                   COMP-1.                 <-ALL-FMTS                           
+          +000043*                  (Floating-point field)                                     <-ALL-FMTS                           
+    44    +000044           06 DOUBLE1                                 COMP-2.                 <-ALL-FMTS                           
+          +000045*                  (Floating-point field)                                     <-ALL-FMTS                           
+    45    +000046           06 FILLER                PIC  X(30).                               <-ALL-FMTS                           
+    46    +000047           06 FILLER                PIC  X(32).                               <-ALL-FMTS                           
+    47    +000048           06 FILLER                PIC  X(32).                               <-ALL-FMTS                           
+    48    +000049           06 ROWID1.                                                         <-ALL-FMTS                           
+          +000050*                  (Variable length field)                                    <-ALL-FMTS                           
+    49    +000051                49 ROWID1-LENGTH    PIC S9(4) COMP-4.                         <-ALL-FMTS                           
+    50    +000052                49 ROWID1-DATA      PIC X(40).                                <-ALL-FMTS                           
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      5  
+  STMT PL SEQNBR -A 1 B..+....2....+....3....+....4....+....5....+....6....+....7..IDENTFCN  S COPYNAME   CHG DATE                  
+           005700*    COPY DDS-ALL-FORMATS OF sampledb2f.                                                                           
+           005800*    COPY DDS-ALL-FORMATS OF USER_INFO.                                                                            
+           005900*    COPY DDR-ALL-FORMATS OF USER_INFO.                                                                            
+           006000*    COPY DD-ALL-FORMATS  OF USER_INFO.                                                                            
+           006100                                                                                                                   
+           006200*===============================================================*                                                  
+           006300                                                                                                                   
+    51     006400 WORKING-STORAGE SECTION.                                                                                          
+           006500                                                                                                                   
+    52     006600 01  WS-WORK-AREAS.                                                                                                
+    53     006700     05 X                       PIC X     VALUE SPACES.                                                            
+           006800                                                                                                                   
+           006900*===============================================================*                                                  
+           007000                                                                                                                   
+    54     007100 PROCEDURE DIVISION.                                                                                               
+           007200                                                                                                                   
+           007300 0000-MAIN.                                                                                                        
+           007400                                                                                                                   
+    55     007500     OPEN INPUT FILENAME.                                                                                          
+    56     007600     read filename next record                                                                                     
+    57     007700        at end continue.                                                                                           
+    58     007800     display recname.                                                                                              
+    59     007900     CLOSE FILENAME.                                                                                               
+           008000                                                                                                                   
+    60     008100     GOBACK.                                                                             26/02/17                  
+           008200                                                                                                                   
+                           * * * * *   E N D   O F   S O U R C E   * * * * *                                                        
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      6  
+                                    M e s s a g e s                                                                                 
+   STMT                                                                                                                             
+*        MSGID: LNC0026  SEVERITY: 10  SEQNBR:  000100                                                                              
+         Message . . . . :   Option expected, 'PICXGRAPHIC' found. 'PICXGRAPHIC'                                                    
+           ignored.                                                                                                                 
+*        MSGID: LNC0026  SEVERITY: 10  SEQNBR:  000200                                                                              
+         Message . . . . :   Option expected, 'PICGGRAPHIC' found. 'PICGGRAPHIC'                                                    
+           ignored.                                                                                                                 
+*        MSGID: LNC0026  SEVERITY: 10  SEQNBR:  000200                                                                              
+         Message . . . . :   Option expected, 'PICNGRAPHIC' found. 'PICNGRAPHIC'                                                    
+           ignored.                                                                                                                 
+*    11  MSGID: LNC0739  SEVERITY: 10  SEQNBR:  003700                                                                              
+         Message . . . . :   ALWNULL attribute does not match system description                                                    
+           of file 'FILENAME'. Attribute accepted.                                                                                  
+*    14  MSGID: LNC0848  SEVERITY:  0  SEQNBR:  005400                                                                              
+         Message . . . . :   The LABEL clause is syntax checked and ignored.                                                        
+*    31  MSGID: LNC0561  SEVERITY: 20  SEQNBR: +000021                                                                              
+         Message . . . . :   Variable-length field 'LVARCHAR1-DATA' longer than                                                     
+           9 999 or 32 767 characters. Data item created.                                                                           
+*    39  MSGID: LNC0560  SEVERITY: 10  SEQNBR: +000034                                                                              
+         Message . . . . :   'GRAPHIC1' has a field type that is not correct.                                                       
+           Alphanumeric FILLER declared.                                                                                            
+*    42  MSGID: LNC0560  SEVERITY: 10  SEQNBR: +000040                                                                              
+         Message . . . . :   'VARGRAPH1-DATA' has a field type that is not                                                          
+           correct. Alphanumeric FILLER declared.                                                                                   
+*    45  MSGID: LNC0560  SEVERITY: 10  SEQNBR: +000046                                                                              
+         Message . . . . :   'CLOB1' has a field type that is not correct.                                                          
+           Alphanumeric FILLER declared.                                                                                            
+*    46  MSGID: LNC0560  SEVERITY: 10  SEQNBR: +000047                                                                              
+         Message . . . . :   'BLOB1' has a field type that is not correct.                                                          
+           Alphanumeric FILLER declared.                                                                                            
+*    47  MSGID: LNC0560  SEVERITY: 10  SEQNBR: +000048                                                                              
+         Message . . . . :   'DBCLOB1' has a field type that is not correct.                                                        
+           Alphanumeric FILLER declared.                                                                                            
+*    60  MSGID: LNC0650  SEVERITY:  0  SEQNBR:  008100                                                                              
+         Message . . . . :   Blocking/Deblocking for file 'FILENAME' will be                                                        
+           performed by compiler-generated code.                                                                                    
+                                                   -=* http://pub400.com *=-                                                        
+ 5770WDS V7R5M0  220415 LN  IBM ILE COBOL                 VPCRZKH1/GETPIC          PUB400     26-03-17 13:04:17        Page      7  
+                                         Message Summary                                                                            
+Message totals:                                                                                                                     
+   Information (00-04) . . . . . . . . :      2                                                                                     
+   Warning     (05-19) . . . . . . . . :      9                                                                                     
+   Error       (20-29) . . . . . . . . :      1                                                                                     
+   Severe      (30-39) . . . . . . . . :      0                                                                                     
+   Terminal    (40-99) . . . . . . . . :      0                                                                                     
+   --------------------------------------------                                                                                     
+   Total                                     12                                                                                     
+                        * * * * *   E N D   O F   M E S S A G E S   * * * * *                                                       
+Statistics:                                                                                                                         
+   Source records read . . . . . . . . :     82                                                                                     
+   Copy records read . . . . . . . . . :     52                                                                                     
+   Copy members processed  . . . . . . :      1                                                                                     
+   Sequence errors . . . . . . . . . . :      0                                                                                     
+   Highest severity message issued . . :     20                                                                                     
+  LNC0901  0  Program GETPIC created in library VPCRZKH1 on 26-03-17 at 13:04:17.                                                   
+                      * * * * *   E N D   O F   C O M P I L A T I O N   * * * * *                                                   
+                                                   -=* http://pub400.com *=-                                                        
