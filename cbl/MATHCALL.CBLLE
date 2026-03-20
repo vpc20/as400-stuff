@@ -1,0 +1,65 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. MATHCALL.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER.  IBM-AS400.
+       OBJECT-COMPUTER.  IBM-AS400.
+
+       SPECIAL-NAMES.
+           LINKAGE TYPE IS PROCEDURE FOR "ADDNUMS".
+           LINKAGE TYPE IS PROCEDURE FOR "SUBNUMS".
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-A           PIC S9(9) COMP-4 VALUE 10.
+       01  WS-B           PIC S9(9) COMP-4 VALUE 3.
+       01  WS-RESULT      PIC S9(9) COMP-4 VALUE ZERO.
+
+       PROCEDURE DIVISION.
+       MAIN-LOGIC.
+      *    Dynamic call \Z resolves at runtime
+           CALL 'ADDNUMS' USING WS-A
+                                WS-B
+                                WS-RESULT
+           DISPLAY 'ADD RESULT: ' WS-RESULT
+
+           CALL 'SUBNUMS' USING WS-A
+                                WS-B
+                                WS-RESULT
+           DISPLAY 'SUB RESULT: ' WS-RESULT
+
+           STOP RUN.
+
+      ******************************************************************
+      *> /* Step 1 - ADDNUMS module */
+      *> CRTCBLMOD MODULE(VPCRZKH1/ADDNUMS)
+      *>           SRCFILE(VPCRZKH1/QCBLLESRC)
+      *>           SRCMBR(ADDNUMS)
+
+      *> /* Step 2 - SUBNUMS module */
+      *> CRTCBLMOD MODULE(VPCRZKH1/SUBNUMS)
+      *>           SRCFILE(VPCRZKH1/QCBLLESRC)
+      *>           SRCMBR(SUBNUMS)
+
+      *> binder source MATHSRV in VPCRZKH1/QSRVSRC
+      *> STRPGMEXP  PGMLVL(*CURRENT)
+      *> EXPORT     SYMBOL('ADDNUMS')
+      *> EXPORT     SYMBOL('SUBNUMS')
+      *> ENDPGMEXP
+
+      *> /* Step 3 - Build service program */
+      *> CRTSRVPGM SRVPGM(VPCRZKH1/MATHSRV)
+      *>           MODULE(VPCRZKH1/ADDNUMS VPCRZKH1/SUBNUMS)
+      *>           EXPORT(*SRCFILE)
+      *>           SRCFILE(VPCRZKH1/QSRVSRC)
+      *>           SRCMBR(MATHSRV)
+
+      *> /* Step 4 - MATHCALL */
+      *> CRTBNDCBL PGM(VPCRZKH1/MATHCALL)
+      *>           SRCFILE(VPCRZKH1/QCBLLESRC)
+      *>           SRCMBR(MATHCALL)
+      *>           REPLACE(*YES)
+      *>           BNDDIR(VPCRZKH1/MYBNDDIR)
+
+

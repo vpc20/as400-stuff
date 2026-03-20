@@ -1,0 +1,4 @@
+             STRPGMEXP  PGMLVL(*CURRENT)
+             EXPORT     SYMBOL('ADDNUMS')
+             EXPORT     SYMBOL('SUBNUMS')
+             ENDPGMEXP

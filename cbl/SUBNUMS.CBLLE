@@ -1,0 +1,16 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SUBNUMS.
+
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  LS-A           PIC S9(9) COMP-4.
+       01  LS-B           PIC S9(9) COMP-4.
+       01  LS-RESULT      PIC S9(9) COMP-4.
+
+       PROCEDURE DIVISION USING BY REFERENCE LS-A
+                                BY REFERENCE LS-B
+                                BY REFERENCE LS-RESULT.
+       MAIN-LOGIC.
+           COMPUTE LS-RESULT = LS-A - LS-B
+           GOBACK.
+
